@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://garage.team/garage_team/sitemap.xml

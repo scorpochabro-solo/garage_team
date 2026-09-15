@@ -1,0 +1,195 @@
+{
+ "_note": "Координаты хотспотов — проценты от бокса изображения машины (car.png, BMW Alpina B3 Touring, вид спереди). side: колонка подписи как на оригинальном сайте.",
+ "items": [
+  {
+   "key": "electric",
+   "name": "Автоэлектрика",
+   "href": "/services/remont-elektrooborudovania-avtomobila.html",
+   "x": 40,
+   "y": 18,
+   "side": "left",
+   "icon": "electric",
+   "blurb": "Проводка, генератор, стартер, фары, ксенон, лампы"
+  },
+  {
+   "key": "body",
+   "name": "Кузовной ремонт",
+   "href": "/services/kuzovnoj-remont.html",
+   "x": 90,
+   "y": 40,
+   "side": "left",
+   "icon": "body",
+   "blurb": "Рихтовка, замена элементов, геометрия, покраска"
+  },
+  {
+   "key": "climate",
+   "name": "Климат",
+   "href": "/services/zapravka-i-remont-avtokondicionerov.html",
+   "x": 68,
+   "y": 33,
+   "side": "left",
+   "icon": "ac",
+   "blurb": "Заправка и ремонт кондиционера, печка, фильтры"
+  },
+  {
+   "key": "glass",
+   "name": "Вклейка стекол",
+   "href": "/services/kuzovnoj-remont.html",
+   "x": 32,
+   "y": 12,
+   "side": "left",
+   "icon": "glass",
+   "blurb": "Замена и вклейка лобовых и боковых стёкол"
+  },
+  {
+   "key": "vinyl",
+   "name": "Брендирование",
+   "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
+   "x": 28,
+   "y": 36,
+   "side": "left",
+   "icon": "vinyl",
+   "blurb": "Оклейка, покраска, стайлинг транспорта"
+  },
+  {
+   "key": "headlight",
+   "name": "Ремонт фар",
+   "href": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
+   "x": 14,
+   "y": 52,
+   "side": "left",
+   "icon": "headlight",
+   "blurb": "Замена, регулировка и восстановление оптики"
+  },
+  {
+   "key": "chip",
+   "name": "Тюнинг",
+   "href": "/services/cip-tuning.html",
+   "x": 50,
+   "y": 79,
+   "side": "left",
+   "icon": "chip",
+   "blurb": "Чип-тюнинг, удаление DPF, катализаторов, AdBlue"
+  },
+  {
+   "key": "akpp",
+   "name": "Ремонт трансмиссии",
+   "href": "/services/remont-akpp-i-zamena-masla-v-akpp.html",
+   "x": 44,
+   "y": 92,
+   "side": "left",
+   "icon": "akpp",
+   "blurb": "АКПП, МКПП, сцепление, замена масла"
+  },
+  {
+   "key": "steering",
+   "name": "Рулевое управление",
+   "href": "/services/remont-hodovoj/zamena-rulevoj-rejki.html",
+   "x": 61,
+   "y": 23,
+   "side": "right",
+   "icon": "steering",
+   "blurb": "Рулевая рейка, тяги, наконечники"
+  },
+  {
+   "key": "exhaust",
+   "name": "Ремонт глушителей",
+   "href": "/services/remont-vyhlopnoj-sistemy/remont-glusitela.html",
+   "x": 80,
+   "y": 96,
+   "side": "right",
+   "icon": "exhaust",
+   "blurb": "Глушители, резонаторы, гофры, катализаторы"
+  },
+  {
+   "key": "engine",
+   "name": "Ремонт двигателя",
+   "href": "/services/remont-dvigatela.html",
+   "x": 50,
+   "y": 44,
+   "side": "right",
+   "icon": "engine",
+   "blurb": "ГРМ, прокладки, клапаны, течи масла, дизель"
+  },
+  {
+   "key": "brake",
+   "name": "Тормозная система",
+   "href": "/services/remont-zamena-regulirovka-prokacka-tormozov.html",
+   "x": 96,
+   "y": 82,
+   "side": "right",
+   "icon": "brake",
+   "blurb": "Колодки, диски, суппорты, прокачка, ручник"
+  },
+  {
+   "key": "cooling",
+   "name": "Радиатор и охлаждение",
+   "href": "/services/remont-i-promyvka-sistem-ohlazdenia.html",
+   "x": 50,
+   "y": 57,
+   "side": "right",
+   "icon": "cooling",
+   "blurb": "Помпа, термостат, радиатор, антифриз, датчики"
+  },
+  {
+   "key": "fuel",
+   "name": "Топливная система",
+   "href": "/services/remont-promyvka-inzektorov-i-monovpryskov.html",
+   "x": 74,
+   "y": 46,
+   "side": "right",
+   "icon": "injector",
+   "blurb": "Форсунки, инжектор, свечи, давление"
+  },
+  {
+   "key": "suspension",
+   "name": "Подвеска",
+   "href": "/services/remont-hodovoj/zamena-rycagov-podveski.html",
+   "x": 4,
+   "y": 80,
+   "side": "right",
+   "icon": "suspension",
+   "blurb": "Амортизаторы, рычаги, сайлентблоки, ШРУСы"
+  },
+  {
+   "key": "alignment",
+   "name": "Сход-развал",
+   "href": "/services/remont-hodovoj.html",
+   "x": 7,
+   "y": 94,
+   "side": "right",
+   "icon": "alignment",
+   "blurb": "Регулировка углов установки колёс"
+  },
+  {
+   "key": "parts",
+   "name": "Автозапчасти",
+   "href": "/services/avtozapcasti.html",
+   "x": 14,
+   "y": 72,
+   "side": "bottom",
+   "icon": "parts",
+   "blurb": "В наличии и под заказ, оригинал и аналоги"
+  },
+  {
+   "key": "equipment",
+   "name": "Дополнительное оборудование",
+   "href": "/services/ustanovka-dopolnitelnogo-oborudovania.html",
+   "x": 6,
+   "y": 27,
+   "side": "bottom",
+   "icon": "equipment",
+   "blurb": "Сигнализации, парктроники, камеры, тонировка"
+  },
+  {
+   "key": "maintenance",
+   "name": "ТО",
+   "href": "/services/planovoe-to.html",
+   "x": 86,
+   "y": 72,
+   "side": "bottom",
+   "icon": "maintenance",
+   "blurb": "Плановое обслуживание по регламенту"
+  }
+ ]
+}

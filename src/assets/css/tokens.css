@@ -1,0 +1,114 @@
+/* ============================================================
+   ГАРАЖ · design tokens
+   Палитра бренда: белый · чёрный · зелёный #00963D (из оригинального сайта).
+   ============================================================ */
+:root {
+  color-scheme: dark;
+
+  /* brand */
+  --green: #00963d;
+  --green-deep: #0c6e34;
+  --green-bright: #1fc463;   /* сигнальный зелёный для текста/свечения на чёрном */
+  --green-rgb: 0, 150, 61;
+  --green-bright-rgb: 31, 196, 99;
+  --green-tint: #e0f2e7;
+
+  /* neutrals */
+  --black: #070807;
+  --ink-900: #0c0d0c;
+  --ink-800: #121412;
+  --ink-700: #181a18;
+  --ink-600: #202320;
+  --ink-500: #2b2f2b;
+  --ink-400: #3a3f3a;
+  --ink-300: #5d625d;
+  --gray-400: #8c918c;
+  --gray-300: #b8bdb8;
+  --gray-200: #d6d9d6;
+  --gray-100: #e7e9ea;
+  --paper: #f3f4f4;
+  --white: #ffffff;
+
+  /* semantic (dark surfaces by default) */
+  --bg: var(--ink-900);
+  --bg-2: var(--ink-800);
+  --bg-3: var(--ink-700);
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.10);
+  --line-2: rgba(255, 255, 255, 0.18);
+  --text: #f3f4f4;
+  --text-2: #b8bdb8;
+  --text-3: #7c827c;
+  --accent: var(--green-bright);
+  --accent-fill: var(--green);
+  --on-accent: #ffffff;
+  --danger: #ff4d4d;
+
+  /* type */
+  --font-display: "Unbounded", "Manrope", system-ui, sans-serif;
+  --font-text: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fs-giant: clamp(2.75rem, 1.2rem + 6.4vw, 7.25rem);
+  --fs-h1: clamp(2.2rem, 1.3rem + 3.6vw, 4.6rem);
+  --fs-h2: clamp(1.75rem, 1.2rem + 2.2vw, 3.2rem);
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.9vw, 1.8rem);
+  --fs-h4: clamp(1.05rem, 1rem + 0.35vw, 1.3rem);
+  --fs-lead: clamp(1.05rem, 0.98rem + 0.4vw, 1.3rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.75rem;
+  --fs-mono: 0.72rem;
+
+  --lh-tight: 1.0;
+  --lh-snug: 1.15;
+  --lh-body: 1.6;
+
+  /* layout */
+  --container: 1400px;
+  --container-narrow: 960px;
+  --gutter: clamp(1.1rem, 0.6rem + 2.6vw, 3.5rem);
+  --section-y: clamp(4.5rem, 3rem + 6vw, 9.5rem);
+  --header-h: 76px;
+  --topline-h: 36px;
+
+  /* shape */
+  --chamfer: 12px;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur: 0.35s;
+  --dur-slow: 0.7s;
+
+  /* shadows / glows */
+  --glow: 0 0 0 1px rgba(var(--green-bright-rgb), 0.45), 0 12px 48px -12px rgba(var(--green-bright-rgb), 0.55);
+  --shadow-lg: 0 40px 90px -30px rgba(0, 0, 0, 0.85);
+
+  --z-header: 100;
+  --z-modal: 300;
+  --z-toast: 400;
+}
+
+/* light surfaces */
+.theme-paper {
+  color-scheme: light;
+  color: var(--text);
+  --bg: var(--paper);
+  --bg-2: var(--white);
+  --bg-3: var(--gray-100);
+  --surface: rgba(7, 8, 7, 0.035);
+  --surface-2: rgba(7, 8, 7, 0.06);
+  --line: rgba(7, 8, 7, 0.12);
+  --line-2: rgba(7, 8, 7, 0.22);
+  --text: #0c0d0c;
+  --text-2: #4a4f4a;
+  --text-3: #7c827c;
+  --accent: var(--green);
+  --accent-fill: var(--green);
+  --shadow-lg: 0 40px 90px -36px rgba(10, 20, 12, 0.35);
+}

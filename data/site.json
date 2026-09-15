@@ -1,0 +1,1554 @@
+{
+ "promo_heading": "Все виды ремонтных работ в Нижнем Новгороде",
+ "promo_text": "Зарегистрируйтесь<br>на сайте и получите<br><strong>скидку 5%</strong>",
+ "promo_btn": "Зарегистрироваться",
+ "car_menu": [],
+ "advantages": [
+  "Комплекс услуг",
+  "Сервис и ремонт любых марок",
+  "Обслуживание коммерческой техники до 5.5 тонн",
+  "Профессионализм сотрудников",
+  "Современное оборудование",
+  "Программы лояльности для постоянных клиентов",
+  "Запчасти в наличии и под заказ с минимальным сроком доставки",
+  "Гарантия на выполненные работы до 360 дней*"
+ ],
+ "advantages_note": "* Зависит от типа работ и установленных запчастей",
+ "director": {
+  "photo": "/data/images/blockadvantage/BV5A0389.jpg",
+  "name": "Александр Шишов",
+  "position": "генеральный директор",
+  "text": "За все эти года мы научились делать свою работу хорошо и мы не собираемся останавливаться на достигнутом. Напишите, пожалуйста, о Вашем опыте обращения в наш автосервис, чтобы сделать нас ещё лучше. Спасибо, что предпочитаете именно нас, наша команда постарается не обмануть Ваши ожидания."
+ },
+ "gallery": [
+  {
+   "full": "/data/images/gallerymain/BV5A0546.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0546_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0852.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0852_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0609.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0609_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0974.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0974_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0791.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0791_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0700.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0700_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A1018.jpg",
+   "thumb": "/data/images/gallerymain/BV5A1018_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0896.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0896_262x262.jpg"
+  },
+  {
+   "full": "/data/images/gallerymain/BV5A0942.jpg",
+   "thumb": "/data/images/gallerymain/BV5A0942_262x262.jpg"
+  }
+ ],
+ "team": [
+  {
+   "photo": "/data/images/team/BV5A0382.jpg",
+   "name": "Александр Шишов",
+   "position": "генеральный директор"
+  },
+  {
+   "photo": "/data/images/team/BV5A0408.jpg",
+   "name": "Юрий Андреев",
+   "position": "Диагност Электрик"
+  },
+  {
+   "photo": "/data/images/team/BV5A0468.jpg",
+   "name": "Валентин Никифоров",
+   "position": "Мастер по ремонту и обслуживанию автомобилей"
+  },
+  {
+   "photo": "/data/images/team/BV5A0422.jpg",
+   "name": "Вячеслав Синицин",
+   "position": "Специалист по ремонту ходовой части"
+  },
+  {
+   "photo": "/data/images/team/BV5A0448.jpg",
+   "name": "Дмитрий Калайда",
+   "position": "Менеджер по запасным частям, расходным материалам и доп. оборудованию"
+  },
+  {
+   "photo": "/data/images/team/BV5A0428.jpg",
+   "name": "Александр Коченов",
+   "position": "Специалист по ремонту ходовой и рулевой системы автомобиля"
+  },
+  {
+   "photo": "/data/images/team/BV5A0415.jpg",
+   "name": "Максим Смирнов",
+   "position": "Моторист дефектовщик"
+  },
+  {
+   "photo": "/data/images/team/BV5A0410.jpg",
+   "name": "Владимир Нагорнов",
+   "position": "Маляр подготовщик"
+  },
+  {
+   "photo": "/data/images/team/BV5A0437.jpg",
+   "name": "Павел Лебедев",
+   "position": "Менеджер по стайлингу, тонировке и брендированию транспорта"
+  },
+  {
+   "photo": "/data/images/team/BV5A0456.jpg",
+   "name": "Юрий Воронцов",
+   "position": "Специалист по доп. оборудованию (оклейке, тонировке)"
+  }
+ ],
+ "reviews": [
+  {
+   "text": "«Все оперативно, четко и понятно. Результатом очень довольны! Нечасто встретишь таких исполнителей».",
+   "photo": "/data/images/review/RGIRVDfms6Q.jpg",
+   "link": "https://vk.com/titovhome",
+   "name": "Александр Титов"
+  },
+  {
+   "text": "«Отличный сервис! Прекрасное отношение, быстрое и качественное обслуживание за разумные деньги. Сергей Jеер Wrаnglеr 2003.».",
+   "photo": "/data/images/review/-mckna-VJn4.jpg",
+   "link": "",
+   "name": "Сергей Гундаров"
+  },
+  {
+   "text": "«Съездил в wwwgarageteam привёл тачку в порядок после покатушек)) Спасибо ребятам что взялись)».",
+   "photo": "/data/images/review/t4RbNyskDvI.jpg",
+   "link": "https://www.instagram.com/p/BdiAM4sHBuwPJoUJUd9IvI-PhqiaXiuEiy29ao0/?hl=ru&taken-by=artem_poluninn",
+   "name": "Артем Полунин"
+  },
+  {
+   "text": "«Все оперативно, четко и понятно. Результатом довольны! Нечасто встретишь таких исполнителей».",
+   "photo": "/data/images/review/18192299_1714607215504402_1365327742970326188_o.jpg",
+   "link": "https://www.facebook.com/profile.php?id=100008654203421&pnref=lhc.unseen",
+   "name": "Pavel Denzhonkov"
+  },
+  {
+   "text": "«Я всегда мечтала о машине, которая будет выглядеть необычно. И однажды, увидела как делают другие машины. Сердце замерло) и поняла что хочу! Узнала стоимость и поняла что это реальнее чем я думала! Ребята сделали все быстро и великолепно... на машине были мелкие следы моих неудачных дней! Это тоже все устранили) в результате я имею машину, садясь в которую радуюсь каждый день)) Безумно благодарна!!».",
+   "photo": "/data/images/review/viber image_1.jpg",
+   "link": "https://vk.com/anyutkagordeeva",
+   "name": "Анна Гордеева"
+  },
+  {
+   "text": "«По заявленной цене ожидал увидеть “гараж-сервис”. Ошибся. Все по-взрослому, очень профессионально. ».",
+   "photo": "/data/images/review/6wFVp9XGpqg.jpg",
+   "link": "https://vk.com/iiiymaxer",
+   "name": "Дмитрий Овчинников"
+  },
+  {
+   "text": "«Сервис Гараж порадовал возможностью записи на удобное время, широкими возможностями диагностики автомобиля, низкими ценами по сравнению с другими сервисами и тем более официалами, при этом не уступая в качестве выполняемых работ. Приёмщик автомобиля доступно и понятно объясняет перечень работ, ценообразование и сроки.».",
+   "photo": "/data/images/review/Mic3m4YjJLo.jpg",
+   "link": "https://vk.com/id2054250",
+   "name": "Сергей Коскин"
+  },
+  {
+   "text": "«Хочу выразить благодарность за внимательный подход к автомобилю во время ремонта, справедливые цены и качество! Отдельно хотел бы поблагодарить механика Александра Коченова за профессиональное и быстрое решение проблемы в моём автомобиле».",
+   "photo": "/data/images/review/viber image.jpg",
+   "link": "https://vk.com/bombay_nn",
+   "name": "Антон Савелий"
+  }
+ ],
+ "brands": [
+  "Abarth",
+  "AC",
+  "Acura",
+  "Aito",
+  "Alfa Romeo",
+  "Alpina",
+  "AMC",
+  "Asia Motors",
+  "Aston Martin",
+  "Audi",
+  "Avatr",
+  "Baic",
+  "BAW",
+  "Belgee",
+  "Bentley",
+  "Bertone",
+  "BMW",
+  "Brilliance",
+  "Bugatti",
+  "Buick",
+  "BYD",
+  "Cadillac",
+  "Changan",
+  "Changfeng",
+  "Chery",
+  "Chevrolet",
+  "Chrysler",
+  "Ciimo",
+  "Citroen",
+  "Cupra",
+  "Dacia",
+  "Dadi",
+  "Daewoo",
+  "DAF",
+  "Daihatsu",
+  "Datsun",
+  "De Lorean",
+  "Derways",
+  "DFSK",
+  "Dodge",
+  "Dongfeng",
+  "Doninvest",
+  "DS",
+  "Eagle",
+  "Evolute",
+  "Exeed",
+  "Exlantix",
+  "FAW",
+  "Ferrari",
+  "Fiat",
+  "Ford",
+  "Ford Asia",
+  "Ford USA",
+  "Forthing",
+  "Foton",
+  "Freightliner",
+  "FSO",
+  "GAC",
+  "Geely",
+  "Genesis",
+  "Geo",
+  "GMC",
+  "Great Wall",
+  "GWM",
+  "Hafei",
+  "Haima",
+  "Haval",
+  "Hawtai",
+  "Honda",
+  "Hongqi",
+  "Hummer",
+  "Hyundai",
+  "Infiniti",
+  "Iran Khodro",
+  "Isuzu",
+  "JAC",
+  "Jaecoo",
+  "Jaguar",
+  "Jeep",
+  "Jetour",
+  "Jetta",
+  "JMC",
+  "Kaiyi",
+  "Kia",
+  "Knewstar",
+  "KTM",
+  "Lamborghini",
+  "Lancia",
+  "Land Rover",
+  "LDV",
+  "Leapmotor",
+  "Lexus",
+  "Lifan",
+  "Lincoln",
+  "Livan",
+  "Lixiang",
+  "Lotus",
+  "Luxgen",
+  "Lynk & Co",
+  "Mahindra",
+  "Maruti",
+  "Maruti Suzuki",
+  "Maserati",
+  "Maxus",
+  "Maybach",
+  "Mazda",
+  "Mercedes",
+  "Mercury",
+  "Merkur",
+  "MG",
+  "MINI",
+  "Mitsubishi",
+  "Nissan",
+  "Oldsmobile",
+  "Oltcit",
+  "Omoda",
+  "Opel",
+  "ORA",
+  "Oting",
+  "Peugeot",
+  "Piaggio",
+  "Plymouth",
+  "Polaris",
+  "PoleStar",
+  "Pontiac",
+  "Porsche",
+  "Proton",
+  "Ravon",
+  "Renault",
+  "Renault Samsung",
+  "Rolls-Royce",
+  "Rover",
+  "Saab",
+  "SAIC MG",
+  "SAIC Roewe",
+  "Saturn",
+  "Scion",
+  "Seat",
+  "Seres",
+  "ShuangHuan",
+  "Sinotruk",
+  "Skoda",
+  "Skywell",
+  "SMA",
+  "Smart",
+  "Solaris",
+  "Sollers",
+  "Soueast",
+  "Ssangyong",
+  "Subaru",
+  "Suzuki",
+  "SWM",
+  "Tank",
+  "Tata",
+  "Tesla",
+  "Toyota",
+  "Triumph",
+  "Vauxhall",
+  "Volkswagen",
+  "Volvo",
+  "Vortex",
+  "Voyah",
+  "Wartburg",
+  "WEY",
+  "Wuling",
+  "Xcite",
+  "Yema Auto",
+  "Yuejin",
+  "Zeekr",
+  "ZhongXing",
+  "Zotye",
+  "Богдан",
+  "ВАЗ",
+  "ГАЗ",
+  "ЗАЗ",
+  "Иж",
+  "ЛуАЗ",
+  "Москвич",
+  "ТагАЗ",
+  "УАЗ"
+ ],
+ "brand_options": [
+  {
+   "id": "1",
+   "name": "Abarth"
+  },
+  {
+   "id": "2",
+   "name": "AC"
+  },
+  {
+   "id": "3",
+   "name": "Acura"
+  },
+  {
+   "id": "4",
+   "name": "Aito"
+  },
+  {
+   "id": "5",
+   "name": "Alfa Romeo"
+  },
+  {
+   "id": "6",
+   "name": "Alpina"
+  },
+  {
+   "id": "7",
+   "name": "AMC"
+  },
+  {
+   "id": "8",
+   "name": "Asia Motors"
+  },
+  {
+   "id": "9",
+   "name": "Aston Martin"
+  },
+  {
+   "id": "10",
+   "name": "Audi"
+  },
+  {
+   "id": "11",
+   "name": "Avatr"
+  },
+  {
+   "id": "12",
+   "name": "Baic"
+  },
+  {
+   "id": "13",
+   "name": "BAW"
+  },
+  {
+   "id": "14",
+   "name": "Belgee"
+  },
+  {
+   "id": "15",
+   "name": "Bentley"
+  },
+  {
+   "id": "16",
+   "name": "Bertone"
+  },
+  {
+   "id": "17",
+   "name": "BMW"
+  },
+  {
+   "id": "18",
+   "name": "Brilliance"
+  },
+  {
+   "id": "19",
+   "name": "Bugatti"
+  },
+  {
+   "id": "20",
+   "name": "Buick"
+  },
+  {
+   "id": "21",
+   "name": "BYD"
+  },
+  {
+   "id": "22",
+   "name": "Cadillac"
+  },
+  {
+   "id": "23",
+   "name": "Changan"
+  },
+  {
+   "id": "24",
+   "name": "Changfeng"
+  },
+  {
+   "id": "25",
+   "name": "Chery"
+  },
+  {
+   "id": "26",
+   "name": "Chevrolet"
+  },
+  {
+   "id": "27",
+   "name": "Chrysler"
+  },
+  {
+   "id": "28",
+   "name": "Ciimo"
+  },
+  {
+   "id": "29",
+   "name": "Citroen"
+  },
+  {
+   "id": "30",
+   "name": "Cupra"
+  },
+  {
+   "id": "31",
+   "name": "Dacia"
+  },
+  {
+   "id": "32",
+   "name": "Dadi"
+  },
+  {
+   "id": "33",
+   "name": "Daewoo"
+  },
+  {
+   "id": "34",
+   "name": "DAF"
+  },
+  {
+   "id": "35",
+   "name": "Daihatsu"
+  },
+  {
+   "id": "36",
+   "name": "Datsun"
+  },
+  {
+   "id": "37",
+   "name": "De Lorean"
+  },
+  {
+   "id": "38",
+   "name": "Derways"
+  },
+  {
+   "id": "39",
+   "name": "DFSK"
+  },
+  {
+   "id": "40",
+   "name": "Dodge"
+  },
+  {
+   "id": "41",
+   "name": "Dongfeng"
+  },
+  {
+   "id": "42",
+   "name": "Doninvest"
+  },
+  {
+   "id": "43",
+   "name": "DS"
+  },
+  {
+   "id": "44",
+   "name": "Eagle"
+  },
+  {
+   "id": "45",
+   "name": "Evolute"
+  },
+  {
+   "id": "46",
+   "name": "Exeed"
+  },
+  {
+   "id": "47",
+   "name": "Exlantix"
+  },
+  {
+   "id": "48",
+   "name": "FAW"
+  },
+  {
+   "id": "49",
+   "name": "Ferrari"
+  },
+  {
+   "id": "50",
+   "name": "Fiat"
+  },
+  {
+   "id": "51",
+   "name": "Ford"
+  },
+  {
+   "id": "52",
+   "name": "Ford Asia"
+  },
+  {
+   "id": "53",
+   "name": "Ford USA"
+  },
+  {
+   "id": "54",
+   "name": "Forthing"
+  },
+  {
+   "id": "55",
+   "name": "Foton"
+  },
+  {
+   "id": "56",
+   "name": "Freightliner"
+  },
+  {
+   "id": "57",
+   "name": "FSO"
+  },
+  {
+   "id": "58",
+   "name": "GAC"
+  },
+  {
+   "id": "59",
+   "name": "Geely"
+  },
+  {
+   "id": "60",
+   "name": "Genesis"
+  },
+  {
+   "id": "61",
+   "name": "Geo"
+  },
+  {
+   "id": "62",
+   "name": "GMC"
+  },
+  {
+   "id": "63",
+   "name": "Great Wall"
+  },
+  {
+   "id": "64",
+   "name": "GWM"
+  },
+  {
+   "id": "65",
+   "name": "Hafei"
+  },
+  {
+   "id": "66",
+   "name": "Haima"
+  },
+  {
+   "id": "67",
+   "name": "Haval"
+  },
+  {
+   "id": "68",
+   "name": "Hawtai"
+  },
+  {
+   "id": "69",
+   "name": "Honda"
+  },
+  {
+   "id": "70",
+   "name": "Hongqi"
+  },
+  {
+   "id": "71",
+   "name": "Hummer"
+  },
+  {
+   "id": "72",
+   "name": "Hyundai"
+  },
+  {
+   "id": "73",
+   "name": "Infiniti"
+  },
+  {
+   "id": "74",
+   "name": "Iran Khodro"
+  },
+  {
+   "id": "75",
+   "name": "Isuzu"
+  },
+  {
+   "id": "76",
+   "name": "JAC"
+  },
+  {
+   "id": "77",
+   "name": "Jaecoo"
+  },
+  {
+   "id": "78",
+   "name": "Jaguar"
+  },
+  {
+   "id": "79",
+   "name": "Jeep"
+  },
+  {
+   "id": "80",
+   "name": "Jetour"
+  },
+  {
+   "id": "81",
+   "name": "Jetta"
+  },
+  {
+   "id": "82",
+   "name": "JMC"
+  },
+  {
+   "id": "83",
+   "name": "Kaiyi"
+  },
+  {
+   "id": "84",
+   "name": "Kia"
+  },
+  {
+   "id": "85",
+   "name": "Knewstar"
+  },
+  {
+   "id": "86",
+   "name": "KTM"
+  },
+  {
+   "id": "87",
+   "name": "Lamborghini"
+  },
+  {
+   "id": "88",
+   "name": "Lancia"
+  },
+  {
+   "id": "89",
+   "name": "Land Rover"
+  },
+  {
+   "id": "90",
+   "name": "LDV"
+  },
+  {
+   "id": "91",
+   "name": "Leapmotor"
+  },
+  {
+   "id": "92",
+   "name": "Lexus"
+  },
+  {
+   "id": "93",
+   "name": "Lifan"
+  },
+  {
+   "id": "94",
+   "name": "Lincoln"
+  },
+  {
+   "id": "95",
+   "name": "Livan"
+  },
+  {
+   "id": "96",
+   "name": "Lixiang"
+  },
+  {
+   "id": "97",
+   "name": "Lotus"
+  },
+  {
+   "id": "98",
+   "name": "Luxgen"
+  },
+  {
+   "id": "99",
+   "name": "Lynk & Co"
+  },
+  {
+   "id": "100",
+   "name": "Mahindra"
+  },
+  {
+   "id": "101",
+   "name": "Maruti"
+  },
+  {
+   "id": "102",
+   "name": "Maruti Suzuki"
+  },
+  {
+   "id": "103",
+   "name": "Maserati"
+  },
+  {
+   "id": "104",
+   "name": "Maxus"
+  },
+  {
+   "id": "105",
+   "name": "Maybach"
+  },
+  {
+   "id": "106",
+   "name": "Mazda"
+  },
+  {
+   "id": "107",
+   "name": "Mercedes"
+  },
+  {
+   "id": "108",
+   "name": "Mercury"
+  },
+  {
+   "id": "109",
+   "name": "Merkur"
+  },
+  {
+   "id": "110",
+   "name": "MG"
+  },
+  {
+   "id": "111",
+   "name": "MINI"
+  },
+  {
+   "id": "112",
+   "name": "Mitsubishi"
+  },
+  {
+   "id": "113",
+   "name": "Nissan"
+  },
+  {
+   "id": "114",
+   "name": "Oldsmobile"
+  },
+  {
+   "id": "115",
+   "name": "Oltcit"
+  },
+  {
+   "id": "116",
+   "name": "Omoda"
+  },
+  {
+   "id": "117",
+   "name": "Opel"
+  },
+  {
+   "id": "118",
+   "name": "ORA"
+  },
+  {
+   "id": "119",
+   "name": "Oting"
+  },
+  {
+   "id": "120",
+   "name": "Peugeot"
+  },
+  {
+   "id": "121",
+   "name": "Piaggio"
+  },
+  {
+   "id": "122",
+   "name": "Plymouth"
+  },
+  {
+   "id": "123",
+   "name": "Polaris"
+  },
+  {
+   "id": "124",
+   "name": "PoleStar"
+  },
+  {
+   "id": "125",
+   "name": "Pontiac"
+  },
+  {
+   "id": "126",
+   "name": "Porsche"
+  },
+  {
+   "id": "127",
+   "name": "Proton"
+  },
+  {
+   "id": "128",
+   "name": "Ravon"
+  },
+  {
+   "id": "129",
+   "name": "Renault"
+  },
+  {
+   "id": "130",
+   "name": "Renault Samsung"
+  },
+  {
+   "id": "131",
+   "name": "Rolls-Royce"
+  },
+  {
+   "id": "132",
+   "name": "Rover"
+  },
+  {
+   "id": "133",
+   "name": "Saab"
+  },
+  {
+   "id": "134",
+   "name": "SAIC MG"
+  },
+  {
+   "id": "135",
+   "name": "SAIC Roewe"
+  },
+  {
+   "id": "136",
+   "name": "Saturn"
+  },
+  {
+   "id": "137",
+   "name": "Scion"
+  },
+  {
+   "id": "138",
+   "name": "Seat"
+  },
+  {
+   "id": "139",
+   "name": "Seres"
+  },
+  {
+   "id": "140",
+   "name": "ShuangHuan"
+  },
+  {
+   "id": "141",
+   "name": "Sinotruk"
+  },
+  {
+   "id": "142",
+   "name": "Skoda"
+  },
+  {
+   "id": "143",
+   "name": "Skywell"
+  },
+  {
+   "id": "144",
+   "name": "SMA"
+  },
+  {
+   "id": "145",
+   "name": "Smart"
+  },
+  {
+   "id": "146",
+   "name": "Solaris"
+  },
+  {
+   "id": "147",
+   "name": "Sollers"
+  },
+  {
+   "id": "148",
+   "name": "Soueast"
+  },
+  {
+   "id": "149",
+   "name": "Ssangyong"
+  },
+  {
+   "id": "150",
+   "name": "Subaru"
+  },
+  {
+   "id": "151",
+   "name": "Suzuki"
+  },
+  {
+   "id": "152",
+   "name": "SWM"
+  },
+  {
+   "id": "153",
+   "name": "Tank"
+  },
+  {
+   "id": "154",
+   "name": "Tata"
+  },
+  {
+   "id": "155",
+   "name": "Tesla"
+  },
+  {
+   "id": "156",
+   "name": "Toyota"
+  },
+  {
+   "id": "157",
+   "name": "Triumph"
+  },
+  {
+   "id": "158",
+   "name": "Vauxhall"
+  },
+  {
+   "id": "159",
+   "name": "Volkswagen"
+  },
+  {
+   "id": "160",
+   "name": "Volvo"
+  },
+  {
+   "id": "161",
+   "name": "Vortex"
+  },
+  {
+   "id": "162",
+   "name": "Voyah"
+  },
+  {
+   "id": "163",
+   "name": "Wartburg"
+  },
+  {
+   "id": "164",
+   "name": "WEY"
+  },
+  {
+   "id": "165",
+   "name": "Wuling"
+  },
+  {
+   "id": "166",
+   "name": "Xcite"
+  },
+  {
+   "id": "167",
+   "name": "Yema Auto"
+  },
+  {
+   "id": "168",
+   "name": "Yuejin"
+  },
+  {
+   "id": "169",
+   "name": "Zeekr"
+  },
+  {
+   "id": "170",
+   "name": "ZhongXing"
+  },
+  {
+   "id": "171",
+   "name": "Zotye"
+  },
+  {
+   "id": "172",
+   "name": "Богдан"
+  },
+  {
+   "id": "173",
+   "name": "ВАЗ"
+  },
+  {
+   "id": "174",
+   "name": "ГАЗ"
+  },
+  {
+   "id": "175",
+   "name": "ЗАЗ"
+  },
+  {
+   "id": "176",
+   "name": "Иж"
+  },
+  {
+   "id": "177",
+   "name": "ЛуАЗ"
+  },
+  {
+   "id": "178",
+   "name": "Москвич"
+  },
+  {
+   "id": "179",
+   "name": "ТагАЗ"
+  },
+  {
+   "id": "180",
+   "name": "УАЗ"
+  }
+ ],
+ "request_title": "Оставить запрос",
+ "request_fallback": "Если вы не можете оставить заявку, то свяжитесь с нами по телефону. Наш менеджер быстро и качественно поможет решить проблему или найти ответ на вопрос. Вы не останетесь без поддержки!",
+ "footer_text": [
+  "ООО «Гараж» Сеть магазинов запчастей «Гараж» © 2011-2025. Все права защищены."
+ ],
+ "footer_raw": "ООО «Гараж» Сеть магазинов запчастей «Гараж» © 2011-2025. Все права защищены. Звоните по телефонамгорячей линии: (831) 416-16-77 Н. Новгород, ул. Красная слобода, 9",
+ "pages": {
+  "about": {
+   "title": "О компании | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Запчасти для иномарок от магазина garage.team. Тел. (831)  416-16-77. Если требуемая запчасть не нашлась, мы доставим ее в Нижний Новгород для вашей иномарки.",
+   "body_html": "<div><h1>Запчасти для иномарок от компании &quot;Гараж&quot;.</h1><hr><p><i>Индивидуальный подход к каждому клиенту делает нас надёжными партнёрами.</i></p><p>Торговая марка garage.team объединяет единомышленников, всю свою жизнь связавших с автомобилями. Одно из направлений деятельности компании - продажа запчастей для иномарок, в котором команда профессионалов работает уже более 4 лет.</p><h2>Широкий ассортимент.</h2><p>Для удобства наших покупателей мы представляем максимально возможный ассортимент товара, несколько миллионов наименований, что позволяет каждому купить все необходимые для себя запчасти в одном месте, выбрав при этом наиболее оптимальное сочетание цены, качества и времени доставки. В нашем интернет-магазине Вы можете купить запчасти ведущих мировых производителей. У нас большой выбор американских, французских, немецких, корейских и японских запчастей. В ассортименте нашего интернет магазина запчастей представлены как оригинальные, так и не оригинальные запчасти.</p><h2>Низкие цены.</h2><p>Цены на запчасти Вас приятно удивят. В вопросах ценообразования и ценовой политики компания всегда старается придерживаться принципа максимальной выгоды для клиента. Мы постоянно находимся в поиске лучших предложений на рынке, чтобы дать воспользоваться ими своим покупателям.</p><h2>Квалифицированная помощь.</h2><p>Наши менеджеры ответят на все интересующие Вас вопросы и помогут подобрать нужные запчасти для вашего автомобиля. Для Вашего удобства весь товар представлен на сайте с информацией о предполагаемом времени доставки с возможностью выбора оригинальных или не оригинальных аналогов той детали, которая Вам необходима по лучшей цене. Вы можете выбрать нужную деталь сами, воспользовавшись поиском по каталогам, найти ее через поиск или воспользоваться консультацией наших специалистов, которым не составит труда помочь Вам с выбором. Заказ можно оформить через интернет или позвонив по телефону <span>(831)</span>.</p><h2>Специальные предложения.</h2><p>Мы не перестанем Вас удивлять.Garage.team постоянно проводит различные акции, сезонные скидки и распродажи. Мы обеспечим Вас качественными и надежными услугами.</p><p>Garage.team гарантирует качественное обслуживание и высокий уровень сервиса.</p><p>Если Вы не смогли найти ответа на интересующий вопрос, Вы можете задать его по электронной почте, указанной в контактах магазина, либо по телефону 416 16 77</p><p><i>Удачных покупок.</i></p></div></main>"
+  },
+  "contacts": {
+   "title": "Контакты | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Наша контактная информация. Тел. (831)  416-16-77 . Запчасти для иномарок от магазина garage.team. Если требуемая запчасть не нашлась, мы доставим ее в Нижний Новгород для вашей иномарки.",
+   "body_html": "<div><h1>Контакты</h1><p>603155 г. Нижний Новгород, ул. Красная слобода, 9<br>Телефон: <span>(831) 416-16-77</span></p><p>E-mail: <a href=\"mailto:info@garage.team\">info@garage.team</a></p><p>Часы работы:<br>9.00 - 19.00 Понедельник - Пятница<br>9.00 - 17.00 Суббота</p></div></main>"
+  },
+  "oplata": {
+   "title": "Оплата | Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
+   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
+   "body_html": "<div><h1>Оплата запчастей</h1><p><span>Для принятия заказа&nbsp;&nbsp;к исполнению необходимо внести предоплату от 50 %.<br></span></p><p><span>Вы можете оплатить запчасти для иномарок <b>наличными</b> в магазинах по адресам</span>:<br>&nbsp;</p><p><a href=\"/contacts\">г. Нижний Новгород, ул. Красная слобода, 9</a><br>Понедельник &ndash; пятница с 10.00 до 19.00<br>Суббота с 10.00 до 17.00<br>Воскресенье&nbsp;- &nbsp;по предворительной записи<br><br>При оформлении заказа в магазине Вам получаете бланк заказа с кассовым чеком на сумму предоплаты.</p><div><span><span><span><span>Более подробную информацию по способам расчёта вы можете получить у менеджера по телефону</span></span>&nbsp;<span><strong> 416 16 77</strong></span></span></span></div></div></main>"
+  },
+  "delivery": {
+   "title": "Доставка | Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
+   "meta_description": "Автосервис и автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
+   "body_html": "<h1>Доставка автозапчастей</h1><p><span>Бесплатная доставка</span> при заказе от 5000 руб.<br><br>Вы можете оформить доставку по указанном вами адресу в любом из наших <a href=\"/contacts\">магазинов запчастей для иномарок</a> или заказав звонок нашего менеджера на главной странице сайта. Выбранный вами товар доставят в любое время в течение 1-2 дней.</p><ul><li><p>Стоимость доставки по Нижнему Новгороду: 300 рублей.</p></li><li><p>Доставка за пределы Нижнего Новгорода обсуждается отдельно (от 300рублей)</p></li></ul><br>"
+  },
+  "avtozapchasti": {
+   "title": "Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
+   "meta_description": "Запчасти для иномарок. Тел. (831)  416-16-77. Запчасти для иномарок от магазина www.garage.team. Если требуемая запчасть не нашлась, мы доставим ее в Нижний Новгород для вашей иномарки.",
+   "body_html": "<div><div><div><div><div><div><div><img alt=\"image\" src=\"/img/money2.jpg\"><div><span>ГАРАНТИЯ ВОЗВРАТА!!!</span><p>Если деталь не подойдет мы гарантируем возврат</p></div><br><a href=\"javascript:;\">Заказать звонок</a></div></div></div></div></div><div><div><div><div><div><img alt=\"image\" src=\"/img/dostavka2.jpg\"><div><span><a href=\"/dostavka.html\"></a></span><p><a href=\"/delivery.html\"><span>У Вас нет времени приехать в магазин?<br>БЕСПЛАТНАЯ ДОСТАВКА!*<br><span>*при заказе от 5000 руб.</span></span></a></p></div><a href=\"javascript:;\">Заказать звонок</a></div></div></div></div></div></div></div><h1>Запчасти в Нижнем Новгороде</h1><p>Мы специализируемся на оптовых и розничных <strong>поставках запчастей</strong> для любых марок автомобилей &ndash; японских, корейских, европейских, китайских и американских. В нашей базе насчитывается свыше 20 млн наименований запчастей, 2 тысячи торговых марок в наличии и на заказ.</p><p>Сразу ответим на вопрос, который нам зададут не раз &ndash; <strong>МЫ НЕ ЗАНИМАЕМСЯ КОНТРАКТНЫМИ ЗАПЧАСТЯМИ И ПРОЧИМИ ЗАПЧАСТЯМИ Б/У.</strong></p><p><strong><a href=\"#request\">Оставьте заявку!</a></strong> или позвоните нам <span>(831)</span><span>416-16-77</span></p><div><ul><li><a href=\"/search/\"><img src=\"/img/example/search-menu-1.jpg\" alt=\"Найти запчасти по артикулу\"></a> <a href=\"/search/\">Найти запчасти по номеру</a></li><li><a href=\"/call/request\"><img src=\"/img/example/search-menu-2.jpg\" alt=\"Оставить заявку\"></a> <a href=\"/call/request\">Оставить заявку</a></li><li><a href=\"/cats\"><img src=\"/img/example/search-menu-3.jpg\" alt=\"Каталоги запчастей\"></a> <a href=\"/cats\">Найти запчасти по каталогу</a></li><li><a href=\"/call/manager\"><img src=\"/img/example/search-menu-4.jpg\" alt=\"Позвонить менеджеру\"></a> <a href=\"/call/manager\">Позвонить менеджеру</a></li><li><a href=\"/contacts\"><img src=\"/img/example/search-menu-5.jpg\" alt=\"Приехать к нам в магазин\"></a> <a href=\"/contacts\">Приехать к нам в магазин</a></li></ul></div><div><h3>Каталоги запчастей</h3><div><ul><li>Легковые</li><li>Грузовые</li></ul><div><div><div><div><a href=\"/cats/zapchasti_na_acura_1.html\"><img src=\"/img/example/brands/acura.jpg\" alt=\"Acura\">Acura</a></div><div><a href=\"/cats/zapchasti_na_alfa-romeo_1.html\"><img src=\"/img/example/brands/alfa-romeo.jpg\" alt=\"Alfa Romeo\">Alfa Romeo</a></div><div><a href=\"/cats/zapchasti_na_aston-martin_1.html\"><img src=\"/img/example/brands/aston-martin.jpg\" alt=\"Aston Martin\">Aston Martin</a></div><div><a href=\"/cats/zapchasti_na_audi_1.html\"><img src=\"/img/example/brands/audi.jpg\" alt=\"Audi\">Audi</a></div><div><a href=\"/cats/zapchasti_na_bentley_1.html\"><img src=\"/img/example/brands/bentley.jpg\" alt=\"Bentley\">Bentley</a></div><div><a href=\"/cats/zapchasti_na_bmw_1.html\"><img src=\"/img/example/brands/bmw.jpg\" alt=\"Bmw\">Bmw</a></div><div><a href=\"/cats/zapchasti_na_buick_1.html\"><img src=\"/img/example/brands/buick.jpg\" alt=\"Buick\">Buick</a></div><div><a href=\"/cats/zapchasti_na_byd_1.html\"><img src=\"/img/example/brands/byd.jpg\" alt=\"Byd\">Byd</a></div><div><a href=\"/cats/zapchasti_na_cadillac_1.html\"><img src=\"/img/example/brands/cadillac.jpg\" alt=\"Cadillac\">Cadillac</a></div><div><a href=\"/cats/zapchasti_na_chery_1.html\"><img src=\"/img/example/brands/chery.jpg\" alt=\"Chery\">Chery</a></div><div><a href=\"/cats/zapchasti_na_chevrolet_1.html\"><img src=\"/img/example/brands/chevrolet.jpg\" alt=\"Chevrolet\">Chevrolet</a></div><div><a href=\"/cats/zapchasti_na_chrysler_1.html\"><img src=\"/img/example/brands/chrysler.jpg\" alt=\"Chrysler\">Chrysler</a></div><div><a href=\"/cats/zapchasti_na_citroen_1.html\"><img src=\"/img/example/brands/citroen.jpg\" alt=\"Citroen\">Citroen</a></div><div><a href=\"/cats/zapchasti_na_daewoo_1.html\"><img src=\"/img/example/brands/daewoo.jpg\" alt=\"Daewoo\">Daewoo</a></div></div><div><div><a href=\"/cats/zapchasti_na_daihatsu_1.html\"><img src=\"/img/example/brands/daihatsu.jpg\" alt=\"Daihatsu\">Daihatsu</a></div><div><a href=\"/cats/zapchasti_na_dodge_1.html\"><img src=\"/img/example/brands/dodge.jpg\" alt=\"Dodge\">Dodge</a></div><div><a href=\"/cats/zapchasti_na_ferrari_1.html\"><img src=\"/img/example/brands/ferrari.jpg\" alt=\"Ferrari\">Ferrari</a></div><div><a href=\"/cats/zapchasti_na_fiat_1.html\"><img src=\"/img/example/brands/fiat.jpg\" alt=\"Fiat\">Fiat</a></div><div><a href=\"/cats/zapchasti_na_ford_1.html\"><img src=\"/img/example/brands/ford.jpg\" alt=\"Ford\">Ford</a></div><div><a href=\"/cats/zapchasti_na_geely_1.html\"><img src=\"/img/example/brands/geely.jpg\" alt=\"Geely\">Geely</a></div><div><a href=\"/cats/zapchasti_na_gmc_1.html\"><img src=\"/img/example/brands/gmc.jpg\" alt=\"GMC\">GMC</a></div><div><a href=\"/cats/zapchasti_na_great-wall_1.html\"><img src=\"/img/example/brands/great-wall.jpg\" alt=\"Great Wall\">Great Wall</a></div><div><a href=\"/cats/zapchasti_na_honda_1.html\"><img src=\"/img/example/brands/honda.jpg\" alt=\"Honda\">Honda</a></div><div><a href=\"/cats/zapchasti_na_hummer_1.html\"><img src=\"/img/example/brands/hummer.jpg\" alt=\"Hummer\">Hummer</a></div><div><a href=\"/cats/zapchasti_na_hyundai_1.html\"><img src=\"/img/example/brands/hyundai.jpg\" alt=\"Hyundai\">Hyundai</a></div><div><a href=\"/cats/zapchasti_na_infiniti_1.html\"><img src=\"/img/example/brands/infiniti.jpg\" alt=\"Infiniti\">Infiniti</a></div><div><a href=\"/cats/zapchasti_na_jaguar_1.html\"><img src=\"/img/example/brands/jaguar.jpg\" alt=\"Jaguar\">Jaguar</a></div><div><a href=\"/cats/zapchasti_na_jeep_1.html\"><img src=\"/img/example/brands/jeep.jpg\" alt=\"Jeep\">Jeep</a></div></div><div><div><a href=\"/cats/zapchasti_na_kia_1.html\"><img src=\"/img/example/brands/kia.jpg\" alt=\"Kia\">Kia</a></div><div><a href=\"/cats/zapchasti_na_lada_1.html\"><img src=\"/img/example/brands/lada.jpg\" alt=\"Lada\">Lada</a></div><div><a href=\"/cats/zapchasti_na_lancia_1.html\"><img src=\"/img/example/brands/lancia.jpg\" alt=\"Lancia\">Lancia</a></div><div><a href=\"/cats/zapchasti_na_land-rover_1.html\"><img src=\"/img/example/brands/land-rover.jpg\" alt=\"Land Rover\">Land Rover</a></div><div><a href=\"/cats/zapchasti_na_lexus_1.html\"><img src=\"/img/example/brands/lexus.jpg\" alt=\"Lexus\">Lexus</a></div><div><a href=\"/cats/zapchasti_na_lifan_1.html\"><img src=\"/img/example/brands/lifan.jpg\" alt=\"Lifan\">Lifan</a></div><div><a href=\"/cats/zapchasti_na_lincoln_1.html\"><img src=\"/img/example/brands/lincoln.jpg\" alt=\"Lincoln\">Lincoln</a></div><div><a href=\"/cats/zapchasti_na_lotus_1.html\"><img src=\"/img/example/brands/lotus.jpg\" alt=\"Lotus\">Lotus</a></div><div><a href=\"/cats/zapchasti_na_maserati_1.html\"><img src=\"/img/example/brands/maserati.jpg\" alt=\"Maserati\">Maserati</a></div><div><a href=\"/cats/zapchasti_na_maybach_1.html\"><img src=\"/img/example/brands/maybach.jpg\" alt=\"Maybach\">Maybach</a></div><div><a href=\"/cats/zapchasti_na_mazda_1.html\"><img src=\"/img/example/brands/mazda.jpg\" alt=\"Mazda\">Mazda</a></div><div><a href=\"/cats/zapchasti_na_mercedes-benz_1.html\"><img src=\"/img/example/brands/mercedes-benz.jpg\" alt=\"Mercedes\">Mercedes</a></div><div><a href=\"/cats/zapchasti_na_mg_1.html\"><img src=\"/img/example/brands/mg.jpg\" alt=\"Mg\">Mg</a></div><div><a href=\"/cats/zapchasti_na_mini_1.html\"><img src=\"/img/example/brands/mini.jpg\" alt=\"Mini\">Mini</a></div></div><div><div><a href=\"/cats/zapchasti_na_mitsubishi_1.html\"><img src=\"/img/example/brands/mitsubishi.jpg\" alt=\"Mitsubishi\">Mitsubishi</a></div><div><a href=\"/cats/zapchasti_na_nissan_1.html\"><img src=\"/img/example/brands/nissan.jpg\" alt=\"Nissan\">Nissan</a></div><div><a href=\"/cats/zapchasti_na_opel_1.html\"><img src=\"/img/example/brands/opel.jpg\" alt=\"Opel\">Opel</a></div><div><a href=\"/cats/zapchasti_na_peugeot_1.html\"><img src=\"/img/example/brands/peugeot.jpg\" alt=\"Peugeot\">Peugeot</a></div><div><a href=\"/cats/zapchasti_na_pontiac_1.html\"><img src=\"/img/example/brands/pontiac.jpg\" alt=\"Pontiac\">Pontiac</a></div><div><a href=\"/cats/zapchasti_na_porsche_1.html\"><img src=\"/img/example/brands/porsche.jpg\" alt=\"Porsche\">Porsche</a></div><div><a href=\"/cats/zapchasti_na_proton_1.html\"><img src=\"/img/example/brands/proton.jpg\" alt=\"Proton\">Proton</a></div><div><a href=\"/cats/zapchasti_na_renault_1.html\"><img src=\"/img/example/brands/renault.jpg\" alt=\"Renault\">Renault</a></div><div><a href=\"/cats/zapchasti_na_rover_1.html\"><img src=\"/img/example/brands/rover.jpg\" alt=\"Rover\">Rover</a></div><div><a href=\"/cats/zapchasti_na_saab_1.html\"><img src=\"/img/example/brands/saab.jpg\" alt=\"Saab\">Saab</a></div><div><a href=\"/cats/zapchasti_na_seat_1.html\"><img src=\"/img/example/brands/seat.jpg\" alt=\"Seat\">Seat</a></div><div><a href=\"/cats/zapchasti_na_skoda_1.html\"><img src=\"/img/example/brands/skoda.jpg\" alt=\"Skoda\">Skoda</a></div><div><a href=\"/cats/zapchasti_na_smart_1.html\"><img src=\"/img/example/brands/smart.jpg\" alt=\"Smart\">Smart</a></div><div><a href=\"/cats/zapchasti_na_ssangyong_1.html\"><img src=\"/img/example/brands/ssangyong.jpg\" alt=\"SsangYong\">SsangYong</a></div></div><div><div><a href=\"/cats/zapchasti_na_subaru_1.html\"><img src=\"/img/example/brands/subaru.jpg\" alt=\"Subaru\">Subaru</a></div><div><a href=\"/cats/zapchasti_na_suzuki_1.html\"><img src=\"/img/example/brands/suzuki.jpg\" alt=\"Suzuki\">Suzuki</a></div><div><a href=\"/cats/zapchasti_na_toyota_1.html\"><img src=\"/img/example/brands/toyota.jpg\" alt=\"Toyota\">Toyota</a></div><div><a href=\"/cats/zapchasti_na_vw_1.html\"><img src=\"/img/example/brands/vw.jpg\" alt=\"Volkswagen\">Volkswagen</a></div><div><a href=\"/cats/zapchasti_na_volvo_1.html\"><img src=\"/img/example/brands/volvo.jpg\" alt=\"Volvo\">Volvo</a></div><div><a href=\"/cats/zapchasti_na_zhongxing-zte_1.html\"><img src=\"/img/example/brands/zhongxing-zte.jpg\" alt=\"Zhongxing\">Zhongxing</a></div></div></div></div><div><div><div><div><a href=\"/cats/zapchasti_na_fiat_2.html\"><img src=\"/img/example/brands/fiat.jpg\" alt=\"Fiat\">Fiat</a></div><div><a href=\"/cats/zapchasti_na_ford_2.html\"><img src=\"/img/example/brands/ford.jpg\" alt=\"Ford\">Ford</a></div><div><a href=\"/cats/zapchasti_na_hyundai_2.html\"><img src=\"/img/example/brands/hyundai.jpg\" alt=\"Hyundai\">Hyundai</a></div><div><a href=\"/cats/zapchasti_na_mercedes-benz_2.html\"><img src=\"/img/example/brands/mercedes-benz.jpg\" alt=\"Mercedes\">Mercedes</a></div><div><a href=\"/cats/zapchasti_na_nissan_2.html\"><img src=\"/img/example/brands/nissan.jpg\" alt=\"Nissan\">Nissan</a></div></div><div><div><a href=\"/cats/zapchasti_na_renault-trucks_2.html\"><img src=\"/img/example/brands/renault-trucks.jpg\" alt=\"Renault Trucks\">Renault Trucks</a></div><div><a href=\"/cats/zapchasti_na_scania_2.html\"><img src=\"/img/example/brands/scania.jpg\" alt=\"Scania\">Scania</a></div><div><a href=\"/cats/zapchasti_na_vw_2.html\"><img src=\"/img/example/brands/vw.jpg\" alt=\"Volkswagen\">Volkswagen</a></div><div><a href=\"/cats/zapchasti_na_volvo_2.html\"><img src=\"/img/example/brands/volvo.jpg\" alt=\"Volvo\">Volvo</a></div></div></div></div></div></div></div></main>"
+  },
+  "search": {
+   "title": "Поиск по номеру запчасти | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
+   "body_html": "<div><h1>Поиск по номеру автозапчасти</h1><form> <input> <button>Поиск</button> </form><p><strong>Внимание! Поиск временно не работает.</strong></p><p><b>Код детали (артикул)</b> &mdash; маркировка завода-изготовителя, однозначно идентифицирующая деталь автомобиля.</p><p>Маркировку можно найти на детали, на упаковке или в сопроводительной документации если на детали по какой либо причине нанесение номера невозможно.</p><p>Наиболее простой способ узнать номер артикула - найти заводскую маркировку на поверхности детали если есть возможность ее демонтировать. Несмотря на это для поиска номера нужной детали мы рекомендуем обращаться к профессионалам. И для этого есть несколько причин:</p><ul><li>в процессе производства завод-изготовитель установленной детали вносит изменения в конструкцию не только автомобиля, но и отдельных его узлов, агрегатов и даже самих деталей что приводит иногда к несоответсвию номеров отдельных узлов</li><li>совершенствуется технология производства</li><li>снимаются с производства устаревшие артикулы</li><li>появляются аналоги более доступные и не менее качественные</li></ul><h2>Важно знать:</h2><p>При вводе номера необходимо использовать только цифры и латинские буквы. Знаки тире, точки, пробелы и др. игнорируются.</p><p>Номера по каталогам:<br>FEBI имеют длину 5 цифр<br>GKN-Spidan &mdash; 7 цифр<br>BOSCH &mdash; 10 цифр<br>OCAP &mdash; 7 цифр<br><br>Для поиска номеров этих фирм добавляйте нули перед номером до необходимой длины.</p><p>Для номеров Citroen и Peugeot не вводятся &laquo;0000&raquo; в начале номера детали.</p></div></main>"
+  },
+  "cats": {
+   "title": "Электронные каталоги запчастей | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Электронные каталоги запчастей. Запчасти для иномарок от магазина garage.team. Тел. (831)  416-16-77 . Если требуемая запчасть не нашлась, мы доставим ее в Нижний Новгород для вашей иномарки.",
+   "body_html": "<div><h1>Каталоги автозапчастей</h1><div><div><ul><li>Легковые</li><li>Грузовые</li></ul><div><div><div><div><a href=\"/cats/zapchasti_na_acura_1.html\"><img src=\"/img/example/brands/acura.jpg\" alt=\"Acura\">Acura</a></div><div><a href=\"/cats/zapchasti_na_alfa-romeo_1.html\"><img src=\"/img/example/brands/alfa-romeo.jpg\" alt=\"Alfa Romeo\">Alfa Romeo</a></div><div><a href=\"/cats/zapchasti_na_aston-martin_1.html\"><img src=\"/img/example/brands/aston-martin.jpg\" alt=\"Aston Martin\">Aston Martin</a></div><div><a href=\"/cats/zapchasti_na_audi_1.html\"><img src=\"/img/example/brands/audi.jpg\" alt=\"Audi\">Audi</a></div><div><a href=\"/cats/zapchasti_na_bentley_1.html\"><img src=\"/img/example/brands/bentley.jpg\" alt=\"Bentley\">Bentley</a></div><div><a href=\"/cats/zapchasti_na_bmw_1.html\"><img src=\"/img/example/brands/bmw.jpg\" alt=\"Bmw\">Bmw</a></div><div><a href=\"/cats/zapchasti_na_buick_1.html\"><img src=\"/img/example/brands/buick.jpg\" alt=\"Buick\">Buick</a></div><div><a href=\"/cats/zapchasti_na_byd_1.html\"><img src=\"/img/example/brands/byd.jpg\" alt=\"Byd\">Byd</a></div><div><a href=\"/cats/zapchasti_na_cadillac_1.html\"><img src=\"/img/example/brands/cadillac.jpg\" alt=\"Cadillac\">Cadillac</a></div><div><a href=\"/cats/zapchasti_na_chery_1.html\"><img src=\"/img/example/brands/chery.jpg\" alt=\"Chery\">Chery</a></div><div><a href=\"/cats/zapchasti_na_chevrolet_1.html\"><img src=\"/img/example/brands/chevrolet.jpg\" alt=\"Chevrolet\">Chevrolet</a></div><div><a href=\"/cats/zapchasti_na_chrysler_1.html\"><img src=\"/img/example/brands/chrysler.jpg\" alt=\"Chrysler\">Chrysler</a></div><div><a href=\"/cats/zapchasti_na_citroen_1.html\"><img src=\"/img/example/brands/citroen.jpg\" alt=\"Citroen\">Citroen</a></div><div><a href=\"/cats/zapchasti_na_daewoo_1.html\"><img src=\"/img/example/brands/daewoo.jpg\" alt=\"Daewoo\">Daewoo</a></div></div><div><div><a href=\"/cats/zapchasti_na_daihatsu_1.html\"><img src=\"/img/example/brands/daihatsu.jpg\" alt=\"Daihatsu\">Daihatsu</a></div><div><a href=\"/cats/zapchasti_na_dodge_1.html\"><img src=\"/img/example/brands/dodge.jpg\" alt=\"Dodge\">Dodge</a></div><div><a href=\"/cats/zapchasti_na_ferrari_1.html\"><img src=\"/img/example/brands/ferrari.jpg\" alt=\"Ferrari\">Ferrari</a></div><div><a href=\"/cats/zapchasti_na_fiat_1.html\"><img src=\"/img/example/brands/fiat.jpg\" alt=\"Fiat\">Fiat</a></div><div><a href=\"/cats/zapchasti_na_ford_1.html\"><img src=\"/img/example/brands/ford.jpg\" alt=\"Ford\">Ford</a></div><div><a href=\"/cats/zapchasti_na_geely_1.html\"><img src=\"/img/example/brands/geely.jpg\" alt=\"Geely\">Geely</a></div><div><a href=\"/cats/zapchasti_na_gmc_1.html\"><img src=\"/img/example/brands/gmc.jpg\" alt=\"GMC\">GMC</a></div><div><a href=\"/cats/zapchasti_na_great-wall_1.html\"><img src=\"/img/example/brands/great-wall.jpg\" alt=\"Great Wall\">Great Wall</a></div><div><a href=\"/cats/zapchasti_na_honda_1.html\"><img src=\"/img/example/brands/honda.jpg\" alt=\"Honda\">Honda</a></div><div><a href=\"/cats/zapchasti_na_hummer_1.html\"><img src=\"/img/example/brands/hummer.jpg\" alt=\"Hummer\">Hummer</a></div><div><a href=\"/cats/zapchasti_na_hyundai_1.html\"><img src=\"/img/example/brands/hyundai.jpg\" alt=\"Hyundai\">Hyundai</a></div><div><a href=\"/cats/zapchasti_na_infiniti_1.html\"><img src=\"/img/example/brands/infiniti.jpg\" alt=\"Infiniti\">Infiniti</a></div><div><a href=\"/cats/zapchasti_na_jaguar_1.html\"><img src=\"/img/example/brands/jaguar.jpg\" alt=\"Jaguar\">Jaguar</a></div><div><a href=\"/cats/zapchasti_na_jeep_1.html\"><img src=\"/img/example/brands/jeep.jpg\" alt=\"Jeep\">Jeep</a></div></div><div><div><a href=\"/cats/zapchasti_na_kia_1.html\"><img src=\"/img/example/brands/kia.jpg\" alt=\"Kia\">Kia</a></div><div><a href=\"/cats/zapchasti_na_lada_1.html\"><img src=\"/img/example/brands/lada.jpg\" alt=\"Lada\">Lada</a></div><div><a href=\"/cats/zapchasti_na_lancia_1.html\"><img src=\"/img/example/brands/lancia.jpg\" alt=\"Lancia\">Lancia</a></div><div><a href=\"/cats/zapchasti_na_land-rover_1.html\"><img src=\"/img/example/brands/land-rover.jpg\" alt=\"Land Rover\">Land Rover</a></div><div><a href=\"/cats/zapchasti_na_lexus_1.html\"><img src=\"/img/example/brands/lexus.jpg\" alt=\"Lexus\">Lexus</a></div><div><a href=\"/cats/zapchasti_na_lifan_1.html\"><img src=\"/img/example/brands/lifan.jpg\" alt=\"Lifan\">Lifan</a></div><div><a href=\"/cats/zapchasti_na_lincoln_1.html\"><img src=\"/img/example/brands/lincoln.jpg\" alt=\"Lincoln\">Lincoln</a></div><div><a href=\"/cats/zapchasti_na_lotus_1.html\"><img src=\"/img/example/brands/lotus.jpg\" alt=\"Lotus\">Lotus</a></div><div><a href=\"/cats/zapchasti_na_maserati_1.html\"><img src=\"/img/example/brands/maserati.jpg\" alt=\"Maserati\">Maserati</a></div><div><a href=\"/cats/zapchasti_na_maybach_1.html\"><img src=\"/img/example/brands/maybach.jpg\" alt=\"Maybach\">Maybach</a></div><div><a href=\"/cats/zapchasti_na_mazda_1.html\"><img src=\"/img/example/brands/mazda.jpg\" alt=\"Mazda\">Mazda</a></div><div><a href=\"/cats/zapchasti_na_mercedes-benz_1.html\"><img src=\"/img/example/brands/mercedes-benz.jpg\" alt=\"Mercedes\">Mercedes</a></div><div><a href=\"/cats/zapchasti_na_mg_1.html\"><img src=\"/img/example/brands/mg.jpg\" alt=\"Mg\">Mg</a></div><div><a href=\"/cats/zapchasti_na_mini_1.html\"><img src=\"/img/example/brands/mini.jpg\" alt=\"Mini\">Mini</a></div></div><div><div><a href=\"/cats/zapchasti_na_mitsubishi_1.html\"><img src=\"/img/example/brands/mitsubishi.jpg\" alt=\"Mitsubishi\">Mitsubishi</a></div><div><a href=\"/cats/zapchasti_na_nissan_1.html\"><img src=\"/img/example/brands/nissan.jpg\" alt=\"Nissan\">Nissan</a></div><div><a href=\"/cats/zapchasti_na_opel_1.html\"><img src=\"/img/example/brands/opel.jpg\" alt=\"Opel\">Opel</a></div><div><a href=\"/cats/zapchasti_na_peugeot_1.html\"><img src=\"/img/example/brands/peugeot.jpg\" alt=\"Peugeot\">Peugeot</a></div><div><a href=\"/cats/zapchasti_na_pontiac_1.html\"><img src=\"/img/example/brands/pontiac.jpg\" alt=\"Pontiac\">Pontiac</a></div><div><a href=\"/cats/zapchasti_na_porsche_1.html\"><img src=\"/img/example/brands/porsche.jpg\" alt=\"Porsche\">Porsche</a></div><div><a href=\"/cats/zapchasti_na_proton_1.html\"><img src=\"/img/example/brands/proton.jpg\" alt=\"Proton\">Proton</a></div><div><a href=\"/cats/zapchasti_na_renault_1.html\"><img src=\"/img/example/brands/renault.jpg\" alt=\"Renault\">Renault</a></div><div><a href=\"/cats/zapchasti_na_rover_1.html\"><img src=\"/img/example/brands/rover.jpg\" alt=\"Rover\">Rover</a></div><div><a href=\"/cats/zapchasti_na_saab_1.html\"><img src=\"/img/example/brands/saab.jpg\" alt=\"Saab\">Saab</a></div><div><a href=\"/cats/zapchasti_na_seat_1.html\"><img src=\"/img/example/brands/seat.jpg\" alt=\"Seat\">Seat</a></div><div><a href=\"/cats/zapchasti_na_skoda_1.html\"><img src=\"/img/example/brands/skoda.jpg\" alt=\"Skoda\">Skoda</a></div><div><a href=\"/cats/zapchasti_na_smart_1.html\"><img src=\"/img/example/brands/smart.jpg\" alt=\"Smart\">Smart</a></div><div><a href=\"/cats/zapchasti_na_ssangyong_1.html\"><img src=\"/img/example/brands/ssangyong.jpg\" alt=\"SsangYong\">SsangYong</a></div></div><div><div><a href=\"/cats/zapchasti_na_subaru_1.html\"><img src=\"/img/example/brands/subaru.jpg\" alt=\"Subaru\">Subaru</a></div><div><a href=\"/cats/zapchasti_na_suzuki_1.html\"><img src=\"/img/example/brands/suzuki.jpg\" alt=\"Suzuki\">Suzuki</a></div><div><a href=\"/cats/zapchasti_na_toyota_1.html\"><img src=\"/img/example/brands/toyota.jpg\" alt=\"Toyota\">Toyota</a></div><div><a href=\"/cats/zapchasti_na_vw_1.html\"><img src=\"/img/example/brands/vw.jpg\" alt=\"Volkswagen\">Volkswagen</a></div><div><a href=\"/cats/zapchasti_na_volvo_1.html\"><img src=\"/img/example/brands/volvo.jpg\" alt=\"Volvo\">Volvo</a></div><div><a href=\"/cats/zapchasti_na_zhongxing-zte_1.html\"><img src=\"/img/example/brands/zhongxing-zte.jpg\" alt=\"Zhongxing\">Zhongxing</a></div></div></div></div><div><div><div><div><a href=\"/cats/zapchasti_na_fiat_2.html\"><img src=\"/img/example/brands/fiat.jpg\" alt=\"Fiat\">Fiat</a></div><div><a href=\"/cats/zapchasti_na_ford_2.html\"><img src=\"/img/example/brands/ford.jpg\" alt=\"Ford\">Ford</a></div><div><a href=\"/cats/zapchasti_na_hyundai_2.html\"><img src=\"/img/example/brands/hyundai.jpg\" alt=\"Hyundai\">Hyundai</a></div><div><a href=\"/cats/zapchasti_na_mercedes-benz_2.html\"><img src=\"/img/example/brands/mercedes-benz.jpg\" alt=\"Mercedes\">Mercedes</a></div><div><a href=\"/cats/zapchasti_na_nissan_2.html\"><img src=\"/img/example/brands/nissan.jpg\" alt=\"Nissan\">Nissan</a></div></div><div><div><a href=\"/cats/zapchasti_na_renault-trucks_2.html\"><img src=\"/img/example/brands/renault-trucks.jpg\" alt=\"Renault Trucks\">Renault Trucks</a></div><div><a href=\"/cats/zapchasti_na_scania_2.html\"><img src=\"/img/example/brands/scania.jpg\" alt=\"Scania\">Scania</a></div><div><a href=\"/cats/zapchasti_na_vw_2.html\"><img src=\"/img/example/brands/vw.jpg\" alt=\"Volkswagen\">Volkswagen</a></div><div><a href=\"/cats/zapchasti_na_volvo_2.html\"><img src=\"/img/example/brands/volvo.jpg\" alt=\"Volvo\">Volvo</a></div></div></div></div></div></div></div></main>"
+  },
+  "call_manager": {
+   "title": "Звонок менеджеру | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
+   "body_html": ""
+  },
+  "call_request": {
+   "title": "Заявка на подбор запчастей | Гараж - автосервис, поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей",
+   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
+   "body_html": "<div>"
+  },
+  "soglashenie": {
+   "title": "Пользовательское соглашение | Гараж",
+   "meta_description": "Пользовательское соглашение сайта garage.team — ООО «Гараж», Нижний Новгород.",
+   "body_html": "<h1>Пользовательское соглашение</h1><hr><div><h2>1. Общие положения</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>1.1</p></td><td><p>Настоящее Пользовательское соглашение (именуемое в&nbsp;дальнейшем&nbsp;&mdash; Соглашение) регламентирует отношения между Обществом с ограниченной ответственностью ООО &quot;Гараж&quot; (именуемое в&nbsp;дальнейшем&nbsp;&mdash; Администрация) и&nbsp;физическим лицом (именуемым в&nbsp;дальнейшем&nbsp;&mdash; Пользователь) по&nbsp;использованию ресурсов сайта <a href=\"/\">www.garage.team</a>.</p></td></tr><tr><td><p>1.2</p></td><td><p>Соглашение является юридически обязывающим договором между Пользователем и&nbsp;Администрацией и регламентирует использование Пользователем сайта <a href=\"/\">www.garage.team</a>.</p></td></tr></tbody></table></td><td><p>Соглашение&nbsp;&mdash; документ, в&nbsp;котором описаны отношения нас&nbsp;&mdash; администрации сайта и&nbsp;вас&nbsp;&mdash; пользователя.</p></td></tr></tbody></table><h2>2. Вступление в&nbsp;силу и&nbsp;порядок изменения Соглашения</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>2.1</p></td><td><p>Соглашение вступает в&nbsp;силу с&nbsp;момента выражения Пользователем согласия с&nbsp;его условиями путем регистрации (создания учетной записи), зарегистрировавшись на&nbsp;сайте <a href=\"/\">www.garage.team</a>, а&nbsp;также используя любой из сервисов сайта <a href=\"/\">www.garage.team</a> или воспользовавшись любой их&nbsp;функциональной возможностью, Пользователь выражает свое безоговорочное согласие со&nbsp;всеми условиями настоящего Соглашения и&nbsp;обязуется их&nbsp;соблюдать или прекратить использование сервисов сайта <a href=\"/\">www.garage.team</a>.</p></td></tr><tr><td><p>2.2</p></td><td><p>Соглашение может быть изменено Администрацией без <nobr>какого-либо</nobr> специального уведомления, новая редакция Соглашения вступает в&nbsp;силу с&nbsp;момента ее&nbsp;размещения, если иное не&nbsp;предусмотрено новой редакцией Соглашения. Действующая редакция Соглашения всегда находится по&nbsp;адресу <a href=\"http://garage.team/page/soglashenie/\">garage.team/page/soglashenie/</a>. Пользователь принимает на&nbsp;себя ответственность за&nbsp;проверку настоящего Соглашения на&nbsp;предмет изменений.</p></td></tr><tr><td><p>2.3</p></td><td><p>Выражая согласие с&nbsp;условиями Соглашения в&nbsp;порядке, предусмотренном п. 2.1. настоящего Соглашения, Пользователь подтверждает, что действует не&nbsp;в&nbsp;интересах третьих лиц, а&nbsp;исключительно от&nbsp;своего имени и&nbsp;в&nbsp;собственных интересах.</p></td></tr></tbody></table></td><td><p>Как только вы&nbsp;начали пользоваться сайтом или нашими услугами, вы&nbsp;приняли условия Соглашения.</p><p>Актуальная версия Соглашения всегда доступна по&nbsp;адресу <a href=\"http://garage.team/soglashenie/\">http://garage.team/soglashenie/</a>. Мы&nbsp;вынужденно оставляем за&nbsp;собой право изменять условия Соглашения без специального уведомления.</p></td></tr></tbody></table><h2>3. Условия пользования Сайтом</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>3.1</p></td><td><p>Несоблюдение условий настоящего Соглашения может повлечь за&nbsp;собой потерю права пользования сайтом <a href=\"/\">www.garage.team</a> и&nbsp;удаление учетной записи с&nbsp;последующим блокированием <nobr>IP-адреса</nobr> Пользователя.</p></td></tr><tr><td><p>3.2</p></td><td><p>Все пользователи сайта <a href=\"/\">www.garage.team</a> имеют право пользоваться сайтом на&nbsp;бесплатной основе. Бесплатное право пользования сайтом дает пользователям возможность создавать и&nbsp;просматривать профайлы, публиковать личные данные, а&nbsp;также использовать другие возможности сайта.</p></td></tr><tr><td><p>3.3</p></td><td><p>При регистрации (создании учетной записи) на&nbsp;сайте <a href=\"/\">www.garage.team</a>. Пользователь обязуется предоставить достоверную, точную и&nbsp;полную информацию о&nbsp;себе по&nbsp;вопросам, предлагаемым в&nbsp;регистрационной форме, и поддерживать ее&nbsp;в&nbsp;актуальном состоянии.</p></td></tr><tr><td><p>3.4</p></td><td><p>В&nbsp;случае, если у&nbsp;Администрации сайта <a href=\"/\">www.garage.team</a> возникают основания предполагать, что предоставленная Пользователем информация не&nbsp;соответствует действительности или предоставлена в&nbsp;неполном объеме, его доступ к&nbsp;сайту может быть запрещен на&nbsp;временной или постоянной основе.</p></td></tr><tr><td><p>3.5</p></td><td><p>Пользователь единолично несет ответственность за&nbsp;свои действия при пользовании услугами сайта <a href=\"/\">www.garage.team</a>, а&nbsp;также другими услугами, и&nbsp;единолично несет расходы, в&nbsp;список которых входят, как минимум, расходы на&nbsp;<nobr>Интернет-услуги</nobr>, и&nbsp;любые дополнительные издержки, понесенные другой стороной по&nbsp;вине пользователя в&nbsp;связи с использованием услуг сайта в&nbsp;незаконных целях.</p></td></tr><tr><td><p>3.6</p></td><td><p>Признавая международный характер Интернета, Пользователь соглашается соблюдать все правила поведения в&nbsp;Сети и&nbsp;размещать приемлемый контент. В&nbsp;частности, пользователь соглашается со&nbsp;всеми законами, применимыми в&nbsp;отношении передачи электронных данных из&nbsp;страны проживания/временного пребывания Пользователя.</p></td></tr><tr><td><p>3.7</p></td><td><p>Пользователь соглашается с&nbsp;тем, что Администрация имеет право устанавливать общие правила и ограничения на&nbsp;пользование услугами и&nbsp;вносить поправки в&nbsp;эти правила в&nbsp;любое время.</p></td></tr><tr><td><p>3.8</p></td><td><p>Администрация оставляет за&nbsp;собой право изменять, прекращать (временно или полностью) предоставление услуг (либо их&nbsp;части) в&nbsp;любое время без предварительного уведомления. Пользователь освобождает Администрацию от ответственности за&nbsp;внесение поправок, приостановление либо прекращение услуг.</p></td></tr><tr><td><p>3.9</p></td><td><p>Пользователь обязуется не&nbsp;воспроизводить, не&nbsp;копировать, не&nbsp;продавать, не&nbsp;перепродавать и&nbsp;не эксплуатировать никаким иным способом <nobr>какую-либо</nobr> часть услуг или контента, пользование услугами либо доступ к&nbsp;услугам и контенту сайта <a href=\"/\">www.garage.team</a>.</p></td></tr><tr><td><p>3.10</p></td><td><p>Администрация обязуется не&nbsp;распространять личные данные Пользователя третьим лицам без согласия Пользователя, чьи данные предполагается передать, за&nbsp;исключением случаев поступления запроса на&nbsp;предоставление подобной информации со&nbsp;стороны правоохранительных и&nbsp;надзорных органов.</p></td></tr><tr><td><p>3.11</p></td><td><p>При предоставлении информации на&nbsp;сайте <a href=\"/\">www.garage.team</a>. Пользователь соглашается с тем, что эта информация обрабатывается Администрацией сайта <a href=\"/\">www.garage.team</a>.</p></td></tr><tr><td><p>3.12</p></td><td><p>Администрация сайта <a href=\"/\">www.garage.team</a> обязуется обеспечить конфиденциальность предоставленной информации о&nbsp;Пользователе при регистрации на&nbsp;сайте <a href=\"/\">www.garage.team</a> и&nbsp;всех персональных данных, предоставленных Пользователем в&nbsp;момент пользовании ресурсами сайта <a href=\"/\">www.garage.team</a>. Сбор избыточной информации о&nbsp;Пользователе не&nbsp;допускается.</p></td></tr><tr><td><p>3.13</p></td><td><p>Пользователь соглашается с&nbsp;тем, что Администрация по&nbsp;своему собственному усмотрению может удалить его учетную запись, а&nbsp;также любую информацию, относящуюся к&nbsp;предоставляемым услугам, по&nbsp;какой&nbsp;бы то&nbsp;ни&nbsp;было причине, включая, но&nbsp;не&nbsp;ограничиваясь, длительное неиспользование услуг, а&nbsp;также подозрение со&nbsp;стороны Администрации в&nbsp;том, что Пользователь своими действиями нарушил Соглашение.</p></td></tr><tr><td><p>3.14</p></td><td><p>Администрация оставляет за&nbsp;собой право запретить Пользователю в&nbsp;будущем доступ к&nbsp;услугам или информации на&nbsp;сайте <a href=\"http://www.garage.team\">www.garage.team</a>.</p></td></tr><tr><td><p>3.15</p></td><td><p>При необходимости Пользователь может направить Администрации требование (на электронный адрес support@parts2.ru)&nbsp;удалить собственную учетную запись с сайта <a href=\"http://www.garage.team\">www.garage.team</a>.</p><p>В этом случае Пользователю необходимо направить такое требование с основного почтового адреса электронной почты (e-mail). Основным адресом электронной почты (e-mail) является тот адрес, который Пользователь указывал при создании собственной учетной записи и на который Администрацией направляется пароль для входа в личный кабинет Пользователя при восстановлении пароля.</p></td></tr></tbody></table></td><td><p>Регистрация на&nbsp;сайте бесплатна!</p><p>Надеемся, что вы&nbsp;укажете достоверную информацию о&nbsp;себе и&nbsp;будете поддерживать её в&nbsp;актуальном состоянии, а&nbsp;мы&nbsp;в&nbsp;свою очередь обещаем не&nbsp;передавать ваши личные данные никому, кроме ситуаций, предусмотренных законом.</p><p>Вы&nbsp;обязуетесь соблюдать правила поведения в&nbsp;Сети и&nbsp;не&nbsp;размещать неприемлемую информацию на&nbsp;сайте. Пожалуйста, помните: вы&nbsp;несете ответственность за&nbsp;свои действия.</p><p>Мы&nbsp;надеемся, что вы&nbsp;будете соблюдать авторские права и&nbsp;не&nbsp;станете использовать сайт в&nbsp;корыстных целях.</p><p>Мы&nbsp;будем вынуждены ограничивать или запрещать доступ к&nbsp;сайту, а&nbsp;в&nbsp;некоторых случаях удалять аккаунт, например, при невыполнении требований Соглашения.</p><p>Администрация имеет право изменять или прекращать предоставление услуг в&nbsp;любое время.</p></td></tr></tbody></table><h2>4. Ответственность Пользователя и&nbsp;Администрации</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>4.1</p></td><td><p>Пользователь признает и&nbsp;соглашается с&nbsp;тем, что Администрация не&nbsp;несет ответственность, прямо или косвенно, за&nbsp;какой&nbsp;бы то&nbsp;ни&nbsp;было ущерб, явно либо предполагаемо понесенный в&nbsp;связи с&nbsp;использованием <nobr>каких-либо</nobr> ресурсов либо ссылок на&nbsp;них, а&nbsp;также за&nbsp;товары или услуги, предлагаемые на&nbsp;подобных сайтах.</p></td></tr><tr><td><p>4.2</p></td><td><p>Пользователь, разместивший материалы, не&nbsp;предназначенные для всех категорий пользователей, полностью несет ответственность за&nbsp;их&nbsp;размещение. В&nbsp;случае если согласно закону, распространяющемуся на&nbsp;пользователя, <nobr>какие-либо</nobr> материалы будут признаны незаконными, Администрация обязуется предоставить всю необходимую по&nbsp;этому вопросу информацию в правоохранительные органы и&nbsp;соответствующие инстанции.</p></td></tr><tr><td><p>4.3</p></td><td><p>Администрация не&nbsp;несет ответственность за&nbsp;<nobr>какую-либо</nobr> информацию, размещенную пользователем на&nbsp;сайтах, принадлежащих Администрации сайта <a href=\"/\">www.garage.team</a>, без прямого согласия владельца авторского права, включая, но не&nbsp;ограничиваясь, информацию, защищенную авторским правом.</p></td></tr><tr><td><p>4.4</p></td><td><p>Пользователь несет полную ответственность за&nbsp;опубликованные/размещенные им&nbsp;материалы на&nbsp;сайте <a href=\"/\">www.garage.team</a>, а&nbsp;также любые материалы или информацию, переданную другим пользователям. Размещая любую информацию в&nbsp;общедоступных разделах сайта <a href=\"/\">www.garage.team</a>, пользователь тем самым предоставляет Администрации неисключительную, оплаченную и&nbsp;всемирно действующую лицензию на&nbsp;использование, публичный показ, редактирование и&nbsp;перевод на&nbsp;другие языки данных материалов на&nbsp;сайте <a href=\"/\">www.garage.team</a>. Действие лицензии прекращается в&nbsp;момент удаления пользователем материалов. Пользователь соглашается и&nbsp;гарантирует, что он&nbsp;является владельцем материалов и&nbsp;информации, размещенных им&nbsp;на&nbsp;сайте <a href=\"/\">www.garage.team</a>, что размещаемые пользователем материалы и&nbsp;информация не&nbsp;нарушают прав на&nbsp;неприкосновенность частной жизни, прав на&nbsp;публичность, авторских прав, прав интеллектуальной собственности и&nbsp;других прав любого лица.</p></td></tr><tr><td><p>4.5</p></td><td><p>Никакая информация, полученная с&nbsp;сайта <a href=\"/\">www.garage.team</a> либо с&nbsp;помощью других услуг <a href=\"/\">www.garage.team</a> в&nbsp;устном или письменном виде, не&nbsp;может считаться <nobr>каким-либо</nobr> видом гарантии, за&nbsp;исключением случаев, оговоренных в&nbsp;Соглашении.</p></td></tr><tr><td><p>4.6</p></td><td><p>Пользователь понимает и&nbsp;соглашается с&nbsp;тем, что Администрация не&nbsp;несет ответственность за&nbsp;любые прямые или непрямые убытки (даже в&nbsp;том случае, если Администрация была предупреждена о&nbsp;возможности ущерба), в&nbsp;частности, за потерю прибыли, утрату репутации, потерю данных, нематериальный ущерб и&nbsp;издержки, которые были понесены вследствие:</p></td></tr><tr><td><p>4.6.1</p></td><td><p>Использования или невозможности использования услуг сайта <a href=\"/\">www.garage.team</a>;</p></td></tr><tr><td><p>4.6.2</p></td><td><p>Приобретения дополнительных материальных и&nbsp;нематериальных товаров и&nbsp;услуг с&nbsp;помощью или при посредничестве сайта <a href=\"/\">www.garage.team</a>;</p></td></tr><tr><td><p>4.6.3</p></td><td><p>Всех остальных инцидентов, имеющих отношение к&nbsp;услугам сайта <a href=\"/\">www.garage.team</a>.</p></td></tr></tbody></table></td><td><p>Публикуя на&nbsp;сайте статью, изображение или <nobr>что-то</nobr> еще, вы&nbsp;подтверждаете свое авторство и&nbsp;несете полную ответственность за&nbsp;размещенные материалы. Они не&nbsp;должны нарушать <nobr>чьих-то</nobr> прав и&nbsp;законов. Мы&nbsp;оставляем за&nbsp;собой право редактировать эту информацию.</p><p>Мы, администрация сайта garage.team, не&nbsp;несем ответственности за&nbsp;информацию, опубликованную пользователями, а&nbsp;также за&nbsp;ущерб или убытки, которые вы&nbsp;можете понести <nobr>из-за</nobr> приобретения товаров и&nbsp;услуг, использования наших ресурсов, сервисов и&nbsp;ссылок на&nbsp;другие сайты.</p></td></tr></tbody></table><h2>5. Порядок обработки персональных данных Пользователя</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>5.1</p></td><td><p>Пользователь и&nbsp;Администрация определили для целей настоящего Соглашения использовать следующие термины:</p><p>&laquo;Персональные данные&raquo;&nbsp;&mdash; информация, относящаяся к&nbsp;Пользователю, в&nbsp;том числе указанная им&nbsp;при регистрации в&nbsp;порядке, предусмотренном п. 2.1. настоящего Соглашения (Ф.И.О., адрес, номер основного документа, удостоверяющего личность, сведения о&nbsp;дате выдаче данного документа и&nbsp;выдавшем его органе, адрес электронной почты, телефон), а&nbsp;также информация, полученная из&nbsp;заполненных Пользователем анкет опроса.</p><p>&laquo;Обработка персональных данных&raquo;&nbsp;&mdash; действия (операции), производимые в ручном или автоматическом режиме с&nbsp;персональными данными, включая сбор, систематизацию, накопление, хранение, уточнение (обновление, изменение), использование, распространение (в&nbsp;том числе передача), обезличивание, блокирование и&nbsp;уничтожение персональных данных.</p><p>&laquo;Аналог собственноручной подписи&raquo;&nbsp;&mdash; проставление отметки (галочки) в&nbsp;окошке &laquo;Согласен с&nbsp;условиями Пользовательского соглашения&raquo;, размещенной на&nbsp;сайте <a href=\"/\">www.garage.team</a>, а&nbsp;также регистрация в&nbsp;порядке, предусмотренном п. 2.1. настоящего Соглашения.</p></td></tr><tr><td><p>5.2</p></td><td><p>Регистрируясь на&nbsp;сайте <a href=\"/\">www.garage.team</a>, Пользователь подтверждает свое согласие на обработку своих персональных данных, переданных <nobr>ООО &quot;Гараж&quot;</nobr>, расположенному по&nbsp;юридическому адресу: Российская Федерация, 603111, город Нижний Новгород, улица Дьяконова, дом 2Г.</p></td></tr><tr><td><p>5.3</p></td><td><p>Настоящим Пользователь подтверждает:</p></td></tr><tr><td><p>5.3.1</p></td><td><p>Что дает согласие на&nbsp;то, что <nobr>ООО &quot;Гараж&quot;</nobr> будет направлять в&nbsp;адрес Пользователя корреспонденцию на&nbsp;указанный почтовый адрес, адрес электронной почты и/или номер мобильного телефона, информацию о&nbsp;проводимых <nobr>ООО &quot;Гараж&quot;</nobr> и&nbsp;его партнерами рекламных акциях.</p></td></tr><tr><td><p>5.3.2</p></td><td><p>Что дает согласие на&nbsp;то, что <nobr>ООО &quot;Гараж&quot;</nobr> и&nbsp;его уполномоченные представители будут получать, собирать, систематизировать, накапливать, хранить, уточнять (обновлять, изменять), использовать и&nbsp;иным образом обрабатывать (в&nbsp;том числе в&nbsp;электронном виде) персональные данные Пользователя, а&nbsp;также на&nbsp;передачу этих персональных данных партнерам <nobr>ООО &quot;Гараж&quot;</nobr>.</p></td></tr><tr><td><p>5.4</p></td><td><p>Согласие в&nbsp;понятиях раздела 5 настоящего Соглашения дается на&nbsp;срок 50 (пятьдесят) лет и&nbsp;может быть в любой момент отозвано Пользователем путем направления письменного уведомления.</p></td></tr><tr><td><p>5.5</p></td><td><p>Пользователь предупрежден, что направление указанного в&nbsp;п. 5.4 настоящего Соглашения письменного уведомления автоматически влечет за&nbsp;собой удаление аккаунта Пользователя на&nbsp;сайте <a href=\"/\">www.garage.team</a> и&nbsp;уничтожение всех персональных данных Пользователя.</p></td></tr><tr><td><p>5.6</p></td><td><p><nobr>ООО &quot;Гараж&quot;</nobr> обеспечивает конфиденциальность и&nbsp;безопасность персональных данных в соответствии с&nbsp;требованиями законодательства РФ.</p></td></tr></tbody></table></td><td><p>Зарегистрировавшись на&nbsp;сайте Гараж.Теам, вы&nbsp;доверяете нам обработку и&nbsp;хранение своих персональных данных на&nbsp;50 лет. Также вы&nbsp;соглашаетесь получать информацию о&nbsp;проводимых рекламных акциях на&nbsp;почту и&nbsp;мобильный номер.</p><p>Мы&nbsp;обязуемся обеспечить конфиденциальность и&nbsp;безопасность ваших персональных данных в&nbsp;соответствии с&nbsp;требованиями законодательства РФ.</p><p>Вы&nbsp;в&nbsp;любой момент можете расторгнуть Соглашение, направив нам письменное уведомление.</p></td></tr></tbody></table><h2>6. Заключительная информация</h2><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><table><colgroup> <col> <col> </colgroup> <tbody><tr><td><p>6.1</p></td><td><p>Пользователь и&nbsp;Администрация соглашаются на&nbsp;то, что все возможные споры по&nbsp;поводу Соглашения будут разрешаться по&nbsp;нормам российского права.</p></td></tr><tr><td><p>6.2</p></td><td><p>Ввиду безвозмездности услуг, оказываемых в&nbsp;рамках Соглашения, нормы о&nbsp;защите прав потребителей не могут быть к&nbsp;нему применимы. В&nbsp;случае если Соглашению будет придан возмездный характер, в&nbsp;него будут внесены соответствующие изменения в&nbsp;целях соблюдения указанных норм.</p></td></tr><tr><td><p>6.3</p></td><td><p>Администрация просит направлять все заявления о&nbsp;нарушении Соглашения ей, при этом Администрация гарантирует соблюдение анонимности Пользователя. При составлении заявления Пользователю необходимо максимально подробно описать все детали. Ссылки на&nbsp;конкретные заявления/комментарии (гиперссылки на&nbsp;них) являются наиболее существенными и&nbsp;ускорят рассмотрение заявления Пользователя.</p></td></tr></tbody></table></td><td><p>Возникшие споры разрешаются по&nbsp;нормам российского права. Поскольку услуги мы&nbsp;предоставляем бесплатно, закон о&nbsp;защите прав потребителей неприменим.</p><p>Убедительно просим вас сообщать о&nbsp;всех нарушениях Соглашения. Для оперативности разрешения и&nbsp;устранения нарушений постарайтесь как можно подробнее описывать все детали.</p></td></tr></tbody></table></div>"
+  }
+ },
+ "sent_message": "Ваше сообщение отправлено! Наши менеджеры рассмотрят его в рабочие часы и свяжутся с вами.",
+ "catalog_brands": [
+  {
+   "href": "/cats/zapchasti_na_acura_1.html",
+   "img": "/img/example/brands/acura.jpg",
+   "name": "Acura",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_alfa-romeo_1.html",
+   "img": "/img/example/brands/alfa-romeo.jpg",
+   "name": "Alfa Romeo",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_aston-martin_1.html",
+   "img": "/img/example/brands/aston-martin.jpg",
+   "name": "Aston Martin",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_audi_1.html",
+   "img": "/img/example/brands/audi.jpg",
+   "name": "Audi",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_bentley_1.html",
+   "img": "/img/example/brands/bentley.jpg",
+   "name": "Bentley",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_bmw_1.html",
+   "img": "/img/example/brands/bmw.jpg",
+   "name": "Bmw",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_buick_1.html",
+   "img": "/img/example/brands/buick.jpg",
+   "name": "Buick",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_byd_1.html",
+   "img": "/img/example/brands/byd.jpg",
+   "name": "Byd",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_cadillac_1.html",
+   "img": "/img/example/brands/cadillac.jpg",
+   "name": "Cadillac",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_chery_1.html",
+   "img": "/img/example/brands/chery.jpg",
+   "name": "Chery",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_chevrolet_1.html",
+   "img": "/img/example/brands/chevrolet.jpg",
+   "name": "Chevrolet",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_chrysler_1.html",
+   "img": "/img/example/brands/chrysler.jpg",
+   "name": "Chrysler",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_citroen_1.html",
+   "img": "/img/example/brands/citroen.jpg",
+   "name": "Citroen",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_daewoo_1.html",
+   "img": "/img/example/brands/daewoo.jpg",
+   "name": "Daewoo",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_daihatsu_1.html",
+   "img": "/img/example/brands/daihatsu.jpg",
+   "name": "Daihatsu",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_dodge_1.html",
+   "img": "/img/example/brands/dodge.jpg",
+   "name": "Dodge",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_ferrari_1.html",
+   "img": "/img/example/brands/ferrari.jpg",
+   "name": "Ferrari",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_fiat_1.html",
+   "img": "/img/example/brands/fiat.jpg",
+   "name": "Fiat",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_ford_1.html",
+   "img": "/img/example/brands/ford.jpg",
+   "name": "Ford",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_geely_1.html",
+   "img": "/img/example/brands/geely.jpg",
+   "name": "Geely",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_gmc_1.html",
+   "img": "/img/example/brands/gmc.jpg",
+   "name": "GMC",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_great-wall_1.html",
+   "img": "/img/example/brands/great-wall.jpg",
+   "name": "Great Wall",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_honda_1.html",
+   "img": "/img/example/brands/honda.jpg",
+   "name": "Honda",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_hummer_1.html",
+   "img": "/img/example/brands/hummer.jpg",
+   "name": "Hummer",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_hyundai_1.html",
+   "img": "/img/example/brands/hyundai.jpg",
+   "name": "Hyundai",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_infiniti_1.html",
+   "img": "/img/example/brands/infiniti.jpg",
+   "name": "Infiniti",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_jaguar_1.html",
+   "img": "/img/example/brands/jaguar.jpg",
+   "name": "Jaguar",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_jeep_1.html",
+   "img": "/img/example/brands/jeep.jpg",
+   "name": "Jeep",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_kia_1.html",
+   "img": "/img/example/brands/kia.jpg",
+   "name": "Kia",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lada_1.html",
+   "img": "/img/example/brands/lada.jpg",
+   "name": "Lada",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lancia_1.html",
+   "img": "/img/example/brands/lancia.jpg",
+   "name": "Lancia",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_land-rover_1.html",
+   "img": "/img/example/brands/land-rover.jpg",
+   "name": "Land Rover",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lexus_1.html",
+   "img": "/img/example/brands/lexus.jpg",
+   "name": "Lexus",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lifan_1.html",
+   "img": "/img/example/brands/lifan.jpg",
+   "name": "Lifan",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lincoln_1.html",
+   "img": "/img/example/brands/lincoln.jpg",
+   "name": "Lincoln",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_lotus_1.html",
+   "img": "/img/example/brands/lotus.jpg",
+   "name": "Lotus",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_maserati_1.html",
+   "img": "/img/example/brands/maserati.jpg",
+   "name": "Maserati",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_maybach_1.html",
+   "img": "/img/example/brands/maybach.jpg",
+   "name": "Maybach",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_mazda_1.html",
+   "img": "/img/example/brands/mazda.jpg",
+   "name": "Mazda",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_mercedes-benz_1.html",
+   "img": "/img/example/brands/mercedes-benz.jpg",
+   "name": "Mercedes",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_mg_1.html",
+   "img": "/img/example/brands/mg.jpg",
+   "name": "Mg",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_mini_1.html",
+   "img": "/img/example/brands/mini.jpg",
+   "name": "Mini",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_mitsubishi_1.html",
+   "img": "/img/example/brands/mitsubishi.jpg",
+   "name": "Mitsubishi",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_nissan_1.html",
+   "img": "/img/example/brands/nissan.jpg",
+   "name": "Nissan",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_opel_1.html",
+   "img": "/img/example/brands/opel.jpg",
+   "name": "Opel",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_peugeot_1.html",
+   "img": "/img/example/brands/peugeot.jpg",
+   "name": "Peugeot",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_pontiac_1.html",
+   "img": "/img/example/brands/pontiac.jpg",
+   "name": "Pontiac",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_porsche_1.html",
+   "img": "/img/example/brands/porsche.jpg",
+   "name": "Porsche",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_proton_1.html",
+   "img": "/img/example/brands/proton.jpg",
+   "name": "Proton",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_renault_1.html",
+   "img": "/img/example/brands/renault.jpg",
+   "name": "Renault",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_rover_1.html",
+   "img": "/img/example/brands/rover.jpg",
+   "name": "Rover",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_saab_1.html",
+   "img": "/img/example/brands/saab.jpg",
+   "name": "Saab",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_seat_1.html",
+   "img": "/img/example/brands/seat.jpg",
+   "name": "Seat",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_skoda_1.html",
+   "img": "/img/example/brands/skoda.jpg",
+   "name": "Skoda",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_smart_1.html",
+   "img": "/img/example/brands/smart.jpg",
+   "name": "Smart",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_ssangyong_1.html",
+   "img": "/img/example/brands/ssangyong.jpg",
+   "name": "SsangYong",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_subaru_1.html",
+   "img": "/img/example/brands/subaru.jpg",
+   "name": "Subaru",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_suzuki_1.html",
+   "img": "/img/example/brands/suzuki.jpg",
+   "name": "Suzuki",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_toyota_1.html",
+   "img": "/img/example/brands/toyota.jpg",
+   "name": "Toyota",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_vw_1.html",
+   "img": "/img/example/brands/vw.jpg",
+   "name": "Volkswagen",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_volvo_1.html",
+   "img": "/img/example/brands/volvo.jpg",
+   "name": "Volvo",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_zhongxing-zte_1.html",
+   "img": "/img/example/brands/zhongxing-zte.jpg",
+   "name": "Zhongxing",
+   "type": "car"
+  },
+  {
+   "href": "/cats/zapchasti_na_fiat_2.html",
+   "img": "/img/example/brands/fiat.jpg",
+   "name": "Fiat",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_ford_2.html",
+   "img": "/img/example/brands/ford.jpg",
+   "name": "Ford",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_hyundai_2.html",
+   "img": "/img/example/brands/hyundai.jpg",
+   "name": "Hyundai",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_mercedes-benz_2.html",
+   "img": "/img/example/brands/mercedes-benz.jpg",
+   "name": "Mercedes",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_nissan_2.html",
+   "img": "/img/example/brands/nissan.jpg",
+   "name": "Nissan",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_renault-trucks_2.html",
+   "img": "/img/example/brands/renault-trucks.jpg",
+   "name": "Renault Trucks",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_scania_2.html",
+   "img": "/img/example/brands/scania.jpg",
+   "name": "Scania",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_vw_2.html",
+   "img": "/img/example/brands/vw.jpg",
+   "name": "Volkswagen",
+   "type": "truck"
+  },
+  {
+   "href": "/cats/zapchasti_na_volvo_2.html",
+   "img": "/img/example/brands/volvo.jpg",
+   "name": "Volvo",
+   "type": "truck"
+  }
+ ]
+}
