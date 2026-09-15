@@ -73,7 +73,7 @@ def _hotspot_payload():
             "blurb": h["blurb"],
             "price": f"от {D.fmt_amount(best)}" if best else "",
             "price_note": "по прайсу, иномарки",
-            "href": h["href"],
+            "href": D.BASE + h["href"],
             "icon": h["icon"],
             "n": i + 1,
         }

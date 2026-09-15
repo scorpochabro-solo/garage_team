@@ -80,6 +80,19 @@ garage-2027/
 Ссылки каталогов `/cats/zapchasti_na_*.html` и поиск `/search/` обслуживаются существующим бэкендом.
 Страницу `404.html` нужно назначить в настройках хостинга/nginx (`error_page 404 /404.html`).
 
+## Деплой
+
+- **GitHub Pages (превью для заказчика):** <https://scorpochabro-solo.github.io/garage_team/>.
+  Репозиторий `scorpochabro-solo/garage_team`, Pages читает папку `docs/` ветки `main`.
+  Пересобрать и выложить:
+
+  ```bash
+  python3 build.py --base /garage_team --out docs && git add -A && git commit -m "build: pages" && git push
+  ```
+
+- **Продакшен на своём домене (garage.team):** `python3 build.py` без флагов → `dist/`, залить содержимое в корень хостинга.
+  `--base` нужен только когда сайт живёт в подпапке.
+
 ## Технологии
 
 Семантический HTML5, современный CSS (custom properties, grid, clamp, `dialog`, scroll-snap),

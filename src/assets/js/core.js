@@ -38,7 +38,8 @@
     const href = (a.getAttribute('href') || '').replace(new RegExp('^' + BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), '');
     if (href === '/' || href === '') return;
     const base = href.replace(/\/$/, '').replace(/\.html$/, '');
-    if (base && path.startsWith(base)) a.classList.add('is-active');
+    const cur = path.replace(/\/$/, '').replace(/\.html$/, '');
+    if (base && (cur === base || cur.startsWith(base + '/'))) a.classList.add('is-active');
   });
 
   /* ---------- scroll reveal ---------- */
