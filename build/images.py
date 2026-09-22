@@ -7,6 +7,16 @@ from PIL import Image
 
 MAX_SIDE = 1600
 WEBP_QUALITY = 82
+# Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages).
+RESPONSIVE_WIDTHS = {"photo": 800}
+
+
+def scaled_size(src: Path, max_side: int = MAX_SIDE) -> tuple[int, int]:
+    """Pixel size the image will have in dist after the MAX_SIDE downscale (reads the header only)."""
+    with Image.open(src) as im:
+        w, h = im.size
+    scale = min(1.0, max_side / max(w, h))
+    return max(1, round(w * scale)), max(1, round(h * scale))
 
 
 def _dest_for(rel: Path) -> Path:
@@ -40,6 +50,13 @@ def process_images(src_root: Path, dist_root: Path, verbose=False):
                 if max(im.size) > MAX_SIDE:
                     im.thumbnail((MAX_SIDE, MAX_SIDE), Image.LANCZOS)
                 im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
+                narrow = RESPONSIVE_WIDTHS.get(rel.parts[0]) if len(rel.parts) > 1 else None
+                if narrow and im.width > narrow:
+                    small = im.copy()
+                    small.thumbnail((narrow, narrow * 4), Image.LANCZOS)
+                    small_dest = dest.with_name(f"{dest.stem}-{narrow}.webp")
+                    small.save(small_dest, "WEBP", quality=WEBP_QUALITY, method=6)
+                    total += small_dest.stat().st_size
             elif ext == ".png":
                 im = Image.open(src)
                 if src.name in ("car.png", "car-xray.png"):
@@ -60,19 +77,27 @@ def process_images(src_root: Path, dist_root: Path, verbose=False):
     return count, total
 
 
-def make_logo_assets(logo_src: Path, dist_logo: Path):
-    """favicon.svg (green badge w/ embedded logo) + apple-touch-icon.png from the white logo."""
-    dist_logo.mkdir(parents=True, exist_ok=True)
+def make_logo_assets(mark_src: Path, dist_root: Path) -> None:
+    """Favicons from the brand mark (the «G» of the Garage Team logo, transparent PNG):
+    /favicon.ico (16–48), /assets/logo/favicon.svg (wrapper with an embedded 96px PNG), apple-touch-icon.png (180)."""
     import base64
-    png = base64.b64encode(logo_src.read_bytes()).decode()
-    svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-           '<rect width="64" height="64" rx="12" fill="#0c0d0c"/>'
-           f'<image href="data:image/png;base64,{png}" x="4" y="14" width="56" height="28" preserveAspectRatio="xMidYMid meet"/>'
-           '<rect x="0" y="58" width="64" height="6" fill="#00963d"/></svg>')
+    import io
+
+    dist_logo = dist_root / "assets" / "logo"
+    dist_logo.mkdir(parents=True, exist_ok=True)
+    mark = Image.open(mark_src).convert("RGBA")
+
+    def tile(size: int, pad: float) -> Image.Image:
+        canvas = Image.new("RGBA", (size, size), (12, 13, 12, 255))
+        inner = mark.resize((round(size * (1 - 2 * pad)),) * 2, Image.LANCZOS)
+        canvas.paste(inner, ((size - inner.width) // 2,) * 2, inner)
+        return canvas
+
+    tile(180, 0.10).save(dist_logo / "apple-touch-icon.png", "PNG", optimize=True)
+    tile(64, 0.04).save(dist_root / "favicon.ico", sizes=[(16, 16), (32, 32), (48, 48)])
+    buf = io.BytesIO()
+    tile(96, 0.04).save(buf, "PNG", optimize=True)
+    png = base64.b64encode(buf.getvalue()).decode()
+    svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><clipPath id="r"><rect width="96" height="96" rx="18"/></clipPath>'
+           f'<image clip-path="url(#r)" href="data:image/png;base64,{png}" width="96" height="96"/></svg>')
     (dist_logo / "favicon.svg").write_text(svg, encoding="utf-8")
-    im = Image.open(logo_src).convert("RGBA")
-    canvas = Image.new("RGBA", (180, 180), (12, 13, 12, 255))
-    logo = im.copy()
-    logo.thumbnail((150, 90), Image.LANCZOS)
-    canvas.paste(logo, ((180 - logo.width) // 2, (180 - logo.height) // 2), logo)
-    canvas.save(dist_logo / "apple-touch-icon.png", "PNG", optimize=True)

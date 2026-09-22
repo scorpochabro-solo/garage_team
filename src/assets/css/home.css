@@ -46,7 +46,8 @@
 @media (max-height: 880px) { .hero__scroll { display: none; } }
 @media (max-height: 700px) and (min-width: 1001px) { .hero__facts li { padding: 0.8rem 1rem; } .promo-ticket { padding: 1.1rem 1.2rem 1.1rem 1.6rem; gap: 0.6rem; } }
 @media (max-width: 1000px) { .hero__in { grid-template-columns: 1fr; } .hero__aside { grid-template-columns: 1fr 1fr; align-items: start; } .hero__scroll { display: none; } }
-@media (max-width: 640px) { .hero { min-height: auto; } .hero__aside { grid-template-columns: 1fr; } .hero__phone { margin-left: 0; } .hero__facts b { font-size: 1.5rem; } }
+/* на телефонах заголовок считается от ширины экрана: самое длинное слово (10 букв) должно помещаться в колонку даже на 320px */
+@media (max-width: 640px) { .hero__title { font-size: clamp(1.8rem, 10vw, 2.6rem); } .hero__copy { min-width: 0; } .hero { min-height: auto; } .hero__aside { grid-template-columns: 1fr; } .hero__phone { margin-left: 0; } .hero__facts b { font-size: 1.5rem; } }
 
 /* ---------- advantages ---------- */
 .adv__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); box-shadow: inset 0 0 0 1px var(--line); }

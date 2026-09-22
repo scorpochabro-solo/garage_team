@@ -1,0 +1,5 @@
+{
+ "_note": "Страницы, которых не было на оригинальном garage.team. Сейчас пусто: страницы тонировки и установки сигнализации удалены 2026-09-21, компания этих услуг не оказывает. Формат: categories[] = {href, name, after (href направления, после которого вставить), subs[]}; services[] = {path, h1, category_href, category_name, description, article_html, price_heads?, price_rows?, gallery?}. Для направления без подстраниц path совпадает с category_href.",
+ "categories": [],
+ "services": []
+}

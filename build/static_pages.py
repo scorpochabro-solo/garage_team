@@ -64,7 +64,7 @@ def render_contacts():
     hours = "".join(f"<li><span>{esc(d)}</span><span>{esc(h)}</span></li>" for d, h in D.HOURS)
     shop_hours = "".join(f"<li><span>{esc(d)}</span><span>{esc(h)}</span></li>" for d, h in D.SHOP_HOURS)
     hero = page_hero("Контакты", [("Главная", "/"), ("Контакты", None)], eyebrow="Как нас найти", aside=phone_aside("Заказать звонок"), mark_icon="steering",
-                     lead=f"{esc(D.ADDRESS_FULL)}. Автотехцентр и магазин запчастей «Гараж».")
+                     lead=f"{esc(D.ADDRESS_FULL)}. Автосервис и магазин запчастей «Гараж».")
     body = f"""{hero}
 <section class="wrap page-grid">
   <div class="stack" style="--gap:2.5rem">
@@ -308,7 +308,7 @@ def render_otzyvy():
     body = f"""{hero}
 <section class="section section--tight"><div class="wrap reveal"><div class="reviews-grid">{cards}</div></div></section>
 {request_section("Оставить запрос")}"""
-    return document("Отзывы клиентов | Автотехцентр Гараж, Нижний Новгород", "Отзывы клиентов автотехцентра Гараж в Нижнем Новгороде.", "/otzyvy.html", body, body_class="page-reviews")
+    return document("Отзывы клиентов | Автосервис Гараж, Нижний Новгород", "Отзывы клиентов автосервиса Гараж в Нижнем Новгороде.", "/otzyvy.html", body, body_class="page-reviews")
 
 
 def render_404():

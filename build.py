@@ -79,10 +79,8 @@ def main(verbose=False):
     # assets
     shutil.copytree(SRC / "assets" / "fonts", DIST / "assets" / "fonts")
     (DIST / "assets" / "logo").mkdir(parents=True)
-    for name in ("logo-white@4x.png", "logo-black@4x.png", "logo-original.png"):
-        shutil.copy(SRC / "assets" / "logo" / name, DIST / "assets" / "logo" / name)
-    make_logo_assets(SRC / "assets" / "logo" / "logo-white@4x.png", DIST / "assets" / "logo")
-    shutil.copy(SRC / "favicon.ico", DIST / "favicon.ico")
+    shutil.copy(SRC / "assets" / "logo" / "logo.svg", DIST / "assets" / "logo" / "logo.svg")
+    make_logo_assets(SRC / "assets" / "logo" / "mark.png", DIST)
     n_img, img_bytes = process_images(SRC / "assets" / "img", DIST / "assets" / "img", verbose=verbose)
 
     css = fonts_css() + D.rebase("\n".join((SRC / "assets" / "css" / n).read_text(encoding="utf-8") for n in CSS_ORDER))

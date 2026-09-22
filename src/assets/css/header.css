@@ -16,8 +16,8 @@
 .site-header.is-scrolled::after { opacity: 1; }
 .site-header__in { display: flex; align-items: center; gap: 1.5rem; height: var(--header-h); }
 .logo { display: block; flex: none; }
-.logo img { width: 118px; height: 59px; object-fit: contain; }
-.logo--footer img { width: 160px; height: 80px; }
+.logo img { width: 133px; height: 48px; object-fit: contain; }
+.logo--footer img { width: 221px; height: 80px; }
 
 .nav { display: flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; }
 .nav__link { position: relative; display: inline-flex; align-items: center; height: 40px; padding: 0 0.85rem; font-weight: 600; font-size: 0.93rem; color: var(--gray-300); transition: color var(--dur) var(--ease); }
@@ -45,7 +45,7 @@
 }
 @media (max-width: 640px) {
   :root { --header-h: 64px; }
-  .logo img { width: 96px; height: 48px; }
+  .logo img { width: 116px; height: 42px; }
   .site-header__actions .btn--primary { display: none; }
 }
 

@@ -1,12 +1,12 @@
 {
- "_note": "Координаты хотспотов — проценты от бокса изображения машины (car.png, BMW Alpina B3 Touring, вид спереди). side: колонка подписи как на оригинальном сайте.",
+ "_note": "Координаты хотспотов — проценты от бокса изображения машины (car.png, BMW Alpina B3 Touring, вид спереди, без водителя). Порядок в файле = нумерация на схеме: сначала левая колонка, затем правая, затем нижний ряд. Минимальное расстояние между точками — 0.08 от ширины, иначе лупа «прилипает» не к той.",
  "items": [
   {
    "key": "electric",
    "name": "Автоэлектрика",
    "href": "/services/remont-elektrooborudovania-avtomobila.html",
    "x": 40,
-   "y": 18,
+   "y": 15,
    "side": "left",
    "icon": "electric",
    "blurb": "Проводка, генератор, стартер, фары, ксенон, лампы"
@@ -16,7 +16,7 @@
    "name": "Кузовной ремонт",
    "href": "/services/kuzovnoj-remont.html",
    "x": 90,
-   "y": 40,
+   "y": 37,
    "side": "left",
    "icon": "body",
    "blurb": "Рихтовка, замена элементов, геометрия, покраска"
@@ -25,8 +25,8 @@
    "key": "climate",
    "name": "Климат",
    "href": "/services/zapravka-i-remont-avtokondicionerov.html",
-   "x": 68,
-   "y": 33,
+   "x": 72,
+   "y": 31,
    "side": "left",
    "icon": "ac",
    "blurb": "Заправка и ремонт кондиционера, печка, фильтры"
@@ -36,17 +36,27 @@
    "name": "Вклейка стекол",
    "href": "/services/kuzovnoj-remont.html",
    "x": 32,
-   "y": 12,
+   "y": 9,
    "side": "left",
    "icon": "glass",
    "blurb": "Замена и вклейка лобовых и боковых стёкол"
+  },
+  {
+   "key": "inspection",
+   "name": "Техосмотр",
+   "href": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
+   "x": 50,
+   "y": 8,
+   "side": "left",
+   "icon": "inspection",
+   "blurb": "Диагностическая карта для ОСАГО"
   },
   {
    "key": "vinyl",
    "name": "Брендирование",
    "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
    "x": 28,
-   "y": 36,
+   "y": 33,
    "side": "left",
    "icon": "vinyl",
    "blurb": "Оклейка, покраска, стайлинг транспорта"
@@ -56,7 +66,7 @@
    "name": "Ремонт фар",
    "href": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
    "x": 14,
-   "y": 52,
+   "y": 50,
    "side": "left",
    "icon": "headlight",
    "blurb": "Замена, регулировка и восстановление оптики"
@@ -66,7 +76,7 @@
    "name": "Тюнинг",
    "href": "/services/cip-tuning.html",
    "x": 50,
-   "y": 79,
+   "y": 77,
    "side": "left",
    "icon": "chip",
    "blurb": "Чип-тюнинг, удаление DPF, катализаторов, AdBlue"
@@ -76,7 +86,7 @@
    "name": "Ремонт трансмиссии",
    "href": "/services/remont-akpp-i-zamena-masla-v-akpp.html",
    "x": 44,
-   "y": 92,
+   "y": 90,
    "side": "left",
    "icon": "akpp",
    "blurb": "АКПП, МКПП, сцепление, замена масла"
@@ -85,8 +95,8 @@
    "key": "steering",
    "name": "Рулевое управление",
    "href": "/services/remont-hodovoj/zamena-rulevoj-rejki.html",
-   "x": 61,
-   "y": 23,
+   "x": 66,
+   "y": 24,
    "side": "right",
    "icon": "steering",
    "blurb": "Рулевая рейка, тяги, наконечники"
@@ -96,7 +106,7 @@
    "name": "Ремонт глушителей",
    "href": "/services/remont-vyhlopnoj-sistemy/remont-glusitela.html",
    "x": 80,
-   "y": 96,
+   "y": 94,
    "side": "right",
    "icon": "exhaust",
    "blurb": "Глушители, резонаторы, гофры, катализаторы"
@@ -106,7 +116,7 @@
    "name": "Ремонт двигателя",
    "href": "/services/remont-dvigatela.html",
    "x": 50,
-   "y": 44,
+   "y": 41,
    "side": "right",
    "icon": "engine",
    "blurb": "ГРМ, прокладки, клапаны, течи масла, дизель"
@@ -116,17 +126,27 @@
    "name": "Тормозная система",
    "href": "/services/remont-zamena-regulirovka-prokacka-tormozov.html",
    "x": 96,
-   "y": 82,
+   "y": 80,
    "side": "right",
    "icon": "brake",
    "blurb": "Колодки, диски, суппорты, прокачка, ручник"
+  },
+  {
+   "key": "tire",
+   "name": "Шиномонтаж",
+   "href": "/services/sinomontaz.html",
+   "x": 93,
+   "y": 93,
+   "side": "right",
+   "icon": "tire",
+   "blurb": "Сезонная замена шин, балансировка, ремонт проколов"
   },
   {
    "key": "cooling",
    "name": "Радиатор и охлаждение",
    "href": "/services/remont-i-promyvka-sistem-ohlazdenia.html",
    "x": 50,
-   "y": 57,
+   "y": 55,
    "side": "right",
    "icon": "cooling",
    "blurb": "Помпа, термостат, радиатор, антифриз, датчики"
@@ -136,7 +156,7 @@
    "name": "Топливная система",
    "href": "/services/remont-promyvka-inzektorov-i-monovpryskov.html",
    "x": 74,
-   "y": 46,
+   "y": 43,
    "side": "right",
    "icon": "injector",
    "blurb": "Форсунки, инжектор, свечи, давление"
@@ -146,7 +166,7 @@
    "name": "Подвеска",
    "href": "/services/remont-hodovoj/zamena-rycagov-podveski.html",
    "x": 4,
-   "y": 80,
+   "y": 78,
    "side": "right",
    "icon": "suspension",
    "blurb": "Амортизаторы, рычаги, сайлентблоки, ШРУСы"
@@ -156,7 +176,7 @@
    "name": "Сход-развал",
    "href": "/services/remont-hodovoj.html",
    "x": 7,
-   "y": 94,
+   "y": 92,
    "side": "right",
    "icon": "alignment",
    "blurb": "Регулировка углов установки колёс"
@@ -166,7 +186,7 @@
    "name": "Автозапчасти",
    "href": "/services/avtozapcasti.html",
    "x": 14,
-   "y": 72,
+   "y": 70,
    "side": "bottom",
    "icon": "parts",
    "blurb": "В наличии и под заказ, оригинал и аналоги"
@@ -176,20 +196,30 @@
    "name": "Дополнительное оборудование",
    "href": "/services/ustanovka-dopolnitelnogo-oborudovania.html",
    "x": 6,
-   "y": 27,
+   "y": 24,
    "side": "bottom",
    "icon": "equipment",
-   "blurb": "Сигнализации, парктроники, камеры, тонировка"
+   "blurb": "Подбор и установка оборудования под вашу модель"
   },
   {
    "key": "maintenance",
    "name": "ТО",
    "href": "/services/planovoe-to.html",
    "x": 86,
-   "y": 72,
+   "y": 70,
    "side": "bottom",
    "icon": "maintenance",
    "blurb": "Плановое обслуживание по регламенту"
+  },
+  {
+   "key": "oil",
+   "name": "Замена масла в АКПП",
+   "href": "/services/remont-akpp-i-zamena-masla-v-akpp/zamena-masla-v-akpp.html",
+   "x": 57,
+   "y": 90,
+   "side": "bottom",
+   "icon": "oil",
+   "blurb": "Замена масла и фильтра автоматической коробки"
   }
  ]
 }

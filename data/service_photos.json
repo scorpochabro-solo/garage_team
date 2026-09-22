@@ -1,0 +1,35 @@
+{
+  "_note": "Иллюстрации для страниц услуг, сгенерированные через kie.ai (tools/kie_images.py). Это не фотографии сервиса «Гараж»: не подписывать их как «фото наших работ». Страница показывает фото, только если файл src/assets/img/photo/<slug>.jpg существует. Поле scene описывает сюжет, общий фотостиль дописывает скрипт.",
+  "items": [
+    {
+      "page": "/services/remont-dvigatela.html",
+      "slug": "remont-dvigatela",
+      "alt": "Ремонт двигателя: моторист измеряет цилиндр нутромером на снятом блоке",
+      "scene": "An inline four-cylinder petrol engine block mounted on a red engine stand in a car repair workshop, cylinder head removed, the flat machined deck with four round cylinder bores in one straight row and the piston crowns visible inside them, slightly oily. A mechanic in dark workwear and black nitrile gloves leans over the block and measures the second cylinder with a dial bore gauge, only his forearms, hands and chest are in frame, face out of frame. On the steel workbench behind: the removed aluminium cylinder head, a torque wrench, a tray with bolts, a rag. Dim workshop with one strong work lamp from the upper left."
+    },
+    {
+      "page": "/services/sinomontaz.html",
+      "slug": "sinomontaz",
+      "alt": "Шиномонтаж: мастер монтирует шину на литой диск на шиномонтажном станке",
+      "scene": "A tire fitter in dark workwear and black gloves mounts a new low-profile tyre onto a graphite multi-spoke alloy wheel clamped on a professional tyre changer machine; the steel mounting head sits at the rim edge, he presses the sidewall down with one hand and guides a tyre lever with the other. Seen from the side at waist height, his face is turned away and out of focus. Background: a wheel balancer, stacks of tyres on racks, an air hose on the wall, a grey sedan on a two-post lift with a wheel removed. Concrete floor with rubber marks and a little tyre paste."
+    },
+    {
+      "page": "/services/shod-razval-regulirovka-i-diagnostika.html",
+      "slug": "shod-razval",
+      "alt": "Сход-развал: автомобиль на стенде с мишенями 3D-стенда на колёсах",
+      "scene": "A dark graphite sedan without any badges stands on a four-post wheel alignment lift raised to chest height in a car workshop. Square reflective 3D alignment targets are clamped onto the front and rear wheels with four-point wheel clamps. In front of the car a tall alignment camera beam on a column. Under the lift a technician in dark workwear, seen from behind, adjusts a tie rod with two spanners, a small work light next to him. Three-quarter front view from slightly below wheel height, front wheel with the target sharp in the foreground."
+    },
+    {
+      "page": "/services/remont-zamena-regulirovka-prokacka-tormozov.html",
+      "slug": "tormoza",
+      "alt": "Замена тормозных колодок: мастер устанавливает новые колодки в суппорт",
+      "scene": "Close-up of a front brake assembly on a car raised on a lift with the wheel removed: a ventilated brake disc with light surface wear marks, the caliper swung open on its bracket, a mechanic's hands in black nitrile gloves sliding a new brake pad with a clean friction surface into the caliper bracket. The old worn pads and a can-shaped aerosol without any label lie on a rolling tool cart at the edge of the frame. Wheel hub with five studs, a slightly rusty hub centre, brake dust on the suspension arm and the brake hose visible behind. The wheel arch liner and spring are dark in the background."
+    },
+    {
+      "page": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
+      "slug": "pokraska",
+      "alt": "Покраска автомобиля: маляр наносит лак на крыло в окрасочной камере",
+      "scene": "Inside a professional automotive spray booth with white panel walls and rows of ceiling filter lights: a painter in a grey paint suit with a hood, a half-face respirator with two filters and nitrile gloves sprays clear coat from an HVLP gravity-feed spray gun onto the front fender of a car painted deep emerald green metallic. The rest of the car is masked with brown masking paper and beige tape, the wheels are covered. A fine mist of overspray hangs in the light, wet glossy reflections of the ceiling lights run along the fender. Side view, the painter in profile with the face hidden by the respirator and hood, the air hose trailing to the floor grate."
+    }
+  ]
+}

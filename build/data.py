@@ -15,10 +15,55 @@ _SERVICES = json.loads((DATA / "services.json").read_text(encoding="utf-8"))
 DESCR = json.loads((DATA / "descriptions.json").read_text(encoding="utf-8"))
 HOTSPOTS = json.loads((DATA / "hotspots.json").read_text(encoding="utf-8"))["items"]
 
-CATEGORIES = _SERVICES["categories"]
-SERVICES = _SERVICES["services"]
+_EXTRA_FILE = DATA / "services_extra.json"
+_EXTRA = json.loads(_EXTRA_FILE.read_text(encoding="utf-8")) if _EXTRA_FILE.exists() else {}
+
+
+def _with_extras(categories: list, services: list, extra: dict) -> tuple[list, list, dict]:
+    """Return (categories, services, descriptions) with services_extra.json merged in.
+    New directions are inserted after the category named in "after"; new sub-pages are appended to their category."""
+    cats = [dict(c, subs=list(c["subs"])) for c in categories]
+    for c in extra.get("categories", []):
+        item = {"href": c["href"], "icon": "", "name": c["name"], "subs": list(c.get("subs", []))}
+        idx = next((i for i, x in enumerate(cats) if x["href"] == c.get("after")), len(cats) - 1)
+        cats.insert(idx + 1, item)
+    svcs, descr = list(services), {}
+    for e in extra.get("services", []):
+        svcs.append({"path": e["path"], "h1": e["h1"], "category_href": e["category_href"], "category_name": e["category_name"],
+                     "description_html": "", "article_html": e.get("article_html", ""), "price_heads": e.get("price_heads", []),
+                     "price_rows": e.get("price_rows", []), "gallery": e.get("gallery", []), "generated": True})
+        descr[e["path"]] = e.get("description", "")
+        if e["category_href"] != e["path"]:
+            parent = next((x for x in cats if x["href"] == e["category_href"]), None)
+            if parent is None:
+                raise ValueError(f"services_extra.json: нет категории {e['category_href']} для {e['path']}")
+            parent["subs"].append({"href": e["path"], "name": e["h1"]})
+    return cats, svcs, descr
+
+
+CATEGORIES, SERVICES, _EXTRA_DESCR = _with_extras(_SERVICES["categories"], _SERVICES["services"], _EXTRA)
+DESCR = {**DESCR, **_EXTRA_DESCR}
 BY_PATH = {s["path"]: s for s in SERVICES}
 CAT_BY_HREF = {c["href"]: c for c in CATEGORIES}
+
+
+def _load_photos(known_pages: dict) -> dict:
+    """Cover photos of service pages from service_photos.json: {page: {slug, alt, src}}.
+    An item without its file in src/assets/img/photo/ is skipped, so a page simply has no photo until it is generated."""
+    file = DATA / "service_photos.json"
+    if not file.exists():
+        return {}
+    photos = {}
+    for item in json.loads(file.read_text(encoding="utf-8")).get("items", []):
+        if item["page"] not in known_pages:
+            raise ValueError(f"service_photos.json: нет страницы услуги {item['page']}")
+        src = SRC / "assets" / "img" / "photo" / f"{item['slug']}.jpg"
+        if src.exists():
+            photos[item["page"]] = {"slug": item["slug"], "alt": item["alt"], "src": src}
+    return photos
+
+
+PHOTOS = _load_photos(BY_PATH)
 
 # ---------- constants (verbatim from the current site) ----------
 BRAND = "Гараж"
@@ -40,6 +85,7 @@ FOUNDED = 2011
 COPYRIGHT_FROM = 2011
 COMPANY = "ООО «Гараж»"
 COMPANY_LINE_2 = "Сеть магазинов запчастей «Гараж»"
+SLOGAN_EN = "Complete car care since 2011"
 META_KEYWORDS = "Гараж - поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей"
 
 NAV = [
@@ -74,6 +120,7 @@ def esc(s):
 BASE = ""
 _ROOT_LINK = re.compile(r'(href|src|action|content)="/(?!/)')
 _ROOT_URL = re.compile(r"url\('/(?!/)")
+_SRCSET = re.compile(r'\bsrcset="([^"]+)"')
 
 
 def set_base(base):
@@ -81,11 +128,19 @@ def set_base(base):
     BASE = (base or "").rstrip("/")
 
 
+def _rebase_srcset(match):
+    """srcset holds several comma-separated URLs, so the single-URL pattern above cannot cover it."""
+    candidates = [c.strip() for c in match.group(1).split(",")]
+    fixed = [BASE + c if c.startswith("/") and not c.startswith("//") else c for c in candidates]
+    return f'srcset="{", ".join(fixed)}"'
+
+
 def rebase(text):
     """Prefix every root-relative URL (/assets/…, /services/…, /call/…) with BASE. No-op when BASE is empty."""
     if not BASE:
         return text
     text = _ROOT_LINK.sub(lambda m: f'{m.group(1)}="{BASE}/', text)
+    text = _SRCSET.sub(_rebase_srcset, text)
     text = _ROOT_URL.sub(f"url('{BASE}/", text)
     text = text.replace("location.href = '/'", f"location.href = '{BASE}/'")
     return text

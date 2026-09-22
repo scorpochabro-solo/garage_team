@@ -4,11 +4,16 @@ import re
 
 from . import data as D
 from .icons import icon, icon_for_href
+from .images import RESPONSIVE_WIDTHS, scaled_size
 from .layout import (document, page_hero, phone_aside, contact_card, side_index, green_note,
                      reviews_section, request_section)
 
 esc = D.esc
 FLAGS = ["Любые марки", "Гарантия до 360 дней*", "Запчасти в наличии и под заказ", "Коммерческая техника до 5,5 т"]
+# Cover photos are generated illustrations, not shots of the workshop: the label says so to the visitor.
+PHOTO_LABEL = "иллюстрация"
+# main column: full width minus gutters below the 1000px breakpoint, up to 1000px next to the sidebar
+PHOTO_SIZES = "(max-width: 1000px) calc(100vw - 2.2rem), 1000px"
 
 
 def _src_exists(url):
@@ -43,7 +48,7 @@ def render_services_index():
     total = len(D.SERVICES)
     lead = (f"{len(D.CATEGORIES)} направлений и {total} видов работ: от компьютерной диагностики до кузовного ремонта и хранения шин. "
             "Сервис и ремонт любых марок, обслуживание коммерческой техники до 5,5 тонн.")
-    hero = page_hero("Наши услуги", [("Главная", "/"), ("Наши услуги", None)], eyebrow="Автотехцентр Гараж", lead=lead,
+    hero = page_hero("Наши услуги", [("Главная", "/"), ("Наши услуги", None)], eyebrow="Автосервис Гараж", lead=lead,
                      aside=phone_aside("Записаться на приём"), mark_icon="maintenance")
     body = f"""{hero}
 <section class="section section--tight" aria-label="Список услуг">
@@ -58,7 +63,7 @@ def render_services_index():
 </section>
 <div class="wrap" style="padding-bottom:var(--section-y)">{green_note()}</div>
 {request_section("Оставить запрос")}"""
-    title = "Услуги автосервиса в Нижнем Новгороде — все направления и цены | Автотехцентр Гараж"
+    title = "Услуги автосервиса в Нижнем Новгороде — все направления и цены | Автосервис Гараж"
     desc = (f"{len(D.CATEGORIES)} направлений ремонта и обслуживания автомобилей в Нижнем Новгороде: диагностика, двигатель, ходовая, "
             f"тормоза, электрика, кузов, покраска, ТО. Цены и запись по телефону {D.PHONE}.")
     return document(title, desc, "/services.html", body, body_class="page-services")
@@ -99,6 +104,21 @@ def _price_block(svc):
       <table class="price-table"><thead><tr>{ths}</tr></thead><tbody>{"".join(trs)}</tbody></table>
       <div class="price-block__foot"><span>Цены указаны за работу; точную стоимость уточняйте по телефону {esc(D.PHONE)}.</span><button class="btn btn--primary btn--sm" type="button" data-modal="call">{icon('phone')} Записаться</button></div>
     </div>"""
+
+
+def _photo_block(svc):
+    photo = D.PHOTOS.get(svc["path"])
+    if not photo:
+        return ""
+    width, height = scaled_size(photo["src"])
+    narrow = RESPONSIVE_WIDTHS["photo"]
+    url = f"/assets/img/photo/{photo['slug']}"
+    return f"""<figure class="svc-photo reveal">
+      <a class="svc-photo__link" href="{url}.webp" data-lightbox="svc" aria-label="Открыть крупнее: {esc(photo['alt'])}">
+        <img src="{url}.webp" srcset="{url}-{narrow}.webp {narrow}w, {url}.webp {width}w" sizes="{PHOTO_SIZES}" alt="{esc(photo['alt'])}" width="{width}" height="{height}" fetchpriority="high" decoding="async">
+      </a>
+      <figcaption class="svc-photo__tag">// {PHOTO_LABEL}</figcaption>
+    </figure>"""
 
 
 def _gallery_block(svc):
@@ -178,9 +198,12 @@ def render_service(svc):
 
     article = ""
     if svc.get("article_html"):
-        article = f'<article class="prose reveal">{_fix_img_src(svc["article_html"])}</article>'
+        article = f'<article class="prose prose--article reveal">{_fix_img_src(svc["article_html"])}</article>'
 
-    main = "\n".join(x for x in [intro, _price_block(svc), cta, _gallery_block(svc), _siblings_block(svc, cat, is_cat), article] if x)
+    # без прайса блок цены сам является призывом позвонить, второй такой же ниже не нужен
+    blocks = [_photo_block(svc), intro, _price_block(svc), cta if svc.get("price_rows") else "", _gallery_block(svc), article,
+              _siblings_block(svc, cat, is_cat)]
+    main = "\n".join(x for x in blocks if x)
     side = f"""<aside class="svc-page__side">{side_index(cat['href'] if cat else None)}{contact_card()}</aside>"""
 
     body = f"""{hero}
@@ -194,6 +217,6 @@ def render_service(svc):
 
     best = D.price_from(svc)
     price_txt = f" Цены от {D.fmt_amount(best)}." if best else ""
-    title = f"{svc['h1']} в Нижнем Новгороде — цены, запись | Автотехцентр Гараж"
+    title = f"{svc['h1']} в Нижнем Новгороде — цены, запись | Автосервис Гараж"
     desc = (D.strip_tags(descr_html)[:200] + price_txt + f" Тел. {D.PHONE}.")
     return document(title, desc, svc["path"], body, body_class="page-service")

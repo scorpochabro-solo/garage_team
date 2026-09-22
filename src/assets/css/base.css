@@ -107,6 +107,8 @@ table { border-collapse: collapse; width: 100%; }
 .reveal.is-in { opacity: 1; transform: none; }
 .reveal--x { transform: translateX(-24px); }
 .reveal--scale { transform: scale(0.96); }
+/* set by core.js on looping decorations that are scrolled out of view; !important because animation shorthands reset play-state */
+.is-offscreen, .is-offscreen * { animation-play-state: paused !important; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }

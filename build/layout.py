@@ -75,7 +75,7 @@ def header():
     nav = "".join(f'<a class="nav__link" href="{h}">{esc(n)}</a>' for n, h in D.NAV)
     return f"""<header class="site-header" data-header>
   <div class="wrap site-header__in">
-    <a class="logo" href="/" aria-label="Гараж — на главную"><img src="/assets/logo/logo-white@4x.png" width="118" height="59" alt="Гараж — автотехцентр в Нижнем Новгороде"></a>
+    <a class="logo" href="/" aria-label="Гараж — на главную"><img src="/assets/logo/logo.svg" width="133" height="48" alt="Garage Team — автосервис «Гараж» в Нижнем Новгороде"></a>
     <nav class="nav" aria-label="Основное меню">{nav}</nav>
     <div class="site-header__actions">
       <a class="site-header__phone" href="tel:{D.PHONE_TEL}"><span class="mono">{D.PHONE_CODE}</span> {D.PHONE_NUM}</a>
@@ -125,8 +125,9 @@ def footer():
   <div class="wrap site-footer__in">
     <div class="footer__grid">
       <div class="footer__brand">
-        <a class="logo logo--footer" href="/"><img src="/assets/logo/logo-white@4x.png" width="160" height="80" alt="Гараж"></a>
-        <p>{esc(D.COMPANY)}<br>{esc(D.COMPANY_LINE_2)}<br>Автотехцентр и магазин запчастей в Нижнем Новгороде с {D.FOUNDED} года.</p>
+        <a class="logo logo--footer" href="/"><img src="/assets/logo/logo.svg" width="221" height="80" alt="Garage Team — автосервис «Гараж»" loading="lazy"></a>
+        <p class="footer__slogan mono" lang="en">{esc(D.SLOGAN_EN)}</p>
+        <p>{esc(D.COMPANY)}<br>{esc(D.COMPANY_LINE_2)}<br>Автосервис и магазин запчастей в Нижнем Новгороде с {D.FOUNDED} года.</p>
         <div class="footer__social">
           <a href="{D.VK_URL}" target="_blank" rel="noopener" aria-label="ВКонтакте">{icon('vk')}</a>
           <a href="{D.FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">{icon('facebook')}</a>

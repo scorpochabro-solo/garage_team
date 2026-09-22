@@ -59,6 +59,13 @@
     }
   }
 
+  /* ---------- looping decorations (ticker, scroll hint) tick on every frame even when scrolled away: pause them off screen ---------- */
+  const loops = $$('.ticker, .hero__scroll');
+  if (loops.length && 'IntersectionObserver' in window) {
+    const idle = new IntersectionObserver((entries) => entries.forEach((en) => en.target.classList.toggle('is-offscreen', !en.isIntersecting)));
+    loops.forEach((el) => idle.observe(el));
+  }
+
   /* ---------- count-up ---------- */
   const counters = $$('[data-countup]');
   if (counters.length) {
