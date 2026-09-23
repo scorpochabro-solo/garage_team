@@ -24,11 +24,23 @@
       burger.setAttribute('aria-expanded', String(open));
       menu.classList.toggle('is-open', open);
       document.body.classList.toggle('no-scroll', open);
+      document.body.classList.toggle('is-menu-open', open);   // hides the fixed mobile bar: the menu has its own call buttons
     };
     burger.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
     menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
     addEventListener('resize', () => { if (innerWidth > 1100) setOpen(false); }, { passive: true });
+  }
+
+  /* ---------- side index: open next to the content on wide screens, collapsed under it on phones ---------- */
+  const sideIndex = $('[data-side-index]');
+  if (sideIndex) {
+    const wide = matchMedia('(min-width: 1001px)');
+    const sync = () => { sideIndex.open = wide.matches; };
+    sync();
+    if (wide.addEventListener) wide.addEventListener('change', sync); else wide.addListener(sync);
+    // next to the content the list is always shown: its title is a heading there, not a toggle
+    sideIndex.querySelector('summary').addEventListener('click', (e) => { if (wide.matches) e.preventDefault(); });
   }
 
   /* ---------- active nav ---------- */
@@ -106,8 +118,10 @@
     if (!dlg) return;
     if (preset) { Object.entries(preset).forEach(([k, v]) => { const f = dlg.querySelector(`[name="${k}"]`); if (f) f.value = v; }); }
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    // with a mouse the cursor goes straight to the first field; on a phone that would throw the keyboard over the form
+    // before it is read, so there the dialog keeps its own focus on the close button and the visitor taps a field
     const first = dlg.querySelector('input:not([type=hidden]):not([disabled]), select, textarea');
-    if (first) setTimeout(() => first.focus(), 60);
+    if (first && G.canHover) setTimeout(() => first.focus(), 60);
   };
   G.closeModal = (dlg) => { if (!dlg) return; if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); };
   document.addEventListener('click', (e) => {

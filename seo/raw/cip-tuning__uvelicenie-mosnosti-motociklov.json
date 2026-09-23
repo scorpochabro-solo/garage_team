@@ -1,0 +1,151 @@
+{
+ "slug": "cip-tuning__uvelicenie-mosnosti-motociklov",
+ "path": "/services/cip-tuning/uvelicenie-mosnosti-motociklov.html",
+ "h1": "Увеличение мощности мотоциклов",
+ "region": "47",
+ "collected": "2026-09-23",
+ "seeds": [
+  {
+   "phrase": "чип тюнинг мотоцикла",
+   "total": 7,
+   "results": [
+    {
+     "phrase": "чип тюнинг мотоциклов",
+     "count": 7
+    }
+   ],
+   "associations": [
+    {
+     "phrase": "питбайк эндуро",
+     "count": 299
+    },
+    {
+     "phrase": "питбайк рисунок",
+     "count": 32
+    },
+    {
+     "phrase": "питбайк бензиновый",
+     "count": 62
+    },
+    {
+     "phrase": "двигатель на питбайк",
+     "count": 88
+    },
+    {
+     "phrase": "мотор на питбайк",
+     "count": 142
+    },
+    {
+     "phrase": "ремонт питбайка",
+     "count": 31
+    },
+    {
+     "phrase": "как поменять масло на питбайке",
+     "count": 2
+    },
+    {
+     "phrase": "питбайк пантера",
+     "count": 4
+    },
+    {
+     "phrase": "двигатель на мопед альфа",
+     "count": 80
+    },
+    {
+     "phrase": "мотошлем aim",
+     "count": 6
+    },
+    {
+     "phrase": "питбайк картинки",
+     "count": 44
+    },
+    {
+     "phrase": "мопед с двигателем от мотоблока",
+     "count": 28
+    },
+    {
+     "phrase": "мотокуртки icon мужские",
+     "count": 7
+    }
+   ]
+  }
+ ],
+ "alts": [
+  {
+   "phrase": "прошивка мотоцикла",
+   "total": 3,
+   "results": [
+    {
+     "phrase": "прошивка мотоцикла",
+     "count": 3
+    }
+   ],
+   "associations": [
+    {
+     "phrase": "мотошлем для чоппера",
+     "count": 3
+    },
+    {
+     "phrase": "песня мото мото текст",
+     "count": 4
+    },
+    {
+     "phrase": "питбайк тюнинг",
+     "count": 16
+    },
+    {
+     "phrase": "мотоциклетное масло",
+     "count": 23
+    }
+   ]
+  },
+  {
+   "phrase": "увеличение мощности мотоцикла",
+   "total": 1,
+   "results": [
+    {
+     "phrase": "видеообзор увеличение мощности мотоцикла днепр мт 16",
+     "count": 1
+    },
+    {
+     "phrase": "увеличение мощности мотоцикла",
+     "count": 1
+    }
+   ],
+   "associations": [
+    {
+     "phrase": "progasi super max 250",
+     "count": 168
+    },
+    {
+     "phrase": "vivo x200 pro mini характеристики",
+     "count": 31
+    },
+    {
+     "phrase": "электромотоцикл взрослый мощный",
+     "count": 9
+    },
+    {
+     "phrase": "royal enfield super meteor 650",
+     "count": 21
+    },
+    {
+     "phrase": "motorola moto g100 pro",
+     "count": 31
+    },
+    {
+     "phrase": "самый мощный питбайк",
+     "count": 20
+    },
+    {
+     "phrase": "ktm 1290 super duke r",
+     "count": 15
+    },
+    {
+     "phrase": "максимальная скорость иж планета 5",
+     "count": 2
+    }
+   ]
+  }
+ ]
+}

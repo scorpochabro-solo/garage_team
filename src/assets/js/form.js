@@ -68,7 +68,8 @@
       });
       if (n > 1) form.scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'start' });
       const first = $(`.rq__panel[data-panel="${n}"] input:not([type=hidden]):not([disabled]), .rq__panel[data-panel="${n}"] select:not([disabled])`, form);
-      if (first && n > 1) setTimeout(() => first.focus(), 350);
+      // phones: no automatic focus, it would open the keyboard or a select wheel on its own (see G.openModal)
+      if (first && n > 1 && G.canHover) setTimeout(() => first.focus(), 350);
     };
 
     /* car selection mode toggle */

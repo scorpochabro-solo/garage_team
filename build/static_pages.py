@@ -3,12 +3,14 @@
 import re
 
 from . import data as D
+from . import schema
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
                      request_section, review_card)
 
 esc = D.esc
-P = D.SITE["pages"]
+# the old site's pages with the new titles and descriptions from data/page_seo.json on top
+P = {key: {**page, **D.PAGE_SEO.get(key, {})} for key, page in D.SITE["pages"].items()}
 
 
 def _split_h1(body_html):
@@ -151,7 +153,7 @@ def render_avtozapchasti():
     ways_html = "".join(
         f'<a class="way reveal" href="{h}" style="--d:{i * 50}ms"><img src="{D.img("/img/example/" + im)}" alt="" width="200" height="200" loading="lazy"><span>{esc(n)} {icon("arrow")}</span></a>'
         for i, (n, h, im) in enumerate(ways))
-    hero = page_hero("Запчасти в Нижнем Новгороде", [("Главная", "/"), ("Автозапчасти", None)], eyebrow="Автозапчасти", aside=phone_aside("Заказать звонок"), mark_icon="parts",
+    hero = page_hero(P["avtozapchasti"].get("h1", "Запчасти в Нижнем Новгороде"), [("Главная", "/"), ("Автозапчасти", None)], eyebrow="Автозапчасти", aside=phone_aside("Заказать звонок"), mark_icon="parts",
                      lead="Оптовые и розничные поставки запчастей для любых марок — японских, корейских, европейских, китайских и американских.")
     body = f"""{hero}
 <section class="section section--tight">
@@ -169,6 +171,7 @@ def render_avtozapchasti():
     <div class="prose reveal">
       <p>Мы специализируемся на оптовых и розничных поставках запчастей для любых марок автомобилей – японских, корейских, европейских, китайских и американских. В нашей базе насчитывается свыше 20 млн наименований запчастей, 2 тысячи торговых марок в наличии и на заказ.</p>
       <p><strong>Сразу ответим на вопрос, который нам зададут не раз – МЫ НЕ ЗАНИМАЕМСЯ КОНТРАКТНЫМИ ЗАПЧАСТЯМИ И ПРОЧИМИ ЗАПЧАСТЯМИ Б/У.</strong></p>
+      <p>Как устроены наличие, заказ и подбор деталей, чем оригинал отличается от аналога и что подготовить к заказу, читайте на странице <a class="accent" href="/services/avtozapcasti.html">автозапчасти в наличии и под заказ</a>.</p>
     </div>
     <div class="callout reveal" style="margin-top:1.5rem"><a class="accent" href="#request">Оставьте заявку!</a> или позвоните нам <a href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a></div>
     <div class="ways">{ways_html}</div>
@@ -181,7 +184,9 @@ def render_avtozapchasti():
   </div>
 </section>
 {request_section("Оставить заявку на автозапчасти")}"""
-    return document(P["avtozapchasti"]["title"], P["avtozapchasti"]["meta_description"], "/avtozapchasti/", body, body_class="page-parts")
+    graph = [schema.shop(), schema.breadcrumbs([("Главная", "/"), ("Автозапчасти", None)], D.SITE_URL + "/avtozapchasti/")]
+    return document(P["avtozapchasti"]["title"], P["avtozapchasti"]["meta_description"], "/avtozapchasti/", body, body_class="page-parts",
+                    jsonld=schema.dump(graph))
 
 
 def render_cats():
@@ -202,7 +207,7 @@ def render_search():
 <section class="wrap page-grid">
   <div class="stack" style="--gap:1.5rem">
     <form class="filter reveal" action="/search/" method="get" role="search">
-      <div class="filter__input">{icon('search')}<input class="input" type="search" name="num" placeholder="Искать по номеру детали..." aria-label="Номер детали"></div>
+      <div class="filter__input">{icon('search')}<input class="input" type="search" name="num" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" placeholder="Искать по номеру детали..." aria-label="Номер детали"></div>
       <button class="btn btn--primary" type="submit">Поиск</button>
     </form>
     <div class="callout callout--warn reveal">{icon('hazard')} Внимание! Поиск временно не работает. Оставьте заявку или позвоните — подберём деталь вручную.</div>
@@ -251,7 +256,7 @@ def render_registration():
     <div class="reg-section">
       <h2 class="reg-section__title">Регистрационные данные</h2>
       <div class="form-grid form-grid--2">
-        <div class="field"><label class="field__label" for="reg-phone">Мобильный телефон <span class="req">*</span></label><div class="input--prefix"><span>+7</span><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="reg-code" name="RegistrationForm[areaCode]" type="text" inputmode="numeric" maxlength="3" placeholder="903" style="width:90px" required aria-label="Код оператора"><input class="input" id="reg-phone" name="RegistrationForm[number]" type="text" inputmode="numeric" maxlength="7" placeholder="1234567" required></div></div><span class="field__error">Введите номер телефона</span></div>
+        <div class="field"><label class="field__label" for="reg-phone">Мобильный телефон <span class="req">*</span></label><div class="input--prefix"><span>+7</span><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="reg-code" name="RegistrationForm[areaCode]" type="text" inputmode="numeric" autocomplete="tel-area-code" maxlength="3" placeholder="903" style="width:90px" required aria-label="Код оператора"><input class="input" id="reg-phone" name="RegistrationForm[number]" type="text" inputmode="numeric" autocomplete="tel-local" maxlength="7" placeholder="1234567" required></div></div><span class="field__error">Введите номер телефона</span></div>
         <div class="field"><label class="field__label" for="reg-pass">Пароль <span class="req">*</span></label><input class="input" id="reg-pass" name="RegistrationForm[password]" type="password" autocomplete="new-password" required><span class="field__error">Придумайте пароль</span></div>
         <div class="field span-2"><span class="field__label">Укажите, в каком статусе вы будете с нами работать</span><div class="radio-group"><label class="radio"><input type="radio" name="RegistrationForm[type]" value="1" checked><span>Физ. лицо</span></label><label class="radio"><input type="radio" name="RegistrationForm[type]" value="2"><span>Юр. лицо</span></label></div></div>
       </div>
@@ -259,10 +264,10 @@ def render_registration():
     <div class="reg-section">
       <h2 class="reg-section__title">Персональные данные</h2>
       <div class="form-grid form-grid--2">
-        <div class="field"><label class="field__label" for="reg-name">Ваше настоящее имя <span class="req">*</span></label><input class="input" id="reg-name" name="RegistrationForm[name]" type="text" placeholder="Например: Иван Иванов" autocomplete="name" required><span class="field__error">Укажите имя</span></div>
-        <div class="field" data-org-only hidden><label class="field__label" for="reg-pos">Должность <span class="req">*</span></label><input class="input" id="reg-pos" name="RegistrationForm[orgPosition]" type="text" placeholder="Ваша должность..." required><span class="field__error">Укажите должность</span></div>
+        <div class="field"><label class="field__label" for="reg-name">Ваше настоящее имя <span class="req">*</span></label><input class="input" id="reg-name" name="RegistrationForm[name]" type="text" placeholder="Например: Иван Иванов" autocomplete="name" autocapitalize="words" required><span class="field__error">Укажите имя</span></div>
+        <div class="field" data-org-only hidden><label class="field__label" for="reg-pos">Должность <span class="req">*</span></label><input class="input" id="reg-pos" name="RegistrationForm[orgPosition]" type="text" autocomplete="organization-title" placeholder="Ваша должность..." required><span class="field__error">Укажите должность</span></div>
         <div class="field"><label class="field__label" for="reg-email">E-mail <span class="req">*</span></label><input class="input" id="reg-email" name="RegistrationForm[email]" type="email" placeholder="Адрес E-mail" autocomplete="email" required><span class="field__error">Укажите e-mail</span></div>
-        <div class="field"><label class="field__label" for="reg-city">Город <span class="req">*</span></label><input class="input" id="reg-city" name="RegistrationForm[city]" type="text" value="Нижний Новгород" required><span class="field__error">Укажите город</span></div>
+        <div class="field"><label class="field__label" for="reg-city">Город <span class="req">*</span></label><input class="input" id="reg-city" name="RegistrationForm[city]" type="text" autocomplete="address-level2" value="Нижний Новгород" required><span class="field__error">Укажите город</span></div>
         <div class="field span-2"><label class="field__label" for="reg-info">Дополнительная информация</label><textarea class="textarea" id="reg-info" name="RegistrationForm[info]" rows="3"></textarea></div>
       </div>
     </div>
@@ -270,9 +275,9 @@ def render_registration():
       <h2 class="reg-section__title">Данные об организации</h2>
       <div class="form-grid form-grid--2">
         <div class="field"><label class="field__label" for="reg-orgtype">Форма собственности</label><select class="select" id="reg-orgtype" name="RegistrationForm[orgType]">{opts}</select></div>
-        <div class="field"><label class="field__label" for="reg-orgname">Наименование организации <span class="req">*</span></label><input class="input" id="reg-orgname" name="RegistrationForm[orgName]" type="text" required><span class="field__error">Укажите наименование</span></div>
-        <div class="field"><label class="field__label" for="reg-inn">ИНН <span class="req">*</span></label><input class="input" id="reg-inn" name="RegistrationForm[orgInn]" type="text" inputmode="numeric" required><span class="field__error">Укажите ИНН</span></div>
-        <div class="field"><label class="field__label" for="reg-addr">Юридический адрес <span class="req">*</span></label><input class="input" id="reg-addr" name="RegistrationForm[orgAddress]" type="text" required><span class="field__error">Укажите адрес</span></div>
+        <div class="field"><label class="field__label" for="reg-orgname">Наименование организации <span class="req">*</span></label><input class="input" id="reg-orgname" name="RegistrationForm[orgName]" type="text" autocomplete="organization" required><span class="field__error">Укажите наименование</span></div>
+        <div class="field"><label class="field__label" for="reg-inn">ИНН <span class="req">*</span></label><input class="input" id="reg-inn" name="RegistrationForm[orgInn]" type="text" inputmode="numeric" autocomplete="off" maxlength="12" required><span class="field__error">Укажите ИНН</span></div>
+        <div class="field"><label class="field__label" for="reg-addr">Юридический адрес <span class="req">*</span></label><input class="input" id="reg-addr" name="RegistrationForm[orgAddress]" type="text" autocomplete="street-address" required><span class="field__error">Укажите адрес</span></div>
       </div>
     </div>
     <div class="reg-section">
@@ -288,7 +293,9 @@ def render_registration():
   </form>
   {_side()}
 </section>"""
-    return document("Регистрация | Гараж - автосервис, поиск и подбор запчастей", "Регистрация в личном кабинете garage.team: скидка 5% на запчасти и услуги автосервиса Гараж, Нижний Новгород.", "/registration/", body, body_class="page-registration")
+    title, desc = D.page_meta("registration", "Регистрация | Гараж - автосервис, поиск и подбор запчастей",
+                              "Регистрация в личном кабинете garage.team: скидка 5% на запчасти и услуги автосервиса Гараж, Нижний Новгород.")
+    return document(title, desc, "/registration/", body, body_class="page-registration")
 
 
 # ---------- agreement / reviews / 404 ----------
@@ -308,7 +315,8 @@ def render_otzyvy():
     body = f"""{hero}
 <section class="section section--tight"><div class="wrap reveal"><div class="reviews-grid">{cards}</div></div></section>
 {request_section("Оставить запрос")}"""
-    return document("Отзывы клиентов | Автосервис Гараж, Нижний Новгород", "Отзывы клиентов автосервиса Гараж в Нижнем Новгороде.", "/otzyvy.html", body, body_class="page-reviews")
+    title, desc = D.page_meta("otzyvy", "Отзывы клиентов | Автосервис Гараж, Нижний Новгород", "Отзывы клиентов автосервиса Гараж в Нижнем Новгороде.")
+    return document(title, desc, "/otzyvy.html", body, body_class="page-reviews")
 
 
 def render_404():

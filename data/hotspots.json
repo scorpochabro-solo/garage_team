@@ -49,7 +49,7 @@
    "y": 8,
    "side": "left",
    "icon": "inspection",
-   "blurb": "Диагностическая карта для ОСАГО"
+   "blurb": "Подготовка к техосмотру: диагностика и ремонт"
   },
   {
    "key": "vinyl",
@@ -63,13 +63,13 @@
   },
   {
    "key": "headlight",
-   "name": "Ремонт фар",
+   "name": "Замена фар",
    "href": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
    "x": 14,
    "y": 50,
    "side": "left",
    "icon": "headlight",
-   "blurb": "Замена, регулировка и восстановление оптики"
+   "blurb": "Замена фар и ламп, регулировка света"
   },
   {
    "key": "chip",
@@ -139,7 +139,7 @@
    "y": 93,
    "side": "right",
    "icon": "tire",
-   "blurb": "Сезонная замена шин, балансировка, ремонт проколов"
+   "blurb": "Сезонная замена шин и колёс"
   },
   {
    "key": "cooling",
@@ -174,7 +174,7 @@
   {
    "key": "alignment",
    "name": "Сход-развал",
-   "href": "/services/remont-hodovoj.html",
+   "href": "/services/shod-razval-regulirovka-i-diagnostika.html",
    "x": 7,
    "y": 92,
    "side": "right",

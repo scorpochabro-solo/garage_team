@@ -3,8 +3,9 @@
 import json
 
 from . import data as D
+from . import schema
 from .icons import icon, icon_for_href
-from .layout import document, request_section, reviews_section, green_note
+from .layout import document, request_section, reviews_section, green_note, slider_nav
 
 esc = D.esc
 S = D.SITE
@@ -18,6 +19,7 @@ HERO_SUB = ("Ремонт и обслуживание автомобилей л�
 
 
 def hero():
+    # a dimmed background: on a phone the 800px copy looks the same and is the first-screen image three times lighter
     photo = D.img("/data/images/gallerymain/BV5A0791.jpg")
     title = "".join(
         f'<span class="hero__line{" hero__line--accent" if i >= HERO_ACCENT_FROM else ""}"><span style="--i:{i}">{esc(t)}</span></span>'
@@ -32,7 +34,7 @@ def hero():
     </ul>"""
     return f"""<section class="hero" id="top" aria-labelledby="hero-title">
   <div class="hero__bg" aria-hidden="true">
-    <img class="hero__photo" src="{photo}" alt="" width="1600" height="1067" fetchpriority="high" decoding="async">
+    <picture><source media="(max-width: 640px)" srcset="{photo.replace('.webp', '-800.webp')}"><img class="hero__photo" src="{photo}" alt="" width="1600" height="1067" fetchpriority="high" decoding="async"></picture>
     <div class="hero__grid grid-bg"></div>
     <div class="hero__veil"></div>
     <div class="hero__glow"></div>
@@ -123,9 +125,11 @@ def services_map():
           </div>
           {hotspots}
         </div>
-        <div class="svc-readout" data-readout aria-live="polite">
-          <div class="svc-readout__icon">{icon('info')}</div>
-          <div class="svc-readout__hint">Наведите на услугу или проведите курсором по автомобилю: прицел найдёт узел, здесь появятся описание и стартовая цена. На телефоне нажмите на точку.</div>
+        <div class="svc-readout-box">
+          <div class="svc-readout" data-readout aria-live="polite">
+            <div class="svc-readout__icon">{icon('info')}</div>
+            <div class="svc-readout__hint">Наведите на услугу или проведите курсором по автомобилю: прицел найдёт узел, здесь появятся описание и стартовая цена. На телефоне нажмите на точку.</div>
+          </div>
         </div>
       </div>
       <div class="svc-col svc-col--right">{"".join(item(h) for h in right)}</div>
@@ -195,9 +199,9 @@ def gallery():
     <div class="sec-head reveal">
       <div><p class="eyebrow">// 03 — Фото работ</p><h2 class="h2 sec-head__title" id="gallery-title">Фото работ</h2></div>
       <div class="row between" style="--gap:1rem"><p class="sec-head__aside">Ремонт двигателей, ходовой, кузова и электрики — как это выглядит в наших боксах.</p>
-      <div class="slider__nav"><button class="slider__btn" type="button" data-prev aria-label="Назад">{icon('chevron-left')}</button><button class="slider__btn" type="button" data-next aria-label="Вперёд">{icon('chevron-right')}</button></div></div>
+      {slider_nav("gallery-track", "фото")}</div>
     </div>
-    <div class="slider reveal" data-slider><div class="slider__track">{"".join(items)}</div></div>
+    <div class="slider reveal" data-slider><div class="slider__track" id="gallery-track">{"".join(items)}</div></div>
   </div>
 </section>"""
 
@@ -249,25 +253,7 @@ def contacts_strip():
 
 
 def jsonld():
-    lat, lon = D.COORDS
-    return json.dumps({
-        "@context": "https://schema.org",
-        "@type": "AutoRepair",
-        "name": "Автосервис «Гараж»",
-        "alternateName": "Автотехцентр «Гараж»",
-        "url": D.SITE_URL,
-        "telephone": "+7 831 416-16-77",
-        "email": D.EMAIL,
-        "image": D.SITE_URL + "/assets/img/misc/advantages-bg.webp",
-        "address": {"@type": "PostalAddress", "streetAddress": "ул. Красная слобода, 9", "addressLocality": "Нижний Новгород", "postalCode": "603155", "addressCountry": "RU"},
-        "geo": {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon},
-        "openingHoursSpecification": [
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "09:00", "closes": "19:00"},
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "09:00", "closes": "17:00"},
-        ],
-        "sameAs": [D.VK_URL],
-        "foundingDate": str(D.FOUNDED),
-    }, ensure_ascii=False)
+    return schema.dump(schema.org())
 
 
 def render_home():
@@ -283,9 +269,10 @@ def render_home():
         green_note_wrap(),
         contacts_strip(),
     ])
-    title = "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж"
-    desc = ("Автосервис «Гараж» в Нижнем Новгороде, ул. Красная слобода, 9. Ремонт и обслуживание автомобилей любых марок, запчасти для иномарок "
-            "в наличии и под заказ, гарантия до 360 дней. Тел. (831) 416-16-77.")
+    title, desc = D.page_meta(
+        "home", "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж",
+        "Автосервис «Гараж» в Нижнем Новгороде, ул. Красная слобода, 9. Ремонт и обслуживание автомобилей любых марок, запчасти для иномарок "
+        "в наличии и под заказ, гарантия до 360 дней. Тел. (831) 416-16-77.")
     return document(title, desc, "/", body, body_class="page-home", jsonld=jsonld())
 
 

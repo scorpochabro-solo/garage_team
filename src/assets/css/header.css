@@ -8,6 +8,8 @@
 .topline__item:hover { color: #fff; }
 .topline__spacer { flex: 1; }
 .topline__item[data-count]:not([data-count="0"])::after { content: attr(data-count); font-family: var(--font-mono); font-size: 0.68rem; background: var(--green); color: #fff; padding: 0.1em 0.45em; }
+/* between 1100 and 1240px the six items do not fit in one line: the e-mail goes (it is in the footer and on /contacts/) */
+@media (max-width: 1240px) { .topline__item--mail { display: none; } }
 @media (max-width: 1100px) { .topline { display: none; } }
 
 .site-header { position: sticky; top: 0; z-index: var(--z-header); background: rgba(12, 13, 12, 0.72); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--line); transition: background-color var(--dur) var(--ease); }
@@ -15,7 +17,7 @@
 .site-header.is-scrolled { background: rgba(9, 10, 9, 0.9); }
 .site-header.is-scrolled::after { opacity: 1; }
 .site-header__in { display: flex; align-items: center; gap: 1.5rem; height: var(--header-h); }
-.logo { display: block; flex: none; }
+.logo { display: flex; align-items: center; min-height: 44px; flex: none; }
 .logo img { width: 133px; height: 48px; object-fit: contain; }
 .logo--footer img { width: 221px; height: 80px; }
 
@@ -43,6 +45,8 @@
   .burger { display: grid; }
   .site-header__phone { display: none; }
 }
+/* phone in landscape: 350–400px of height, the header gives back 16px */
+@media (max-height: 500px) and (orientation: landscape) { :root { --header-h: 60px; } }
 @media (max-width: 640px) {
   :root { --header-h: 64px; }
   .logo img { width: 116px; height: 42px; }
@@ -50,7 +54,7 @@
 }
 
 /* mobile menu */
-.mobile-menu { position: fixed; inset: 0; top: var(--header-h); z-index: calc(var(--z-header) - 1); background: var(--ink-900); overflow-y: auto; padding: 1.5rem var(--gutter) 3rem; display: none; }
+.mobile-menu { position: fixed; inset: 0; top: var(--header-h); z-index: calc(var(--z-header) - 1); background: var(--ink-900); overflow-y: auto; overscroll-behavior: contain; padding: 1.5rem var(--gutter-safe) calc(3rem + env(safe-area-inset-bottom)); display: none; }
 .mobile-menu.is-open { display: block; animation: menu-in 0.35s var(--ease); }
 @keyframes menu-in { from { opacity: 0; transform: translateY(-10px); } }
 .mobile-menu__nav { display: grid; }
@@ -59,6 +63,7 @@
 .mobile-menu__link:active { color: var(--accent); }
 .mobile-menu__meta { display: grid; gap: 0.9rem; margin-top: 1.8rem; color: var(--gray-300); font-size: 0.95rem; }
 .mobile-menu__meta a, .mobile-menu__meta span, .mobile-menu__meta button { display: inline-flex; align-items: center; gap: 0.6em; text-align: left; }
+.mobile-menu__meta a, .mobile-menu__meta button { min-height: 44px; }
 .mobile-menu__meta .ic { color: var(--accent); }
 .mobile-menu__phone { font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: #fff; letter-spacing: -0.02em; }
 .mobile-menu__cta { display: grid; gap: 0.6rem; margin-top: 1.5rem; }

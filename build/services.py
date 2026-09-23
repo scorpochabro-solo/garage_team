@@ -3,6 +3,8 @@
 import re
 
 from . import data as D
+from . import schema
+from . import service_blocks as B
 from .icons import icon, icon_for_href
 from .images import RESPONSIVE_WIDTHS, scaled_size
 from .layout import (document, page_hero, phone_aside, contact_card, side_index, green_note,
@@ -26,12 +28,45 @@ def _src_exists(url):
     return any((base / f"{stem}{ext}").exists() for ext in (".jpg", ".jpeg", ".png", ".webp"))
 
 
+# the site's phone as the texts write it: «(831) 416-16-77», sometimes with «+7»
+_PHONE_TEXT = re.compile(r"(?:\+7\s?)?\(831\)\s?416-16-77")
+_TAG = re.compile(r"(<[^>]+>)")
+
+
+def _link_phones(html_fragment):
+    """A phone number written as plain text becomes a tel: link: on a phone it is one tap to call.
+    Only text between tags is touched, and nothing inside an existing link."""
+    out, in_link = [], 0
+    for part in _TAG.split(html_fragment):
+        if part.startswith("<"):
+            if re.match(r"<a[\s>]", part, re.I):
+                in_link += 1
+            elif re.match(r"</a\s*>", part, re.I):
+                in_link = max(0, in_link - 1)
+            out.append(part)
+        elif in_link or "416-16-77" not in part:
+            out.append(part)
+        else:
+            out.append(_PHONE_TEXT.sub(lambda m: f'<a class="tel" href="tel:{D.PHONE_TEL}">{m.group(0)}</a>', part))
+    return "".join(out)
+
+
 def _fix_img_src(html_fragment):
     html_fragment = re.sub(r'<img[^>]*src="([^"]+)"[^>]*>', lambda m: m.group(0) if _src_exists(m.group(1)) else "", html_fragment)
     return re.sub(r'src="([^"]+)"', lambda m: f'src="{D.img(m.group(1))}"', html_fragment)
 
 
 # ---------- services index ----------
+def _card_text(href):
+    """Short text for a direction card: first sentence of the new lead if the page has content, else the old intro."""
+    content = D.CONTENT.get(href)
+    if not content:
+        return D.DESCR.get(href, "")
+    first = B.plain(content["lead"][0])
+    sentence = re.split(r"(?<=[.!?])\s", first, maxsplit=1)[0]
+    return sentence if len(sentence) <= 220 else sentence[:217].rsplit(" ", 1)[0] + "…"
+
+
 def render_services_index():
     cards = []
     for i, c in enumerate(D.CATEGORIES):
@@ -42,13 +77,13 @@ def render_services_index():
         <span class="cat-card__icon">{icon(icon_for_href(c['href']))}</span>
         <span><span class="cat-card__title">{esc(c['name'])}</span><span class="cat-card__count">{i + 1:02d} · {count}</span></span>
       </a>
-      {f'<div class="cat-card__subs">{subs}</div>' if subs else f'<p class="muted" style="font-size:.9rem">{esc(D.DESCR.get(c["href"], ""))}</p>'}
+      {f'<div class="cat-card__subs">{subs}</div>' if subs else f'<p class="muted" style="font-size:.9rem">{esc(_card_text(c["href"]))}</p>'}
       <a class="link-arrow link-arrow--inline cat-card__more" href="{c['href']}">Подробнее {icon('arrow')}</a>
     </article>""")
     total = len(D.SERVICES)
     lead = (f"{len(D.CATEGORIES)} направлений и {total} видов работ: от компьютерной диагностики до кузовного ремонта и хранения шин. "
             "Сервис и ремонт любых марок, обслуживание коммерческой техники до 5,5 тонн.")
-    hero = page_hero("Наши услуги", [("Главная", "/"), ("Наши услуги", None)], eyebrow="Автосервис Гараж", lead=lead,
+    hero = page_hero(D.PAGE_SEO.get("services", {}).get("h1", "Наши услуги"), [("Главная", "/"), ("Услуги", None)], eyebrow="Автосервис Гараж", lead=lead,
                      aside=phone_aside("Записаться на приём"), mark_icon="maintenance")
     body = f"""{hero}
 <section class="section section--tight" aria-label="Список услуг">
@@ -63,9 +98,10 @@ def render_services_index():
 </section>
 <div class="wrap" style="padding-bottom:var(--section-y)">{green_note()}</div>
 {request_section("Оставить запрос")}"""
-    title = "Услуги автосервиса в Нижнем Новгороде — все направления и цены | Автосервис Гараж"
-    desc = (f"{len(D.CATEGORIES)} направлений ремонта и обслуживания автомобилей в Нижнем Новгороде: диагностика, двигатель, ходовая, "
-            f"тормоза, электрика, кузов, покраска, ТО. Цены и запись по телефону {D.PHONE}.")
+    title, desc = D.page_meta(
+        "services", "Услуги автосервиса в Нижнем Новгороде — все направления и цены | Автосервис Гараж",
+        f"{len(D.CATEGORIES)} направлений ремонта и обслуживания автомобилей в Нижнем Новгороде: диагностика, двигатель, ходовая, "
+        f"тормоза, электрика, кузов, покраска, ТО. Цены и запись по телефону {D.PHONE}.")
     return document(title, desc, "/services.html", body, body_class="page-services")
 
 
@@ -82,25 +118,49 @@ def _plural(n, one, few, many):
 
 
 # ---------- single service ----------
-def _price_block(svc):
+# Who answers the page (content field "contact"): the workshop books a repair, the parts shop picks a part.
+CONTACT = {
+    "service": {"button": "Записаться на приём", "message": "Записаться: {name}",
+                "note": "Стоимость работ уточняйте у менеджера — назовём цену после уточнения модели и объёма работ."},
+    "shop": {"button": "Заказать звонок", "message": "Подбор запчастей: {name}",
+             "note": "Наличие и цену детали уточняйте у менеджера магазина: назовите марку, модель и год выпуска машины, "
+                     "а если знаете — номер детали."},
+}
+
+
+def _contact_block(svc, mode, preset):
+    """One call to action per page: after the price table, or instead of it with a note when the page has no prices."""
+    if svc.get("price_rows"):
+        return f"""<div class="cta-inline reveal">
+      <button class="btn btn--primary" type="button" data-modal="call" data-preset='{preset}'>{icon('phone')} {esc(mode['button'])}</button>
+      <span class="cta-inline__or">или позвонить нам</span>
+      <a class="cta-inline__phone" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a>
+    </div>"""
+    return f"""<div class="cta-inline reveal">
+      <span>{esc(mode['note'])}</span>
+      <a class="cta-inline__phone" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a>
+      <button class="btn btn--primary btn--sm" type="button" data-modal="call" data-preset='{preset}'>{icon('phone')} Заказать звонок</button>
+    </div>"""
+
+
+def _price_block(svc, h2="Цены"):
     rows = svc.get("price_rows") or []
     heads = svc.get("price_heads") or ["Ремонт", "Иномарки", "ВАЗ"]
     if not rows:
-        return f"""<div class="cta-inline reveal">
-      <span>Стоимость работ уточняйте у менеджера — назовём цену после уточнения модели и объёма работ.</span>
-      <a class="cta-inline__phone" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a>
-      <button class="btn btn--primary btn--sm" type="button" data-modal="call">{icon('phone')} Заказать звонок</button>
-    </div>"""
+        return ""
     trs = []
     for r in rows:
-        cells = [f"<td>{esc(r[0])}</td>"]
-        for cell in r[1:]:
+        # the old site left the name empty where the page has a single price row: the row is the page's own work
+        name = str(r[0]).strip() or svc.get("nav_name") or svc["h1"]
+        cells = [f"<td>{esc(name)}</td>"]
+        for i, cell in enumerate(r[1:], 1):
             p = D.fmt_price(cell)
-            cells.append(f'<td><span class="price">{esc(p)}</span></td>' if p else '<td><span class="price price--muted">по запросу</span></td>')
+            label = f' data-label="{esc(heads[i])}"' if i < len(heads) else ""
+            cells.append(f'<td{label}><span class="price">{esc(p)}</span></td>' if p else f'<td{label}><span class="price price--muted">по запросу</span></td>')
         trs.append("<tr>" + "".join(cells) + "</tr>")
     ths = "".join(f"<th>{esc(h)}</th>" for h in heads)
     return f"""<div class="price-block reveal">
-      <div class="block-title"><span class="tag-num">// прайс</span><h2 class="h3">Цены</h2></div>
+      <div class="block-title"><span class="tag-num">// прайс</span><h2 class="h3">{esc(h2)}</h2></div>
       <table class="price-table"><thead><tr>{ths}</tr></thead><tbody>{"".join(trs)}</tbody></table>
       <div class="price-block__foot"><span>Цены указаны за работу; точную стоимость уточняйте по телефону {esc(D.PHONE)}.</span><button class="btn btn--primary btn--sm" type="button" data-modal="call">{icon('phone')} Записаться</button></div>
     </div>"""
@@ -163,13 +223,15 @@ def _siblings_block(svc, cat, is_cat):
 def render_service(svc):
     is_cat = svc["path"] in D.CAT_BY_HREF
     cat = D.category_of(svc)
+    content = D.CONTENT.get(svc["path"])
     icon_key = icon_for_href(svc["path"] if is_cat else (cat["href"] if cat else svc["path"]))
     descr_html, generated = D.description_for(svc)
+    page_name = svc.get("nav_name") or svc["h1"]
 
     crumbs = [("Главная", "/"), ("Услуги", "/services.html")]
     if cat and not is_cat:
         crumbs.append((cat["name"], cat["href"]))
-    crumbs.append((svc["h1"], None))
+    crumbs.append((page_name, None))
 
     if is_cat:
         n = len(cat["subs"]) if cat else 0
@@ -177,34 +239,40 @@ def render_service(svc):
     else:
         eyebrow = cat["name"] if cat else "Услуга"
 
-    preset = D.esc('{"message":"Записаться: ' + svc["h1"].replace('"', "'") + '"}')
-    hero = page_hero(svc["h1"], crumbs, eyebrow=eyebrow, aside=phone_aside("Записаться на приём", preset), mark_icon=icon_key)
+    is_shop = bool(content) and content.get("contact") == "shop"
+    mode = CONTACT["shop" if is_shop else "service"]
+    preset = D.esc('{"message":"' + mode["message"].format(name=page_name.replace('"', "'")) + '"}')
+    hero = page_hero(svc["h1"], crumbs, eyebrow=eyebrow, aside=phone_aside(mode["button"], preset), mark_icon=icon_key)
 
-    # intro
     flags = "".join(f'<span class="chip">{icon("check", "ic--sm")} {esc(f)}</span>' for f in FLAGS)
-    if generated:
-        intro = f"""<div class="intro reveal"><div class="intro__text"><p>{esc(descr_html)}</p><div class="intro__flags">{flags}</div></div></div>"""
-    else:
-        imgs = re.findall(r'<img src="([^"]+)"', descr_html)
-        text_html = _fix_img_src(descr_html)
-        img_html = f'<div class="intro__img"><img src="{D.img(imgs[0])}" alt="{esc(svc["h1"])}" width="600" height="400" loading="lazy"></div>' if imgs else ""
-        intro = f"""<div class="intro{' intro--img' if imgs else ''} reveal"><div class="intro__text">{text_html}<div class="intro__flags">{flags}</div></div>{img_html}</div>"""
-
-    cta = f"""<div class="cta-inline reveal">
-      <button class="btn btn--primary" type="button" data-modal="call" data-preset='{preset}'>{icon('phone')} Записаться на приём</button>
-      <span class="cta-inline__or">или позвонить нам</span>
-      <a class="cta-inline__phone" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a>
-    </div>"""
-
+    cta = _contact_block(svc, mode, preset)
     article = ""
     if svc.get("article_html"):
         article = f'<article class="prose prose--article reveal">{_fix_img_src(svc["article_html"])}</article>'
 
-    # без прайса блок цены сам является призывом позвонить, второй такой же ниже не нужен
-    blocks = [_photo_block(svc), intro, _price_block(svc), cta if svc.get("price_rows") else "", _gallery_block(svc), article,
-              _siblings_block(svc, cat, is_cat)]
-    main = "\n".join(x for x in blocks if x)
-    side = f"""<aside class="svc-page__side">{side_index(cat['href'] if cat else None)}{contact_card()}</aside>"""
+    if content:
+        # the new lead replaces the original description text, but its picture stays (unless the page has a cover photo)
+        orig_imgs = [] if generated or svc["path"] in D.PHOTOS else [u for u in re.findall(r'<img src="([^"]+)"', descr_html) if _src_exists(u)]
+        lead_img = (f'<div class="intro__img"><img src="{D.img(orig_imgs[0])}" alt="{esc(svc["h1"])}" width="600" height="400" loading="lazy"></div>'
+                    if orig_imgs else "")
+        blocks = [_photo_block(svc), B.lead(content, flags, lead_img), _price_block(svc, content.get("price_h2") or "Цены"), B.price_factors(content),
+                  cta, B.symptoms(content), B.includes(content), B.steps(content), B.sections(content), article, B.faq(content),
+                  B.staff(content), _gallery_block(svc),
+                  # a direction without sub-pages lists its neighbours automatically; the hand-picked «related» list replaces that
+                  "" if (is_cat and cat and not cat["subs"] and content.get("related")) else _siblings_block(svc, cat, is_cat),
+                  B.related(content, is_cat)]
+    else:
+        if generated:
+            intro = f"""<div class="intro reveal"><div class="intro__text"><p>{esc(descr_html)}</p><div class="intro__flags">{flags}</div></div></div>"""
+        else:
+            imgs = re.findall(r'<img src="([^"]+)"', descr_html)
+            text_html = _fix_img_src(descr_html)
+            img_html = f'<div class="intro__img"><img src="{D.img(imgs[0])}" alt="{esc(svc["h1"])}" width="600" height="400" loading="lazy"></div>' if imgs else ""
+            intro = f"""<div class="intro{' intro--img' if imgs else ''} reveal"><div class="intro__text">{text_html}<div class="intro__flags">{flags}</div></div>{img_html}</div>"""
+        blocks = [_photo_block(svc), intro, _price_block(svc), cta, _gallery_block(svc), article,
+                  _siblings_block(svc, cat, is_cat)]
+    main = _link_phones("\n".join(x for x in blocks if x))
+    side = f"""<aside class="svc-page__side">{side_index(cat['href'] if cat else None)}{contact_card(shop=is_shop)}</aside>"""
 
     body = f"""{hero}
 <section class="wrap svc-page">
@@ -216,7 +284,17 @@ def render_service(svc):
 {request_section("Оставить запрос")}"""
 
     best = D.price_from(svc)
-    price_txt = f" Цены от {D.fmt_amount(best)}." if best else ""
-    title = f"{svc['h1']} в Нижнем Новгороде — цены, запись | Автосервис Гараж"
-    desc = (D.strip_tags(descr_html)[:200] + price_txt + f" Тел. {D.PHONE}.")
-    return document(title, desc, svc["path"], body, body_class="page-service")
+    if content:
+        title, desc = content["title"], content["meta_description"]
+    else:
+        price_txt = f" Цены от {D.fmt_amount(best)}." if best else ""
+        title = f"{svc['h1']} в Нижнем Новгороде — цены, запись | Автосервис Гараж"
+        desc = (D.strip_tags(descr_html)[:200] + price_txt + f" Тел. {D.PHONE}.")
+    page_url = D.SITE_URL + svc["path"]
+    graph = [schema.service(svc["h1"], page_name, desc, page_url, best, provider=schema.shop_ref() if is_shop else None),
+             schema.breadcrumbs(crumbs, page_url)]
+    if content and content.get("faq"):
+        graph.append(schema.faq([(x["q"], B.plain(x["a"])) for x in content["faq"]["items"]]))
+    photo = D.PHOTOS.get(svc["path"])
+    og_image = f"/assets/img/photo/{photo['slug']}.webp" if photo else None
+    return document(title, desc, svc["path"], body, body_class="page-service", og_image=og_image, jsonld=schema.dump(graph))

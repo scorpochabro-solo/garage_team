@@ -21,7 +21,7 @@
 @keyframes line-up { to { transform: none; } }
 .hero__sub { max-width: 50ch; font-size: clamp(1rem, 0.9rem + 0.35vw, 1.2rem); }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 0.8rem 1rem; align-items: center; margin-top: clamp(1.2rem, 2.4vh, 2rem); }
-.hero__phone { display: inline-flex; flex-direction: column; margin-left: 0.5rem; line-height: 1.1; }
+.hero__phone { display: inline-flex; flex-direction: column; justify-content: center; min-height: 44px; margin-left: 0.5rem; line-height: 1.1; }
 .hero__phone b { font-family: var(--font-display); font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
 .hero__phone span { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-top: 0.3em; }
 .hero__phone:hover b { color: var(--accent); }
@@ -92,6 +92,8 @@
 .slider__btn { width: 48px; height: 48px; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--text); transition: all var(--dur) var(--ease); }
 .slider__btn:hover { background: var(--green); color: #fff; box-shadow: none; }
 .slider__btn:disabled { opacity: 0.3; pointer-events: none; }
+/* touch feedback while the finger is down (hover styles are desktop-only, see build/css_tools.py) */
+.slider__btn:active { background: var(--green); color: #fff; box-shadow: none; }
 
 .gallery__item { position: relative; width: min(72vw, 560px); aspect-ratio: 3 / 2; overflow: hidden; background: var(--ink-700); display: block; }
 .gallery__item:nth-child(3n+2) { width: min(58vw, 400px); aspect-ratio: 4 / 5; }
@@ -127,6 +129,8 @@
 .review__who b { display: block; font-family: var(--font-display); font-size: 0.92rem; }
 .review__who a { color: var(--text-3); font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35em; margin-top: 0.15em; }
 .review__who a:hover { color: var(--accent); }
+/* touch: the 13px source link gets a 44px-high hit area without moving the card (padding eaten by a negative margin) */
+@media (pointer: coarse) { .review__who a { padding-block: 12px; margin-block: -12px; } }
 .review__src { margin-left: auto; color: var(--text-3); }
 
 /* ---------- request ---------- */
@@ -140,7 +144,7 @@
 .request__phone small { display: block; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.3em; }
 .request__social { display: flex; gap: 0.5rem; margin-top: 1.5rem; align-items: center; }
 .request__social span { font-size: 0.85rem; color: var(--text-3); margin-right: 0.5rem; }
-.request__social a { width: 42px; height: 42px; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--gray-300); transition: all var(--dur) var(--ease); }
+.request__social a { width: 44px; height: 44px; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--gray-300); transition: all var(--dur) var(--ease); }
 .request__social a:hover { background: var(--green); color: #fff; box-shadow: none; }
 .rq { position: relative; background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); padding: clamp(1.4rem, 1rem + 2vw, 2.75rem); }
 .rq::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: repeating-linear-gradient(-45deg, var(--green) 0 10px, transparent 10px 20px); }
@@ -148,7 +152,7 @@
 .rq__panel.is-active { display: block; animation: fade-up 0.45s var(--ease); }
 @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } }
 .rq__title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.rq__switch { font-size: 0.85rem; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.rq__switch { display: inline-flex; align-items: center; min-height: 44px; font-size: 0.85rem; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .rq__actions { display: flex; justify-content: space-between; gap: 0.75rem; margin-top: 1.6rem; flex-wrap: wrap; }
 .rq__actions .btn:only-child { margin-left: auto; }
 .part { display: grid; grid-template-columns: minmax(0, 1fr) 120px auto; gap: 0.75rem; align-items: end; margin-bottom: 0.75rem; }
@@ -165,11 +169,11 @@
 .contacts__item .ic { width: 44px; height: 44px; padding: 11px; background: rgba(var(--green-bright-rgb), 0.1); color: var(--accent); }
 .contacts__item b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
 .contacts__item span { display: block; color: var(--text-2); font-size: 0.92rem; }
-.contacts__item a.big { display: block; font-family: var(--font-display); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.02em; color: #fff; }
+.contacts__item a.big { display: flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.02em; color: #fff; }
 .contacts__item a.big:hover { color: var(--accent); }
 .map { position: relative; min-height: 380px; background: var(--ink-700); box-shadow: inset 0 0 0 1px var(--line-2); overflow: hidden; }
 .map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(1) invert(0.92) contrast(1.05) brightness(0.9); }
-.map__label { position: absolute; left: 1rem; bottom: 1rem; z-index: 2; display: inline-flex; align-items: center; gap: 0.6em; padding: 0.7em 1em; background: rgba(9,10,9,0.9); box-shadow: inset 0 0 0 1px var(--line-2); font-size: 0.85rem; font-weight: 600; }
+.map__label { position: absolute; left: 1rem; bottom: 1rem; z-index: 2; display: inline-flex; align-items: center; min-height: 44px; gap: 0.6em; padding: 0.7em 1em; background: rgba(9,10,9,0.9); box-shadow: inset 0 0 0 1px var(--line-2); font-size: 0.85rem; font-weight: 600; }
 .map__label .ic { color: var(--accent); }
 .map__label:hover { box-shadow: inset 0 0 0 1px var(--accent); }
 @media (max-width: 900px) { .contacts { grid-template-columns: 1fr; } .map { min-height: 320px; } }

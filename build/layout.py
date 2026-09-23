@@ -6,7 +6,22 @@ from .icons import icon, sprite, icon_for_href
 esc = D.esc
 
 
+# ---------- sliders ----------
+def slider_nav(track_id, what):
+    """Arrows for a .slider__track; they sit in the section heading, outside the slider, and name their track by aria-controls."""
+    return (f'<div class="slider__nav">'
+            f'<button class="slider__btn" type="button" data-prev aria-controls="{track_id}" aria-label="Предыдущие {what}">{icon("chevron-left")}</button>'
+            f'<button class="slider__btn" type="button" data-next aria-controls="{track_id}" aria-label="Следующие {what}">{icon("chevron-right")}</button>'
+            f'</div>')
+
+
 # ---------- document ----------
+def _version(kind):
+    """?v=<content hash> for site.css / site.js, so a browser never pairs a new page with a stale cached stylesheet."""
+    v = D.ASSET_VERSION.get(kind)
+    return f"?v={v}" if v else ""
+
+
 def document(title, description, path, body, body_class="", og_image=None, jsonld=None, noindex=False):
     canonical = D.SITE_URL + path
     og = og_image or "/assets/img/misc/advantages-bg.webp"
@@ -19,7 +34,6 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
-<meta name="keywords" content="{esc(D.META_KEYWORDS)}">
 {robots}
 <link rel="canonical" href="{esc(canonical)}">
 <meta property="og:type" content="website">
@@ -32,9 +46,9 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/assets/logo/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/logo/apple-touch-icon.png">
-<link rel="preload" href="/assets/fonts/unbounded-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/manrope-500-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="preload" href="/assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css{_version('css')}">
 {ld}
 </head>
 <body class="{esc(body_class)}">
@@ -49,7 +63,7 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 {footer()}
 {mobile_bar()}
 {modals()}
-<script src="/assets/js/site.js" defer></script>
+<script src="/assets/js/site.js{_version('js')}" defer></script>
 </body>
 </html>
 """
@@ -62,7 +76,7 @@ def topline():
   <div class="wrap topline__in">
     <span class="topline__item">{icon('pin')} {esc(D.ADDRESS_SHORT)}</span>
     <span class="topline__item">{icon('clock')} {esc(hours)}</span>
-    <a class="topline__item" href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
+    <a class="topline__item topline__item--mail" href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
     <span class="topline__spacer"></span>
     <a class="topline__item" href="{D.VK_URL}" target="_blank" rel="noopener">{icon('vk')} Подпишитесь на нас</a>
     <button class="topline__item" type="button" data-modal="login">{icon('user')} Вход в личный кабинет</button>
@@ -173,10 +187,10 @@ def call_modal():
         <h2 class="modal__title" id="modal-call-title">Заказать звонок / консультацию</h2>
         <p class="modal__lead">Заполните, пожалуйста, поля ниже, чтобы мы могли связаться с вами.</p>
         <div class="form-grid form-grid--2">
-          <div class="field"><label class="field__label" for="call-name">Имя <span class="req">*</span></label><input class="input" id="call-name" name="contact_name" type="text" autocomplete="name" required><span class="field__error">Укажите, как к вам обращаться</span></div>
-          <div class="field"><label class="field__label" for="call-phone">Телефон <span class="req">*</span></label><input class="input" id="call-phone" name="contact_phone" type="tel" autocomplete="tel" data-phone required><span class="field__error">Укажите корректный телефон</span></div>
+          <div class="field"><label class="field__label" for="call-name">Имя <span class="req">*</span></label><input class="input" id="call-name" name="contact_name" type="text" autocomplete="name" autocapitalize="words" enterkeyhint="next" required><span class="field__error">Укажите, как к вам обращаться</span></div>
+          <div class="field"><label class="field__label" for="call-phone">Телефон <span class="req">*</span></label><input class="input" id="call-phone" name="contact_phone" type="tel" autocomplete="tel" enterkeyhint="next" data-phone required><span class="field__error">Укажите корректный телефон</span></div>
           <div class="field"><label class="field__label" for="call-car">Для автомобиля</label><input class="input" id="call-car" name="car" type="text" placeholder="Марка, модель, год"></div>
-          <div class="field"><label class="field__label" for="call-vin">VIN</label><input class="input" id="call-vin" name="vin_code" type="text" placeholder="Например: 2C4GJ453XYR693697"></div>
+          <div class="field"><label class="field__label" for="call-vin">VIN</label><input class="input" id="call-vin" name="vin_code" type="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697"></div>
           <div class="field span-2"><label class="field__label" for="call-msg">Комментарий</label><textarea class="textarea" id="call-msg" name="message" rows="3"></textarea></div>
           <div class="field span-2"><label class="check"><input type="checkbox" name="agree" value="1" required><span class="check__box">{icon('check')}</span><span>Соглашаюсь с <a href="/page/soglashenie/" target="_blank">пользовательским соглашением</a> и обработкой персональных данных</span></label></div>
         </div>
@@ -204,7 +218,7 @@ def login_modal():
         <div class="form-grid">
           <div class="field">
             <label class="field__label" for="login-phone">Мобильный телефон <span class="req">*</span></label>
-            <div class="input--prefix"><span>+7</span><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="login-code" name="UserLoginForm[areaCode]" type="text" inputmode="numeric" maxlength="3" placeholder="903" style="width:90px" required aria-label="Код оператора"><input class="input" id="login-phone" name="UserLoginForm[number]" type="text" inputmode="numeric" maxlength="7" placeholder="1234567" required></div></div>
+            <div class="input--prefix"><span>+7</span><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="login-code" name="UserLoginForm[areaCode]" type="text" inputmode="numeric" autocomplete="tel-area-code" maxlength="3" placeholder="903" style="width:90px" required aria-label="Код оператора"><input class="input" id="login-phone" name="UserLoginForm[number]" type="text" inputmode="numeric" autocomplete="tel-local" maxlength="7" placeholder="1234567" required></div></div>
             <span class="field__error">Введите номер телефона</span>
           </div>
           <div class="field"><label class="field__label" for="login-pass">Пароль <span class="req">*</span></label><input class="input" id="login-pass" name="UserLoginForm[password]" type="password" autocomplete="current-password" required><span class="field__error">Введите пароль</span></div>
@@ -213,7 +227,7 @@ def login_modal():
             <button class="btn btn--text" type="button" data-sms>Получить пароль по СМС</button>
           </div>
           <div data-lost hidden>
-            <div class="field"><label class="field__label" for="lost-email">Эл. почта <span class="req">*</span></label><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="lost-email" name="lost-email" type="email" placeholder="you@mail.ru"><button class="btn btn--ghost btn--sm" type="button" data-email-lost>Отправить</button></div><span class="field__hint">Пришлём пароль на указанный e-mail.</span></div>
+            <div class="field"><label class="field__label" for="lost-email">Эл. почта <span class="req">*</span></label><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="lost-email" name="lost-email" type="email" autocomplete="email" placeholder="you@mail.ru"><button class="btn btn--ghost btn--sm" type="button" data-email-lost>Отправить</button></div><span class="field__hint">Пришлём пароль на указанный e-mail.</span></div>
           </div>
           <label class="check"><input type="checkbox" name="agree" value="1" required checked><span class="check__box">{icon('check')}</span><span>Подтверждаю, что с <a href="/page/soglashenie/" target="_blank">Пользовательским соглашением</a> ознакомлен и согласен</span></label>
         </div>
@@ -273,12 +287,13 @@ def phone_aside(cta_label="Записаться на приём", preset=None):
     <a class="page-hero__phone" href="tel:{D.PHONE_TEL}"><b>{esc(D.PHONE)}</b><span>или позвоните нам</span></a>"""
 
 
-def contact_card():
-    hours = " · ".join(f"{esc(h)}" for d, h in D.HOURS)
+def contact_card(shop=False):
+    """Side card with the phone and opening hours: the workshop's by default, the parts shop's when shop=True."""
+    label, hours = ("Магазин запчастей", D.SHOP_HOURS) if shop else ("Записаться на приём", D.HOURS)
     return f"""<div class="contact-card">
-  <div class="contact-card__label">Записаться на приём</div>
+  <div class="contact-card__label">{label}</div>
   <a class="contact-card__phone" href="tel:{D.PHONE_TEL}"><small>звоните</small>{esc(D.PHONE)}</a>
-  <div class="contact-card__hours">Пн–Пт {esc(D.HOURS[0][1])} · Сб {esc(D.HOURS[1][1])}<br>{esc(D.ADDRESS_SHORT)}</div>
+  <div class="contact-card__hours">Пн–Пт {esc(hours[0][1])} · Сб {esc(hours[1][1])}<br>{esc(D.ADDRESS_SHORT)}</div>
   <button class="btn btn--white btn--sm" type="button" data-modal="call">{icon('phone')} Заказать звонок</button>
 </div>"""
 
@@ -288,10 +303,11 @@ def side_index(active_href=None):
     for c in D.CATEGORIES:
         cls = ' class="is-active"' if c["href"] == active_href else ""
         items.append(f'<li><a href="{c["href"]}"{cls}>{icon(icon_for_href(c["href"]))}<span>{esc(c["name"])}</span></a></li>')
-    return f"""<nav class="side-index" aria-label="Все направления услуг">
-  <div class="side-index__title"><span>Направления</span><span>{len(D.CATEGORIES)}</span></div>
-  <ul>{"".join(items)}</ul>
-</nav>"""
+    # a disclosure: open next to the content on wide screens, collapsed under it on phones (core.js syncs `open`)
+    return f"""<details class="side-index" data-side-index open>
+  <summary class="side-index__title"><span>Направления</span><span class="side-index__n">{len(D.CATEGORIES)}{icon('plus', 'side-index__ic')}</span></summary>
+  <nav aria-label="Все направления услуг"><ul>{"".join(items)}</ul></nav>
+</details>"""
 
 
 def green_note():
@@ -326,10 +342,10 @@ def reviews_section(compact=False, paper=True):
     <div class="sec-head reveal">
       <div><p class="eyebrow">// Отзывы клиентов</p><h2 class="h2 sec-head__title" id="reviews-title">Что говорят<br>наши клиенты</h2></div>
       <div class="row between" style="--gap:1rem"><p class="sec-head__aside">{n} реальных отзывов из ВКонтакте, Instagram и Facebook. Ещё больше — на нашей странице <a class="accent" href="{D.VK_URL}" target="_blank" rel="noopener">ВКонтакте</a>.</p>
-      <div class="slider__nav"><button class="slider__btn" type="button" data-prev aria-label="Назад">{icon('chevron-left')}</button><button class="slider__btn" type="button" data-next aria-label="Вперёд">{icon('chevron-right')}</button></div></div>
+      {slider_nav("reviews-track", "отзывы")}</div>
     </div>
     <div class="slider reveal" data-slider>
-      <div class="slider__track">{cards}</div>
+      <div class="slider__track" id="reviews-track">{cards}</div>
     </div>
   </div>
 </section>"""
@@ -369,12 +385,12 @@ def request_section(title="Оставить запрос", section_id="request",
           <div class="form-grid form-grid--2">
             <div class="field"><label class="field__label" for="text_car_brand">Марка автомобиля <span class="req">*</span></label><input class="input" id="text_car_brand" name="request_part[text_car_brand]" type="text" placeholder="Введите марку"><span class="field__error">Укажите марку автомобиля</span></div>
             <div class="field"><label class="field__label" for="text_car_model">Модель <span class="req">*</span></label><input class="input" id="text_car_model" name="request_part[text_car_model]" type="text" placeholder="Введите модель"><span class="field__error">Укажите модель автомобиля</span></div>
-            <div class="field"><label class="field__label" for="text_car_year">Год выпуска <span class="req">*</span></label><input class="input" id="text_car_year" name="request_part[text_car_year]" type="text" inputmode="numeric" placeholder="Введите год выпуска"><span class="field__error">Укажите год выпуска</span></div>
+            <div class="field"><label class="field__label" for="text_car_year">Год выпуска <span class="req">*</span></label><input class="input" id="text_car_year" name="request_part[text_car_year]" type="text" inputmode="numeric" maxlength="4" placeholder="Введите год выпуска"><span class="field__error">Укажите год выпуска</span></div>
             <div class="field"><label class="field__label" for="text_car_type">Объём двигателя <span class="req">*</span></label><input class="input" id="text_car_type" name="request_part[text_car_type]" type="text" placeholder="Введите объём двигателя"><span class="field__error">Укажите объём двигателя автомобиля</span></div>
           </div>
         </div>
         <div class="form-grid" style="margin-top:1.1rem">
-          <div class="field"><label class="field__label" for="car_vin">VIN-код</label><input class="input" id="car_vin" name="request_part[car_vin]" type="text" placeholder="Например: 2C4GJ453XYR693697" autocapitalize="characters"><span class="field__hint">17 символов с таблички в проёме двери или в СТС. <button class="btn btn--text" type="button" data-vin-help style="font-size:.8rem">Я не знаю, что такое VIN-код</button></span>
+          <div class="field"><label class="field__label" for="car_vin">VIN-код</label><input class="input" id="car_vin" name="request_part[car_vin]" type="text" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697" autocapitalize="characters"><span class="field__hint">17 символов с таблички в проёме двери или в СТС. <button class="btn btn--text" type="button" data-vin-help style="font-size:.8rem">Я не знаю, что такое VIN-код</button></span>
           <p class="form-note" data-vin-help-text hidden>VIN — уникальный идентификационный номер автомобиля из 17 знаков. По нему мы подбираем запчасти точно под вашу комплектацию. Найти его можно в свидетельстве о регистрации (СТС), ПТС или на табличке под лобовым стеклом. Если VIN под рукой нет — просто пропустите это поле.</p></div>
         </div>
         <div class="rq__actions"><button class="btn btn--primary" type="button" data-next>Вперёд {icon('arrow')}</button></div>
@@ -385,7 +401,7 @@ def request_section(title="Оставить запрос", section_id="request",
         <div data-parts>
           <div class="part">
             <div class="field"><label class="field__label" for="part_name_1">Запчасть №1</label><input class="input" id="part_name_1" name="request_part[parts][1][name]" type="text" placeholder="Например: противотуманные фары"><span class="field__error">Введите запрос</span></div>
-            <div class="field"><label class="field__label" for="part_count_1">Кол-во, шт.</label><input class="input" id="part_count_1" name="request_part[parts][1][count]" type="number" min="1" value="1"></div>
+            <div class="field"><label class="field__label" for="part_count_1">Кол-во, шт.</label><input class="input" id="part_count_1" name="request_part[parts][1][count]" type="number" inputmode="numeric" min="1" value="1"></div>
             <button type="button" class="part__remove" aria-label="Удалить запчасть" disabled>{icon('close')}</button>
           </div>
         </div>
@@ -397,7 +413,7 @@ def request_section(title="Оставить запрос", section_id="request",
       <div class="rq__panel" data-panel="3">
         <div class="rq__title"><span>Контактная информация</span></div>
         <div class="form-grid form-grid--2">
-          <div class="field"><label class="field__label" for="contact_name">Ваше имя <span class="req">*</span></label><input class="input" id="contact_name" name="request_part[contact_name]" type="text" autocomplete="name"><span class="field__error">Укажите, как к вам следует обращаться</span></div>
+          <div class="field"><label class="field__label" for="contact_name">Ваше имя <span class="req">*</span></label><input class="input" id="contact_name" name="request_part[contact_name]" type="text" autocomplete="name" autocapitalize="words"><span class="field__error">Укажите, как к вам следует обращаться</span></div>
           <div class="field"><label class="field__label" for="contact_city">Ваш город <span class="req">*</span></label><input class="input" id="contact_city" name="request_part[city]" type="text" value="Нижний Новгород" autocomplete="address-level2"><span class="field__error">Выберите город, в котором вы находитесь</span></div>
           <div class="field"><label class="field__label" for="contact_phone">Контактный телефон <span class="req">*</span></label><input class="input" id="contact_phone" name="request_part[contact_phone]" type="tel" autocomplete="tel" data-phone><span class="field__error">Укажите контактный телефон для связи с вами</span></div>
           <div class="field"><label class="field__label" for="contact_comment">Комментарий</label><input class="input" id="contact_comment" name="request_part[comment]" type="text" placeholder="Удобное время звонка, пожелания"></div>

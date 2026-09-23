@@ -5,12 +5,16 @@ import json
 import re
 from pathlib import Path
 
+from .content import load_all as load_content, load_page_seo
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 
 SITE = json.loads((DATA / "site.json").read_text(encoding="utf-8"))
+# titles of the pages that are not services: keys of site.json → pages plus the pages whose text lives in the code
+PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy"})
 _SERVICES = json.loads((DATA / "services.json").read_text(encoding="utf-8"))
 DESCR = json.loads((DATA / "descriptions.json").read_text(encoding="utf-8"))
 HOTSPOTS = json.loads((DATA / "hotspots.json").read_text(encoding="utf-8"))["items"]
@@ -43,6 +47,24 @@ def _with_extras(categories: list, services: list, extra: dict) -> tuple[list, l
 
 CATEGORIES, SERVICES, _EXTRA_DESCR = _with_extras(_SERVICES["categories"], _SERVICES["services"], _EXTRA)
 DESCR = {**DESCR, **_EXTRA_DESCR}
+
+# detailed page content (data/content/<slug>.json); see build/content.py for the format
+CONTENT = load_content(DATA / "content", {s["path"] for s in SERVICES}, {t["name"] for t in SITE.get("team", [])})
+
+
+def _with_content_names(categories: list, services: list, content: dict) -> tuple[list, list]:
+    """nav_name and h1 from the content files replace the original names everywhere: menus, lists, breadcrumbs, readout."""
+    def nav(path: str, default: str) -> str:
+        return content[path]["nav_name"] if path in content else default
+
+    cats = [dict(c, name=nav(c["href"], c["name"]), subs=[dict(s, name=nav(s["href"], s["name"])) for s in c["subs"]])
+            for c in categories]
+    svcs = [dict(s, h1=content[s["path"]]["h1"], nav_name=content[s["path"]]["nav_name"], h1_original=s["h1"])
+            if s["path"] in content else s for s in services]
+    return cats, svcs
+
+
+CATEGORIES, SERVICES = _with_content_names(CATEGORIES, SERVICES, CONTENT)
 BY_PATH = {s["path"]: s for s in SERVICES}
 CAT_BY_HREF = {c["href"]: c for c in CATEGORIES}
 
@@ -86,7 +108,8 @@ COPYRIGHT_FROM = 2011
 COMPANY = "ООО «Гараж»"
 COMPANY_LINE_2 = "Сеть магазинов запчастей «Гараж»"
 SLOGAN_EN = "Complete car care since 2011"
-META_KEYWORDS = "Гараж - поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей"
+# content hashes of dist/assets/css/site.css and js/site.js, filled by build.py before the pages are rendered
+ASSET_VERSION = {"css": "", "js": ""}
 
 NAV = [
     ("Услуги", "/services.html"),
@@ -208,6 +231,12 @@ def price_from(svc):
                 if p and (best is None or p[1] < best):
                     best = p[1]
     return best
+
+
+def page_meta(key, title, description):
+    """(title, description) of a page that is not a service: data/page_seo.json wins over the defaults in the code."""
+    seo = PAGE_SEO.get(key, {})
+    return seo.get("title", title), seo.get("meta_description", description)
 
 
 def category_of(svc):

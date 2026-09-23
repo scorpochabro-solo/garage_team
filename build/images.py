@@ -7,8 +7,11 @@ from PIL import Image
 
 MAX_SIDE = 1600
 WEBP_QUALITY = 82
+# Folders shown much smaller than MAX_SIDE: the longest side is capped at the display size × 3 (iPhone screens).
+# Review avatars are 56px circles, team photos at most ~210px wide.
+FOLDER_MAX_SIDE = {"review": 168, "team": 640}
 # Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages).
-RESPONSIVE_WIDTHS = {"photo": 800}
+RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800}
 
 
 def scaled_size(src: Path, max_side: int = MAX_SIDE) -> tuple[int, int]:
@@ -47,8 +50,9 @@ def process_images(src_root: Path, dist_root: Path, verbose=False):
             if ext in (".jpg", ".jpeg"):
                 im = Image.open(src)
                 im = im.convert("RGB")
-                if max(im.size) > MAX_SIDE:
-                    im.thumbnail((MAX_SIDE, MAX_SIDE), Image.LANCZOS)
+                side = FOLDER_MAX_SIDE.get(rel.parts[0], MAX_SIDE) if len(rel.parts) > 1 else MAX_SIDE
+                if max(im.size) > side:
+                    im.thumbnail((side, side), Image.LANCZOS)
                 im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
                 narrow = RESPONSIVE_WIDTHS.get(rel.parts[0]) if len(rel.parts) > 1 else None
                 if narrow and im.width > narrow:

@@ -8,3 +8,4 @@ _plans/
 # secrets and generator state (never commit)
 .env
 tools/.kie_tasks.json
+seo/collect.log

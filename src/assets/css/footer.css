@@ -28,6 +28,18 @@
 .footer__watermark { position: absolute; left: 50%; bottom: -0.18em; transform: translateX(-50%); font-family: var(--font-display); font-weight: 900; font-size: clamp(6rem, 22vw, 22rem); line-height: 1; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.06); pointer-events: none; user-select: none; white-space: nowrap; }
 
 /* floating mobile action bar */
-.mobile-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-header); background: rgba(9, 10, 9, 0.92); backdrop-filter: blur(14px); border-top: 1px solid var(--line-2); padding: 0.6rem var(--gutter) calc(0.6rem + env(safe-area-inset-bottom)); grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.mobile-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-header); background: rgba(9, 10, 9, 0.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line-2); padding: 0.6rem var(--gutter-safe) calc(0.6rem + env(safe-area-inset-bottom)); grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .mobile-bar .btn { width: 100%; --h: 46px; }
-@media (max-width: 640px) { .mobile-bar { display: grid; } body { padding-bottom: 70px; } }
+/* the bar is 66px plus the home-indicator area when Safari hides its toolbar: the page ends above it */
+@media (max-width: 640px) { .mobile-bar { display: grid; } body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); } }
+/* the open menu has its own call buttons at the bottom; the bar would cover them */
+.is-menu-open .mobile-bar { display: none; }
+
+/* touch screens: every footer link is a 44px row (Apple's minimum tap target) */
+@media (pointer: coarse) {
+  .footer__links { gap: 0; }
+  .footer__links a { min-height: 44px; }
+  .footer__contact a { min-height: 44px; align-items: center; }
+  .footer__social a { width: 44px; height: 44px; }
+  .footer__bottom a { display: inline-flex; align-items: center; min-height: 44px; }
+}

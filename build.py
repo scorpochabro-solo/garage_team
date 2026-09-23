@@ -8,6 +8,7 @@ Static site generator for the garage.team redesign.
     python3 build.py --verbose             # log every image
 No dependencies beyond Pillow (image optimization).
 """
+import hashlib
 import re
 import shutil
 import sys
@@ -18,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from build import data as D  # noqa: E402
+from build.css_tools import guard_hover  # noqa: E402
 from build.home import render_home  # noqa: E402
 from build.images import make_logo_assets, process_images  # noqa: E402
 from build.services import render_service, render_services_index  # noqa: E402
@@ -38,7 +40,7 @@ def _arg(name, default):
 BASE = _arg("--base", "").rstrip("/")
 DIST = ROOT / _arg("--out", "dist")
 D.set_base(BASE)
-CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "car.css", "pages.css", "footer.css"]
+CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "car.css", "pages.css", "service.css", "footer.css"]
 JS_ORDER = ["core.js", "car.js", "gallery.js", "form.js", "pages.js"]
 UNICODE = {
     "latin": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
@@ -46,17 +48,20 @@ UNICODE = {
     "cyrillic-ext": "U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F",
 }
 FAMILIES = {"manrope": "Manrope", "unbounded": "Unbounded", "jetbrains-mono": "JetBrains Mono"}
+# All three are variable fonts: one file per alphabet holds every weight. The range is the font's own weight axis;
+# declaring it lets the browser render 500 or 800 from the same file instead of downloading a copy per weight.
+WEIGHT_RANGE = {"manrope": "200 800", "unbounded": "200 900", "jetbrains-mono": "100 800"}
 
 
 def fonts_css():
-    out = ["/* self-hosted fonts (generated) */"]
+    out = ["/* self-hosted variable fonts (generated): one file per family and alphabet */"]
     for f in sorted((SRC / "assets" / "fonts").glob("*.woff2")):
-        m = re.match(r"(manrope|unbounded|jetbrains-mono)-(\d{3})-(latin|cyrillic-ext|cyrillic)\.woff2$", f.name)
+        m = re.match(r"(manrope|unbounded|jetbrains-mono)-(latin|cyrillic-ext|cyrillic)\.woff2$", f.name)
         if not m:
-            continue
-        fam, weight, subset = m.groups()
+            raise SystemExit(f"неизвестный файл шрифта {f.name}: ожидается <семейство>-<алфавит>.woff2")
+        fam, subset = m.groups()
         out.append(
-            f"@font-face{{font-family:'{FAMILIES[fam]}';font-style:normal;font-weight:{weight};font-display:swap;"
+            f"@font-face{{font-family:'{FAMILIES[fam]}';font-style:normal;font-weight:{WEIGHT_RANGE[fam]};font-display:swap;"
             f"src:url('{BASE}/assets/fonts/{f.name}') format('woff2');unicode-range:{UNICODE[subset]};}}"
         )
     return "\n".join(out) + "\n"
@@ -83,12 +88,15 @@ def main(verbose=False):
     make_logo_assets(SRC / "assets" / "logo" / "mark.png", DIST)
     n_img, img_bytes = process_images(SRC / "assets" / "img", DIST / "assets" / "img", verbose=verbose)
 
-    css = fonts_css() + D.rebase("\n".join((SRC / "assets" / "css" / n).read_text(encoding="utf-8") for n in CSS_ORDER))
+    # hover styles only where a pointer can hover: on a phone a tapped element stays in :hover (build/css_tools.py)
+    css = fonts_css() + D.rebase(guard_hover("\n".join((SRC / "assets" / "css" / n).read_text(encoding="utf-8") for n in CSS_ORDER)))
     (DIST / "assets" / "css").mkdir(parents=True)
     (DIST / "assets" / "css" / "site.css").write_text(css, encoding="utf-8")
     js = D.rebase("\n".join((SRC / "assets" / "js" / n).read_text(encoding="utf-8") for n in JS_ORDER))
     (DIST / "assets" / "js").mkdir(parents=True)
     (DIST / "assets" / "js" / "site.js").write_text(js, encoding="utf-8")
+    D.ASSET_VERSION.update(css=hashlib.sha1(css.encode("utf-8")).hexdigest()[:10],
+                           js=hashlib.sha1(js.encode("utf-8")).hexdigest()[:10])
 
     # pages
     urls = []

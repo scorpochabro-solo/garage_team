@@ -9,18 +9,44 @@
   document.querySelectorAll('[data-slider]').forEach((slider) => {
     const track = slider.querySelector('.slider__track');
     if (!track) return;
-    const prev = slider.querySelector('[data-prev]');
-    const next = slider.querySelector('[data-next]');
-    const step = () => Math.max(track.clientWidth * 0.72, 280);
+    // the arrows sit in the section heading, outside the slider, and name their track with aria-controls
+    const control = (sel) => (track.id && document.querySelector(`${sel}[aria-controls="${track.id}"]`)) || slider.querySelector(sel);
+    const prev = control('[data-prev]');
+    const next = control('[data-next]');
     const behavior = G.reducedMotion ? 'auto' : 'smooth';
-    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior }));
-    if (next) next.addEventListener('click', () => track.scrollBy({ left: step(), behavior }));
+    const EDGE = 2;   // px of rounding slack at both ends
+    // a page is the set of fully visible cards: "next" brings the first cut-off card to the left edge,
+    // "prev" goes back until the current first card becomes the last visible one
+    const starts = () => {
+      const left = track.getBoundingClientRect().left - track.scrollLeft;
+      return Array.from(track.children, (el) => {
+        const r = el.getBoundingClientRect();
+        return { start: r.left - left, end: r.right - left };
+      });
+    };
+    const maxLeft = () => track.scrollWidth - track.clientWidth;
+    const go = (dir) => {
+      const x = track.scrollLeft;
+      const cards = starts();
+      let target;
+      if (dir > 0) {
+        const cut = cards.find((c) => c.end > x + track.clientWidth + EDGE);
+        target = cut ? cut.start : maxLeft();
+      } else {
+        const back = cards.find((c) => c.start >= x - track.clientWidth - EDGE);
+        target = back && back.start < x - EDGE ? back.start : 0;
+      }
+      track.scrollTo({ left: Math.max(0, Math.min(target, maxLeft())), behavior });
+    };
+    if (prev) prev.addEventListener('click', () => go(-1));
+    if (next) next.addEventListener('click', () => go(1));
     const update = () => {
-      if (prev) prev.disabled = track.scrollLeft <= 2;
-      if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      const noScroll = maxLeft() <= EDGE;
+      if (prev) prev.disabled = noScroll || track.scrollLeft <= EDGE;
+      if (next) next.disabled = noScroll || track.scrollLeft >= maxLeft() - EDGE;
     };
     track.addEventListener('scroll', update, { passive: true });
-    addEventListener('resize', update, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(update).observe(track); else addEventListener('resize', update, { passive: true });
     update();
 
     let down = false, startX = 0, startLeft = 0, moved = false;

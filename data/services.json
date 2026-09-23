@@ -5173,7 +5173,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замена сайленблока</td><td><strong>300</strong></td><td><strong>200</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замена сайлентблока</td><td><strong>300</strong></td><td><strong>200</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -5242,7 +5242,7 @@
    ],
    "price_rows": [
     [
-     "Замена сайленблока",
+     "Замена сайлентблока",
      "300",
      "200"
     ]
@@ -5305,7 +5305,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Выпресовка шаровой опоры (рычаг снят)</td><td><strong>350</strong></td><td><strong>200</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Выпрессовка шаровой опоры (рычаг снят)</td><td><strong>350</strong></td><td><strong>200</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -5374,7 +5374,7 @@
    ],
    "price_rows": [
     [
-     "Выпресовка шаровой опоры (рычаг снят)",
+     "Выпрессовка шаровой опоры (рычаг снят)",
      "350",
      "200"
     ]
@@ -6496,7 +6496,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замер давления масла ДВС монометром</td><td><strong>от 500 рублей</strong></td><td><strong>от 400 рублей</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замер давления масла ДВС манометром</td><td><strong>от 500 рублей</strong></td><td><strong>от 400 рублей</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -6541,7 +6541,7 @@
    ],
    "price_rows": [
     [
-     "Замер давления масла ДВС монометром",
+     "Замер давления масла ДВС манометром",
      "от 500 рублей",
      "от 400 рублей"
     ]
