@@ -8,6 +8,8 @@
 
   python3 seo/owner_questions_pdf.py          # -> seo/owner-questions.pdf
   python3 seo/owner_questions_pdf.py -o x.pdf
+  python3 seo/owner_questions_pdf.py --short  # seo/owner-questions-short.md -> seo/owner-questions-short.pdf,
+                                              # без согласования названий: её отправляют владельцу
 
 Нужны reportlab, fonttools и brotli (pip install reportlab fonttools brotli).
 Шрифты — шрифты сайта: вариативные woff2 из src/assets/fonts при запуске превращаются в статичные TTF
@@ -359,7 +361,8 @@ def hazard(canv, x, y, w, h, color=GREEN, step=9):
     canv.restoreState()
 
 
-COVER = {}
+COVER = {"kicker": "// АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM"}
+SHORT = False
 
 
 def draw_cover(canv, doc):
@@ -373,7 +376,7 @@ def draw_cover(canv, doc):
                        preserveAspectRatio=True, anchor="sw")
     canv.setFillColor(GREEN_BRIGHT)
     canv.setFont("Mono", 8.5)
-    canv.drawString(MARGIN_X, PAGE_H - 58 * mm, "// АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM")
+    canv.drawString(MARGIN_X, PAGE_H - 58 * mm, COVER["kicker"])
     canv.setFillColor(colors.white)
     canv.setFont("Unbounded", 28)
     canv.drawString(MARGIN_X, PAGE_H - 72 * mm, "ВОПРОСЫ ПО СТРАНИЦАМ")
@@ -409,10 +412,10 @@ def labelled_field(label: str, name: str, height: float = 20, multiline: bool = 
 
 def cover_story(directions: list[Direction], n_questions: int, n_renames: int) -> list:
     n_pages = sum(len(d.pages) for d in directions)
+    cells = ((n_questions, "вопросов"), (len(directions), "разделов")) if SHORT else \
+        ((n_questions, "вопросов"), (n_pages, "страниц услуг"), (len(directions), "направлений"), (n_renames, "новых названий"))
     stats = Table([[Paragraph(f'<font name="Unbounded" size="18">{v}</font><br/>{inline(k)}', STYLES["body"])
-                    for v, k in ((n_questions, "вопросов"), (n_pages, "страниц услуг"), (len(directions), "направлений"),
-                                 (n_renames, "новых названий"))]],
-                  colWidths=[(PAGE_W - 2 * MARGIN_X) / 4] * 4)
+                    for v, k in cells]], colWidths=[(PAGE_W - 2 * MARGIN_X) / 4] * len(cells), hAlign="LEFT")
     stats.setStyle(TableStyle([("LINEBEFORE", (1, 0), (-1, 0), 0.5, LINE), ("LEFTPADDING", (0, 0), (-1, -1), 8),
                                ("LEFTPADDING", (0, 0), (0, 0), 0), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
     intro = [
@@ -426,6 +429,10 @@ def cover_story(directions: list[Direction], n_questions: int, n_renames: int) -
         "Направления идут в порядке меню сайта, каждое начинается с новой страницы. Разделы можно раздать мастерам.",
         "В конце — новые названия страниц: отметьте «согласен» или впишите свой вариант.",
     ]
+    if SHORT:
+        intro = ["Здесь только главные вопросы: от ответов зависит, какие работы, оборудование и сроки сайт может "
+                 "обещать клиентам, и какие картинки останутся на страницах. О ценах анкета не спрашивает."]
+        how = how[:2] + ["В конце есть поле для всего, что не вошло в вопросы."]
     story = [Spacer(1, 6), stats, Spacer(1, 14)]
     story += [Paragraph(inline(t), STYLES["body"]) for t in intro]
     story += [Spacer(1, 10), Paragraph("Как заполнять", STYLES["page"]), Spacer(1, 4)]
@@ -455,11 +462,12 @@ def question_block(number: int, q: Question, page_name: str) -> Flowable:
 def questions_story(directions: list[Direction]) -> tuple[list, int]:
     story, number = [], 0
     for di, d in enumerate(directions, 1):
-        story += [PageBreak(), Paragraph(f"// НАПРАВЛЕНИЕ {di:02d} ИЗ {len(directions):02d}", STYLES["dir_kicker"]),
+        kicker = f"// РАЗДЕЛ {di} ИЗ {len(directions)}" if SHORT else f"// НАПРАВЛЕНИЕ {di:02d} ИЗ {len(directions):02d}"
+        story += [CondPageBreak(200) if SHORT and di > 1 else PageBreak(), Paragraph(kicker, STYLES["dir_kicker"]),
                   Spacer(1, 4), DirectionHeading(d.name, f"dir{di}"), Spacer(1, 6)]
         for p in d.pages:
             title = "Страница направления" if p.is_direction else p.name
-            head = [Paragraph(inline(title), STYLES["page"])]
+            head = [] if SHORT and p.is_direction else [Paragraph(inline(title), STYLES["page"])]
             if p.path:
                 head.append(Paragraph(html.escape("garage.team" + p.path), STYLES["path"]))
             head.append(Spacer(1, 6))
@@ -511,17 +519,22 @@ def renames_story(rows: list[dict]) -> list:
         alt = AnswerField(f"rename_alt_{i:02d}", 18, f"Свой вариант названия вместо: {r['h1']}", multiline=False)
         story.append(KeepTogether([row, Paragraph("свой вариант", STYLES["label"]), Spacer(1, 1), alt, Spacer(1, 5),
                                    Table([[""]], colWidths=[w], style=[("LINEBELOW", (0, 0), (-1, -1), 0.4, LINE)])]))
+    story += notes_story()
+    return story
+
+
+def notes_story() -> list:
     notes_heading = Paragraph("Что ещё важно знать", STYLES["h2"])
-    story += [Spacer(1, 16), notes_heading,
+    return [Spacer(1, 16), notes_heading,
               Paragraph("Всё, что не вошло в вопросы: новые услуги, ошибки на сайте, пожелания.", STYLES["note"]),
               Spacer(1, 6), AnswerField("notes", 150, "Что ещё важно знать")]
-    return story
 
 
 def build(out: Path) -> tuple[int, int, int]:
     global HAS_PT_MONO
-    directions = parse_questions((SEO / "owner-questions.md").read_text(encoding="utf-8"))
-    renames = parse_renames((SEO / "renames.md").read_text(encoding="utf-8"))
+    source = "owner-questions-short.md" if SHORT else "owner-questions.md"
+    directions = parse_questions((SEO / source).read_text(encoding="utf-8"))
+    renames = [] if SHORT else parse_renames((SEO / "renames.md").read_text(encoding="utf-8"))
     # same order as the questions: the site menu, a direction first, then its pages
     order = {p.path: i for i, p in enumerate(p for d in directions for p in d.pages)}
     renames.sort(key=lambda r: order.get(r["path"], len(order)))
@@ -529,14 +542,17 @@ def build(out: Path) -> tuple[int, int, int]:
         HAS_PT_MONO = build_fonts(Path(tmp))
         STYLES["sub"].bulletFontName = "Manrope"
         n_questions = sum(len(p.questions) for d in directions for p in d.pages)
+        if SHORT:
+            COVER["kicker"] = "// КОРОТКАЯ АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM"
         COVER.update(subtitle=f"Автосервис «Гараж», Нижний Новгород · {n_questions} вопросов с полями для ответов",
                      date=date.today().strftime("%d.%m.%Y"))
         toc = TableOfContents(levelStyles=[STYLES["toc0"]], dotsMinLevel=0)
         story = [NextPageTemplate("content")] + cover_story(directions, n_questions, len(renames))
-        story += [PageBreak(), Paragraph("// СОДЕРЖАНИЕ", STYLES["dir_kicker"]), Spacer(1, 4),
-                  Paragraph("Содержание", STYLES["h2"]), Spacer(1, 6), toc]
+        if not SHORT:
+            story += [PageBreak(), Paragraph("// СОДЕРЖАНИЕ", STYLES["dir_kicker"]), Spacer(1, 4),
+                      Paragraph("Содержание", STYLES["h2"]), Spacer(1, 6), toc]
         q_story, numbered = questions_story(directions)
-        story += q_story + renames_story(renames)
+        story += q_story + (notes_story() if SHORT else renames_story(renames))
         raw = out.with_suffix(".tmp.pdf")
         Questionnaire(str(raw)).multiBuild(story)
         writer = PdfWriter(clone_from=PdfReader(str(raw)))
@@ -552,8 +568,12 @@ def build(out: Path) -> tuple[int, int, int]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("-o", "--out", type=Path, default=SEO / "owner-questions.pdf")
+    ap.add_argument("-o", "--out", type=Path)
+    ap.add_argument("--short", action="store_true", help="короткая анкета для владельца")
     args = ap.parse_args()
+    global SHORT
+    SHORT = args.short
+    args.out = args.out or SEO / ("owner-questions-short.pdf" if SHORT else "owner-questions.pdf")
     n, r, pages = build(args.out)
     print(f"записано {args.out.relative_to(ROOT) if args.out.is_relative_to(ROOT) else args.out}: "
           f"{n} вопросов, {r} названий на согласование, {pages} стр.")
