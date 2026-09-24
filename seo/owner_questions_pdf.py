@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Анкета владельца в PDF: все вопросы из seo/owner-questions.md с полями для ответов
-и согласование новых названий страниц из seo/renames.md.
+"""Анкета владельца в PDF: вопросы с полями для ответов и согласование новых названий страниц из seo/renames.md.
+
+Две версии:
+  полная   — все вопросы по каждой странице из seo/owner-questions.md;
+  короткая — seo/owner-questions-short.md: общие вопросы один раз, остальное — таблицы с отметками «да / нет».
 
 Поля заполняются в «Просмотре» на Mac, в Adobe Acrobat Reader и других программах для PDF;
 распечатанная анкета заполняется ручкой (поля печатаются рамками).
 
-  python3 seo/owner_questions_pdf.py          # -> seo/owner-questions.pdf
+  python3 seo/owner_questions_pdf.py            # -> seo/owner-questions.pdf
+  python3 seo/owner_questions_pdf.py --short    # -> seo/owner-questions-short.pdf
   python3 seo/owner_questions_pdf.py -o x.pdf
+
+Таблица в исходнике идёт сразу после вопроса: строка заголовков, строка `|---|`, строки ответов. Ячейки: `( )` — выбор
+одного варианта в строке, `[ ]` — отметка, `___` — поле для текста, остальное — текст. Строка, где заполнена только
+первая ячейка, — подзаголовок.
 
 Нужны reportlab, fonttools и brotli (pip install reportlab fonttools brotli).
 Шрифты — шрифты сайта: вариативные woff2 из src/assets/fonts при запуске превращаются в статичные TTF
@@ -18,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import re
 import sys
 import tempfile
@@ -62,6 +71,10 @@ PAGE_W, PAGE_H = A4
 MARGIN_X, MARGIN_TOP, MARGIN_BOTTOM = 18 * mm, 22 * mm, 18 * mm
 ANSWER_H = 38          # pt: two or three typed lines, a comfortable box on paper
 NUM_W = 30             # pt: the column with the question number
+GRID_FIELD_H = 22      # pt: a comment box in a table row, two typed lines
+GRID_MARK = 11         # pt: a checkbox or a radio button in a table row
+GENERAL = "Общие вопросы"   # the section of the short version that is asked once for the whole site
+CELL_CHOICE, CELL_CHECK, CELL_FIELD = "( )", "[ ]", "___"
 
 
 # ---------- fonts ----------
@@ -82,7 +95,13 @@ def build_fonts(tmp: Path) -> bool:
         if not parts:
             sys.exit(f"нет файлов шрифта {family} в {FONTS_SRC}")
         out = tmp / f"{name}.ttf"
-        Merger().merge(parts).save(out)
+        merged = Merger().merge(parts)
+        # every instance keeps the variable font's own name («Manrope-ExtraLight»); reportlab embeds fonts by that
+        # name, so without a name of its own the bold instance silently turned into the regular one
+        for record in merged["name"].names:
+            if record.nameID in (4, 6):
+                record.string = name
+        merged.save(out)
         pdfmetrics.registerFont(TTFont(name, str(out)))
 
     make("manrope", 400, "Manrope")
@@ -163,6 +182,14 @@ class Question:
     text: str
     subs: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    grid: list[list[str]] = field(default_factory=list)    # header row + answer rows; empty for a text answer
+
+    def answer_rows(self) -> list[list[str]]:
+        return [r for r in self.grid[1:] if not is_group_row(r)]
+
+
+def is_group_row(row: list[str]) -> bool:
+    return bool(row[0]) and not any(row[1:])
 
 
 @dataclass
@@ -181,12 +208,19 @@ class Direction:
 
 
 def parse_questions(md: str) -> list[Direction]:
-    """seo/owner-questions.md: «## направление», «### страница», `путь`, «- вопрос», «  - вариант», «  пояснение»."""
+    """«## направление», «### страница», `путь`, «- вопрос», «  - вариант», «  пояснение», «| таблица |» после вопроса."""
     directions: list[Direction] = []
     page: Page | None = None
     for raw in md.splitlines():
         line = raw.rstrip()
         if not line.strip():
+            continue
+        if line.lstrip().startswith("|") and page is not None:
+            if not page.questions:
+                raise SystemExit(f"таблица без вопроса перед ней: {line}")
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if not all(re.fullmatch(r":?-{3,}:?", c) for c in cells):     # the |---| line under the header
+                page.questions[-1].grid.append(cells)
             continue
         if line.startswith("## "):
             directions.append(Direction(line[3:].strip()))
@@ -213,7 +247,37 @@ def parse_questions(md: str) -> list[Direction]:
             page.notes.append(line.strip())
     for d in directions:
         d.pages = [p for p in d.pages if p.questions or p.notes]
+        for p in d.pages:
+            for q in p.questions:
+                check_grid(q)
     return [d for d in directions if d.pages]
+
+
+def check_grid(q: Question) -> None:
+    if not q.grid:
+        return
+    if not q.answer_rows():
+        raise SystemExit(f"в таблице нет строк для ответа: {q.text}")
+    width = len(q.grid[0])
+    for row in q.grid:
+        if len(row) != width:
+            raise SystemExit(f"в строке таблицы {len(row)} ячеек, в заголовке {width}: {' | '.join(row)}")
+    kinds = [column_kind(q, c) for c in range(width)]
+    if kinds[0] != "text":
+        raise SystemExit(f"первая колонка таблицы должна быть текстом: {q.text}")
+    for row in q.answer_rows():
+        for c, cell in enumerate(row):
+            if kinds[c] != "text" and cell != {"choice": CELL_CHOICE, "check": CELL_CHECK, "field": CELL_FIELD}[kinds[c]]:
+                raise SystemExit(f"в колонке «{q.grid[0][c]}» разные типы ячеек: {' | '.join(row)}")
+
+
+def column_kind(q: Question, c: int) -> str:
+    """text, choice, check or field — by the cells of the answer rows."""
+    cells = {r[c] for r in q.answer_rows()}
+    for kind, token in (("choice", CELL_CHOICE), ("check", CELL_CHECK), ("field", CELL_FIELD)):
+        if token in cells:
+            return kind
+    return "text"
 
 
 def parse_renames(md: str) -> list[dict]:
@@ -227,6 +291,13 @@ def parse_renames(md: str) -> list[dict]:
         rows.append({"path": cells[0].strip("`"), "old": cells[1], "h1": cells[2], "nav": cells[3],
                      "query": cells[4], "freq": cells[5]})
     return rows
+
+
+def site_order() -> dict[str, int]:
+    """Page path -> position in the site menu: a direction, then its pages."""
+    data = json.loads((ROOT / "data" / "services.json").read_text(encoding="utf-8"))
+    paths = [p for c in data["categories"] for p in (c["href"], *(s["href"] for s in c["subs"]))]
+    return {p: i for i, p in enumerate(paths)}
 
 
 # ---------- text ----------
@@ -262,7 +333,15 @@ STYLES = {
     "cell": ParagraphStyle("cell", fontName="Manrope", fontSize=8.6, leading=11.4, textColor=INK),
     "cell_b": ParagraphStyle("cell_b", fontName="Manrope-Bold", fontSize=8.6, leading=11.4, textColor=INK),
     "cell_small": ParagraphStyle("cell_small", fontName="Manrope", fontSize=7.8, leading=10.4, textColor=GRAY),
+    "group": ParagraphStyle("group", fontName="Manrope-Bold", fontSize=8.6, leading=11.4, textColor=GREEN),
 }
+
+
+def plural(n: int, one: str, few: str, many: str) -> str:
+    """plural(21, "вопрос", "вопроса", "вопросов") -> "вопрос"."""
+    if 11 <= n % 100 <= 14:
+        return many
+    return {1: one, 2: few, 3: few, 4: few}.get(n % 10, many)
 
 
 # ---------- form fields ----------
@@ -299,6 +378,25 @@ class CheckField(Flowable):
                                     textColor=GREEN, forceBorder=True, fieldFlags="")
 
 
+class ChoiceField(Flowable):
+    """One radio button; the buttons of a table row share a name, so only one of them can be on."""
+
+    def __init__(self, name: str, value: str, tooltip: str, size: float = GRID_MARK):
+        super().__init__()
+        self.name, self.value, self.tooltip, self.size = name, value, tooltip, size
+
+    def wrap(self, avail_w, avail_h):
+        return self.size, self.size
+
+    def draw(self):
+        # a square with a check mark, like the checkboxes: reportlab's round buttons look the same on and off in
+        # «Просмотр» (PDFKit). No noToggleToOff flag, so a second click clears a wrong answer.
+        self.canv.acroForm.radio(name=self.name, value=self.value, tooltip=self.tooltip, x=0, y=0, size=self.size,
+                                 relative=True, buttonStyle="check", shape="square", borderWidth=0.8,
+                                 borderColor=GREEN, fillColor=colors.white, textColor=GREEN, forceBorder=True,
+                                 fieldFlags="radio")
+
+
 class DirectionHeading(Paragraph):
     """Direction title: goes to the table of contents and the PDF bookmarks."""
 
@@ -309,10 +407,10 @@ class DirectionHeading(Paragraph):
 
 # ---------- document ----------
 class Questionnaire(BaseDocTemplate):
-    def __init__(self, filename: str, **kw):
+    def __init__(self, filename: str, title: str, **kw):
         super().__init__(filename, pagesize=A4, leftMargin=MARGIN_X, rightMargin=MARGIN_X, topMargin=MARGIN_TOP,
-                         bottomMargin=MARGIN_BOTTOM, title="Анкета владельца: вопросы по страницам услуг garage.team",
-                         author="Автосервис «Гараж»", subject="Вопросы владельцу для страниц услуг сайта", **kw)
+                         bottomMargin=MARGIN_BOTTOM, title=title, author="Автосервис «Гараж»",
+                         subject="Вопросы владельцу для страниц услуг сайта", **kw)
         self.section = ""
         frame = Frame(MARGIN_X, MARGIN_BOTTOM, PAGE_W - 2 * MARGIN_X, PAGE_H - MARGIN_TOP - MARGIN_BOTTOM, id="f",
                       leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
@@ -373,11 +471,12 @@ def draw_cover(canv, doc):
                        preserveAspectRatio=True, anchor="sw")
     canv.setFillColor(GREEN_BRIGHT)
     canv.setFont("Mono", 8.5)
-    canv.drawString(MARGIN_X, PAGE_H - 58 * mm, "// АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM")
+    canv.drawString(MARGIN_X, PAGE_H - 58 * mm, COVER["kicker"])
     canv.setFillColor(colors.white)
     canv.setFont("Unbounded", 28)
-    canv.drawString(MARGIN_X, PAGE_H - 72 * mm, "ВОПРОСЫ ПО СТРАНИЦАМ")
-    canv.drawString(MARGIN_X, PAGE_H - 84 * mm, "УСЛУГ САЙТА")
+    first, second = COVER["title"]
+    canv.drawString(MARGIN_X, PAGE_H - 72 * mm, first)
+    canv.drawString(MARGIN_X, PAGE_H - 84 * mm, second)
     canv.setFillColor(colors.HexColor("#b8bdb8"))
     canv.setFont("Manrope", 10.5)
     canv.drawString(MARGIN_X, PAGE_H - 96 * mm, COVER["subtitle"])
@@ -407,29 +506,91 @@ def labelled_field(label: str, name: str, height: float = 20, multiline: bool = 
     return [Paragraph(label, STYLES["label"]), Spacer(1, 2), AnswerField(name, height, label, multiline=multiline), Spacer(1, 8)]
 
 
-def cover_story(directions: list[Direction], n_questions: int, n_renames: int) -> list:
-    n_pages = sum(len(d.pages) for d in directions)
+@dataclass(frozen=True)
+class Profile:
+    source: str
+    out: str
+    doc_title: str
+    kicker: str
+    title: tuple[str, str]
+    intro: str
+    how: tuple[str, ...]
+    page_per_direction: bool      # the full version starts every direction on a new sheet
+
+
+FILL_IN = ("Отвечайте прямо в полях: их заполняют в «Просмотре» на Mac или в Adobe Acrobat Reader. "
+           "Можно распечатать и написать ручкой.")
+RENAMES_HOW = "В конце — новые названия страниц: отметьте «согласен» или впишите свой вариант."
+
+PROFILES = {
+    "full": Profile(
+        source="owner-questions.md", out="owner-questions.pdf",
+        doc_title="Анкета владельца: вопросы по страницам услуг garage.team",
+        kicker="// АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM", title=("ВОПРОСЫ ПО СТРАНИЦАМ", "УСЛУГ САЙТА"),
+        intro="Эта анкета нужна, чтобы дописать страницы услуг сайта фактами. Сейчас на сайте нет ничего, что не "
+              "подтверждено старым сайтом, прайсом или общими техническими знаниями. Ваши ответы позволят указать сроки, "
+              "оборудование и работы, которые вы делаете сами. О ценах анкета не спрашивает.",
+        how=(FILL_IN,
+             "Не знаете ответа — пропустите вопрос. Если работу не делаете, так и напишите: «не делаем» — это тоже важный ответ.",
+             "Направления идут в порядке меню сайта, каждое начинается с новой страницы. Разделы можно раздать мастерам.",
+             RENAMES_HOW),
+        page_per_direction=True),
+    "short": Profile(
+        source="owner-questions-short.md", out="owner-questions-short.pdf",
+        doc_title="Анкета владельца, короткая версия: вопросы для страниц услуг garage.team",
+        kicker="// АНКЕТА ВЛАДЕЛЬЦА · GARAGE.TEAM · КОРОТКАЯ ВЕРСИЯ", title=("КОРОТКАЯ АНКЕТА", "ДЛЯ ВЛАДЕЛЬЦА"),
+        intro="Ответы нужны, чтобы дописать страницы услуг сайта фактами: сейчас там нет ничего, что не подтверждено "
+              "старым сайтом, прайсом или общими техническими знаниями. Гарантию, мастеров, оборудование, сроки "
+              "и подрядчиков спрашиваем один раз, в разделе «Общие вопросы». Где хватит «да» или «нет», вместо вопроса "
+              "строка в таблице. О ценах анкета не спрашивает. Это короткая версия: полную, owner-questions.pdf, "
+              "заполнять не нужно.",
+        how=(FILL_IN,
+             "В таблицах отметьте один вариант в каждой строке. Если нужно пояснить, впишите в поле «комментарий». "
+             "Повторный щелчок снимает отметку.",
+             "Не знаете ответа — пропустите строку. «Не делаем» — тоже важный ответ: такую работу мы не будем обещать на сайте.",
+             "Разделы по направлениям можно раздать мастерам.",
+             RENAMES_HOW),
+        page_per_direction=False),
+}
+
+
+@dataclass(frozen=True)
+class Stats:
+    text: int          # questions answered in a text box
+    rows: int          # table rows answered with a mark
+    pages: int
+    directions: int
+    renames: int
+
+
+def count(directions: list[Direction], n_renames: int) -> Stats:
+    questions = [q for d in directions for p in d.pages for q in p.questions]
+    return Stats(text=sum(1 for q in questions if not q.grid), rows=sum(len(q.answer_rows()) for q in questions),
+                 pages=sum(len(d.pages) for d in directions if d.name != GENERAL),
+                 directions=sum(1 for d in directions if d.name != GENERAL), renames=n_renames)
+
+
+def stat_cells(s: Stats) -> list[tuple[int, str]]:
+    if s.rows:
+        return [(s.text, plural(s.text, "вопрос с ответом текстом", "вопроса с ответом текстом", "вопросов с ответом текстом")),
+                (s.rows, plural(s.rows, "строка, где хватит отметки", "строки, где хватит отметки", "строк, где хватит отметки")),
+                (s.directions, plural(s.directions, "направление", "направления", "направлений")),
+                (s.renames, plural(s.renames, "новое название", "новых названия", "новых названий"))]
+    return [(s.text, plural(s.text, "вопрос", "вопроса", "вопросов")),
+            (s.pages, plural(s.pages, "страница услуг", "страницы услуг", "страниц услуг")),
+            (s.directions, plural(s.directions, "направление", "направления", "направлений")),
+            (s.renames, plural(s.renames, "новое название", "новых названия", "новых названий"))]
+
+
+def cover_story(profile: Profile, s: Stats) -> list:
     stats = Table([[Paragraph(f'<font name="Unbounded" size="18">{v}</font><br/>{inline(k)}', STYLES["body"])
-                    for v, k in ((n_questions, "вопросов"), (n_pages, "страниц услуг"), (len(directions), "направлений"),
-                                 (n_renames, "новых названий"))]],
+                    for v, k in stat_cells(s)]],
                   colWidths=[(PAGE_W - 2 * MARGIN_X) / 4] * 4)
     stats.setStyle(TableStyle([("LINEBEFORE", (1, 0), (-1, 0), 0.5, LINE), ("LEFTPADDING", (0, 0), (-1, -1), 8),
                                ("LEFTPADDING", (0, 0), (0, 0), 0), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
-    intro = [
-        "Эта анкета нужна, чтобы дописать страницы услуг сайта фактами. Сейчас на сайте нет ничего, что не подтверждено "
-        "старым сайтом, прайсом или общими техническими знаниями. Ваши ответы позволят указать сроки, оборудование "
-        "и работы, которые вы делаете сами. О ценах анкета не спрашивает.",
-    ]
-    how = [
-        "Отвечайте прямо в полях: их заполняют в «Просмотре» на Mac или в Adobe Acrobat Reader. Можно распечатать и написать ручкой.",
-        "Не знаете ответа — пропустите вопрос. Если работу не делаете, так и напишите: «не делаем» — это тоже важный ответ.",
-        "Направления идут в порядке меню сайта, каждое начинается с новой страницы. Разделы можно раздать мастерам.",
-        "В конце — новые названия страниц: отметьте «согласен» или впишите свой вариант.",
-    ]
-    story = [Spacer(1, 6), stats, Spacer(1, 14)]
-    story += [Paragraph(inline(t), STYLES["body"]) for t in intro]
+    story = [Spacer(1, 6), stats, Spacer(1, 14), Paragraph(inline(profile.intro), STYLES["body"])]
     story += [Spacer(1, 10), Paragraph("Как заполнять", STYLES["page"]), Spacer(1, 4)]
-    story += [Paragraph(inline(t), STYLES["sub"], bulletText="—") for t in how]
+    story += [Paragraph(inline(t), STYLES["sub"], bulletText="—") for t in profile.how]
     story += [Spacer(1, 14)]
     fields = Table([[labelled_field("Кто заполнил", "cover_name"), labelled_field("Дата", "cover_date")],
                     [labelled_field("Телефон для уточнений", "cover_phone"), labelled_field("Должность", "cover_role")]],
@@ -441,36 +602,130 @@ def cover_story(directions: list[Direction], n_questions: int, n_renames: int) -
 
 
 def question_block(number: int, q: Question, page_name: str) -> Flowable:
+    """The number and the question; a text question also gets its answer box, a table question is followed by the table."""
     body = [Paragraph(inline(q.text), STYLES["q"])]
     body += [Paragraph(inline(s), STYLES["sub"], bulletText="•") for s in q.subs]
     body += [Paragraph(inline(n), STYLES["note"]) for n in q.notes]
-    body += [Spacer(1, 4), AnswerField(f"q{number:03d}", ANSWER_H, f"Ответ на вопрос {number} ({page_name})")]
+    if not q.grid:
+        body += [Spacer(1, 4), AnswerField(f"q{number:03d}", ANSWER_H, f"Ответ на вопрос {number} ({page_name})")]
     t = Table([[Paragraph(f"{number:03d}", STYLES["num"]), body]], colWidths=[NUM_W, PAGE_W - 2 * MARGIN_X - NUM_W])
     t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0),
                            ("RIGHTPADDING", (0, 0), (-1, -1), 0), ("TOPPADDING", (0, 0), (-1, -1), 0),
-                           ("BOTTOMPADDING", (0, 0), (-1, -1), 10)]))
+                           ("BOTTOMPADDING", (0, 0), (-1, -1), 4 if q.grid else 10)]))
     return t
 
 
-def questions_story(directions: list[Direction]) -> tuple[list, int]:
+def grid_widths(q: Question, kinds: list[str]) -> list[float]:
+    """Mark columns as wide as their heading; comment boxes about a third of the rest; text shares what is left."""
+    marks = {c: max(11 * mm, pdfmetrics.stringWidth(q.grid[0][c].upper(), "Mono", 7.4) + 8)
+             for c, k in enumerate(kinds) if k in ("choice", "check")}
+    rest = PAGE_W - 2 * MARGIN_X - NUM_W - sum(marks.values())
+    fields = [c for c, k in enumerate(kinds) if k == "field"]
+    texts = [c for c, k in enumerate(kinds) if k == "text"]
+    field_w = rest * (0.36 if marks else 0.45) / len(fields) if fields else 0
+    text_rest = rest - field_w * len(fields)
+    # every text column fits its longest word (reportlab would cut «моторист-дефектовщик» in two);
+    # the rest goes to longer texts, but never more than twice to one column as to another
+    rows = q.answer_rows()
+    least = {c: max(pdfmetrics.stringWidth(w, "Manrope", STYLES["cell"].fontSize)
+                    for r in rows for w in re.sub(r"\*\*|`", "", r[c]).split() or [""]) + 10 for c in texts}
+    avg = {c: sum(len(r[c]) for r in rows) / len(rows) for c in texts}
+    weight = {c: min(max(avg[c], 1), 2 * max(min(avg.values()), 1)) for c in texts}
+    spare = text_rest - sum(least.values())
+    if spare < 0:
+        raise SystemExit(f"таблица не помещается по ширине: {q.text}")
+    widths = []
+    for c, k in enumerate(kinds):
+        if c in marks:
+            widths.append(marks[c])
+        elif k == "field":
+            widths.append(field_w)
+        else:
+            widths.append(least[c] + spare * weight[c] / sum(weight.values()))
+    return widths
+
+
+def grid_table(number: int, q: Question) -> Table:
+    kinds = [column_kind(q, c) for c in range(len(q.grid[0]))]
+    header = [""] + [Paragraph(html.escape(h.upper()), STYLES["label"]) for h in q.grid[0]]
+    data, style = [header], [
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4), ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("LEFTPADDING", (0, 0), (1, -1), 0), ("LINEBELOW", (1, 0), (-1, 0), 0.8, INK),
+    ]
+    for c, k in enumerate(kinds, 1):
+        if k in ("choice", "check"):
+            style.append(("ALIGN", (c, 0), (c, -1), "CENTER"))
+    last = len(q.grid) - 1
+    # a sheet never starts or ends a table with a lone row, and a subheading stays with the row under it
+    style += [("NOSPLIT", (0, 0), (-1, min(3, last))), ("NOSPLIT", (0, max(0, last - 1)), (-1, last))]
+    for r, row in enumerate(q.grid[1:], 1):
+        if is_group_row(row):
+            data.append([""] + [Paragraph(inline(row[0].strip("*")), STYLES["group"])] + [""] * (len(row) - 1))
+            style += [("SPAN", (1, r), (-1, r)), ("TOPPADDING", (1, r), (-1, r), 10),
+                      ("NOSPLIT", (0, r), (-1, min(r + 1, last)))]
+            continue
+        label = re.sub(r"\*\*|`", "", row[0])
+        cells = [""]
+        for c, (cell, kind) in enumerate(zip(row, kinds)):
+            key = f"q{number:03d}_{r:02d}"
+            if kind == "text":
+                cells.append(Paragraph(inline(cell), STYLES["cell"]))
+            elif kind == "choice":
+                cells.append(ChoiceField(key, f"v{c}", label))
+            elif kind == "check":
+                cells.append(CheckField(f"{key}_c{c}", f"{label}: {q.grid[0][c]}", size=GRID_MARK))
+            else:
+                cells.append(AnswerField(f"{key}_f{c}", GRID_FIELD_H, f"{label}: {q.grid[0][c]}"))
+        data.append(cells)
+        style.append(("LINEBELOW", (1, r), (-1, r), 0.4, LINE))
+    t = Table(data, colWidths=[NUM_W] + grid_widths(q, kinds), repeatRows=1)
+    t.setStyle(TableStyle(style))
+    return t
+
+
+def direction_opening(d: Direction, di: int, total: int, page_per_direction: bool) -> list:
+    kicker = "// ДЛЯ ВСЕХ УСЛУГ СРАЗУ" if d.name == GENERAL else f"// НАПРАВЛЕНИЕ {di:02d} ИЗ {total:02d}"
+    opening = [Paragraph(kicker, STYLES["dir_kicker"]), Spacer(1, 4), DirectionHeading(d.name, f"dir{di}"), Spacer(1, 6)]
+    if page_per_direction or d.name == GENERAL:
+        return [PageBreak()] + opening
+    return [Spacer(1, 18), CondPageBreak(170)] + opening
+
+
+def questions_story(directions: list[Direction], profile: Profile) -> tuple[list, int]:
     story, number = [], 0
-    for di, d in enumerate(directions, 1):
-        story += [PageBreak(), Paragraph(f"// НАПРАВЛЕНИЕ {di:02d} ИЗ {len(directions):02d}", STYLES["dir_kicker"]),
-                  Spacer(1, 4), DirectionHeading(d.name, f"dir{di}"), Spacer(1, 6)]
+    total = sum(1 for d in directions if d.name != GENERAL)
+    di = 0
+    for d in directions:
+        if d.name != GENERAL:
+            di += 1
+        story += direction_opening(d, di, total, profile.page_per_direction)
         for p in d.pages:
-            title = "Страница направления" if p.is_direction else p.name
-            head = [Paragraph(inline(title), STYLES["page"])]
+            head = []
+            if not (p.is_direction and not p.path):       # the short version asks about the direction as a whole
+                head.append(Paragraph(inline("Страница направления" if p.is_direction else p.name), STYLES["page"]))
             if p.path:
                 head.append(Paragraph(html.escape("garage.team" + p.path), STYLES["path"]))
-            head.append(Spacer(1, 6))
+            if head:
+                head.append(Spacer(1, 6))
             head += [Paragraph(inline(n), STYLES["note"]) for n in p.notes]
             blocks = []
             for q in p.questions:
                 number += 1
-                blocks.append(question_block(number, q, p.name))
-            story.append(CondPageBreak(90))
-            story.append(KeepTogether(head + blocks[:1]))   # a page title never stays alone at the bottom of a sheet
-            story += blocks[1:]
+                block = [question_block(number, q, p.name)]
+                if q.grid:
+                    block.append(grid_table(number, q))
+                blocks.append(block)
+            if not blocks:
+                story += head
+            for i, block in enumerate(blocks):
+                has_table = len(block) > 1
+                # a page title never stays alone at the bottom of a sheet, nor does a question without its table
+                story.append(CondPageBreak(170 if has_table else 90 if i == 0 else 0))
+                story.append(KeepTogether((head if i == 0 else []) + block[:1]))
+                story += block[1:]
+                if has_table:
+                    story.append(Spacer(1, 12))
             story.append(Spacer(1, 8))
     return story, number
 
@@ -518,27 +773,37 @@ def renames_story(rows: list[dict]) -> list:
     return story
 
 
-def build(out: Path) -> tuple[int, int, int]:
+def subtitle(s: Stats) -> str:
+    where = "Автосервис «Гараж», Нижний Новгород"
+    if s.rows:
+        return (f"{where} · {s.text} {plural(s.text, 'вопрос', 'вопроса', 'вопросов')} "
+                f"и {s.rows} {plural(s.rows, 'строка', 'строки', 'строк')} с отметками")
+    return f"{where} · {s.text} {plural(s.text, 'вопрос', 'вопроса', 'вопросов')} с полями для ответов"
+
+
+def build(profile: Profile, out: Path) -> tuple[Stats, int]:
     global HAS_PT_MONO
-    directions = parse_questions((SEO / "owner-questions.md").read_text(encoding="utf-8"))
+    directions = parse_questions((SEO / profile.source).read_text(encoding="utf-8"))
     renames = parse_renames((SEO / "renames.md").read_text(encoding="utf-8"))
-    # same order as the questions: the site menu, a direction first, then its pages
-    order = {p.path: i for i, p in enumerate(p for d in directions for p in d.pages)}
-    renames.sort(key=lambda r: order.get(r["path"], len(order)))
+    order = site_order()           # same order as the questions: a direction first, then its pages
+    missing = [r["path"] for r in renames if r["path"] not in order]
+    if missing:
+        raise SystemExit(f"в seo/renames.md страницы, которых нет в data/services.json: {', '.join(missing)}")
+    renames.sort(key=lambda r: order[r["path"]])
+    stats = count(directions, len(renames))
     with tempfile.TemporaryDirectory() as tmp:
         HAS_PT_MONO = build_fonts(Path(tmp))
         STYLES["sub"].bulletFontName = "Manrope"
-        n_questions = sum(len(p.questions) for d in directions for p in d.pages)
-        COVER.update(subtitle=f"Автосервис «Гараж», Нижний Новгород · {n_questions} вопросов с полями для ответов",
+        COVER.update(kicker=profile.kicker, title=profile.title, subtitle=subtitle(stats),
                      date=date.today().strftime("%d.%m.%Y"))
         toc = TableOfContents(levelStyles=[STYLES["toc0"]], dotsMinLevel=0)
-        story = [NextPageTemplate("content")] + cover_story(directions, n_questions, len(renames))
+        story = [NextPageTemplate("content")] + cover_story(profile, stats)
         story += [PageBreak(), Paragraph("// СОДЕРЖАНИЕ", STYLES["dir_kicker"]), Spacer(1, 4),
                   Paragraph("Содержание", STYLES["h2"]), Spacer(1, 6), toc]
-        q_story, numbered = questions_story(directions)
+        q_story, _ = questions_story(directions, profile)
         story += q_story + renames_story(renames)
         raw = out.with_suffix(".tmp.pdf")
-        Questionnaire(str(raw)).multiBuild(story)
+        Questionnaire(str(raw), profile.doc_title).multiBuild(story)
         writer = PdfWriter(clone_from=PdfReader(str(raw)))
         add_field_font(writer, Path(tmp) / "Manrope.ttf")
     # readers draw the typed text themselves, with the field font above, instead of a pre-made appearance
@@ -547,16 +812,20 @@ def build(out: Path) -> tuple[int, int, int]:
     with open(out, "wb") as fh:
         writer.write(fh)
     raw.unlink()
-    return numbered, len(renames), len(writer.pages)
+    return stats, len(writer.pages)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("-o", "--out", type=Path, default=SEO / "owner-questions.pdf")
+    ap.add_argument("--short", action="store_true", help="короткая версия из seo/owner-questions-short.md")
+    ap.add_argument("-o", "--out", type=Path, help="куда записать PDF")
     args = ap.parse_args()
-    n, r, pages = build(args.out)
-    print(f"записано {args.out.relative_to(ROOT) if args.out.is_relative_to(ROOT) else args.out}: "
-          f"{n} вопросов, {r} названий на согласование, {pages} стр.")
+    profile = PROFILES["short" if args.short else "full"]
+    out = args.out or SEO / profile.out
+    s, pages = build(profile, out)
+    rows = f", {s.rows} строк с отметками" if s.rows else ""
+    print(f"записано {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}: "
+          f"{s.text} вопросов с ответом текстом{rows}, {s.renames} названий на согласование, {pages} стр.")
     return 0
 
 
