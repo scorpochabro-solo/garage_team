@@ -2,6 +2,7 @@
 """Homepage renderer."""
 import json
 
+from . import arki
 from . import data as D
 from . import schema
 from .icons import icon, icon_for_href
@@ -170,8 +171,9 @@ def advantages():
     <p class="adv__note">{esc(S['advantages_note'])}</p>
 
     <div class="director reveal" id="director">
-      <div class="director__photo">
-        <img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async">
+      <div class="director__photo director__photo--arch">
+        {arki.wall()}
+        <div class="director__win"><img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async"></div>
         <span class="badge director__badge">{icon('shield', 'ic--sm')} генеральный директор</span>
       </div>
       <blockquote class="director__quote">
@@ -232,7 +234,7 @@ def contacts_strip():
     route = f"https://yandex.ru/maps/?rtext=~{lat}%2C{lon}"
     hours = "<br>".join(f"{esc(d)}: {esc(h)}" for d, h in D.HOURS)
     return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
-  <div class="wrap contacts">
+  <div class="wrap contacts contacts--door">
     <div class="reveal">
       <p class="eyebrow">// 06 — Контакты</p>
       <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
@@ -244,6 +246,7 @@ def contacts_strip():
       </ul>
       <div class="row" style="margin-top:2rem"><a class="btn btn--primary" href="{route}" target="_blank" rel="noopener">{icon('pin')} Схема проезда</a><a class="btn btn--ghost is-on-dark" href="/contacts/">Страница контактов {icon('arrow')}</a></div>
     </div>
+    {arki.door()}
     <div class="map reveal">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
       <a class="map__label" href="{route}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
@@ -261,6 +264,7 @@ def render_home():
         hero(),
         ticker(),
         services_map(),
+        arki.inside_section(),
         advantages(),
         gallery(),
         team(),
