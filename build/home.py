@@ -6,6 +6,7 @@ from . import data as D
 from . import schema
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
+from .pribory import pribory_section
 
 esc = D.esc
 S = D.SITE
@@ -261,6 +262,7 @@ def render_home():
         hero(),
         ticker(),
         services_map(),
+        pribory_section(),
         advantages(),
         gallery(),
         team(),
