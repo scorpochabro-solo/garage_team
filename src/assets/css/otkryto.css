@@ -1,0 +1,141 @@
+/* ============================================================
+   otkryto: «Открыто сейчас» (status dot + text) in the top line, the mobile menu and the contacts,
+   the week with today marked, «Как добраться» tiles (build/otkryto.py, js/otkryto.js)
+   ============================================================ */
+:root { --oc-amber: #f2a93b; --oc-amber-rgb: 242, 169, 59; }
+
+/* state colour, set on the [data-oc] element by otkryto.js: the dot, the state word and today's cell use it */
+[data-oc] { --oc-c: var(--gray-400); --oc-rgb: 140, 145, 140; }
+[data-oc-state="open"] { --oc-c: var(--green-bright); --oc-rgb: var(--green-bright-rgb); }
+[data-oc-state="soon"] { --oc-c: var(--oc-amber); --oc-rgb: var(--oc-amber-rgb); }
+
+/* the dot: only once the status is known; while open it glows and pulses calmly (transform/opacity only) */
+.oc__dot { position: relative; display: none; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--oc-c); }
+.is-live .oc__dot { display: block; }
+.oc__dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--oc-c); opacity: 0; }
+:is([data-oc-state="open"], [data-oc-state="soon"]) .oc__dot { box-shadow: 0 0 0 3px rgba(var(--oc-rgb), 0.14), 0 0 12px rgba(var(--oc-rgb), 0.55); }
+:is([data-oc-state="open"], [data-oc-state="soon"]) .oc__dot::after { animation: oc-pulse 2.8s var(--ease) infinite; }
+@keyframes oc-pulse { 0% { transform: scale(1); opacity: 0.55; } 70%, 100% { transform: scale(3.2); opacity: 0; } }
+/* off screen (otkryto.js sets .is-offscreen): base.css pauses .is-offscreen *, which does not reach a ::after */
+.is-offscreen .oc__dot::after { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .oc__dot::after { animation: none !important; } }
+:is([data-oc-state="open"], [data-oc-state="soon"]) .oc__word { color: var(--oc-c); }
+.oc__sep { opacity: 0.5; }
+
+/* ---------- header top line: the dot stands where the clock icon was ---------- */
+.topline .oc.is-live > .ic { display: none; }
+.topline .oc__dot { width: 7px; height: 7px; margin-inline: 4px; }
+/* the status is up to 13px wider than the plain hours («Закрыто · до понедельника, 9:00»), and between 1241 and 1300px
+   the six items did not fit even before it: the e-mail (header.css hides it up to 1240px) goes up to 1300px,
+   and the narrowest desktop gets slightly closer items */
+@media (max-width: 1300px) { .topline__item--mail { display: none; } }
+@media (max-width: 1180px) { .topline__in { gap: 1.3rem; } }
+
+/* ---------- mobile menu: under the phone number, the status over the plain hours ---------- */
+.oc-menu { display: grid; grid-template-columns: 1.25em minmax(0, 1fr); column-gap: 0.6em; align-items: start; }
+.oc-menu > .ic, .oc-menu > .oc__dot { grid-area: 1 / 1; justify-self: center; }
+.oc-menu > .ic { margin-top: 0.15em; }
+.oc-menu.is-live > .ic { display: none; }
+.oc-menu > .oc__dot { width: 9px; height: 9px; margin-top: 0.55em; }
+.oc-menu p { grid-area: 1 / 2; display: grid; gap: 0.2rem; line-height: 1.5; }
+.mobile-menu__meta .oc-menu p > span { display: block; }
+.oc-menu .oc__text { font-weight: 700; font-size: 1.02rem; color: #fff; }
+.mobile-menu__meta .oc-menu .oc__text span { display: inline; }
+
+/* ---------- the week: status line, seven days, holiday note ---------- */
+/* the state word in the display face, the rest («до 19:00», «откроемся завтра в 9:00») in the text face */
+.oc-now { display: flex; align-items: flex-start; gap: 0.7rem; font-weight: 600; font-size: 1rem; line-height: 1.35; color: var(--text-2); }
+/* on the first line when the text wraps on a phone: (line box of the word − dot) / 2 */
+.oc-now .oc__dot { width: 9px; height: 9px; margin-top: calc(0.71em - 4.5px); }
+.oc-sched .oc-now .oc__word { font-family: var(--font-display); font-weight: 700; font-size: 1.05em; letter-spacing: -0.01em; color: var(--text); }
+/* without JS the line is the old «Часы работы» title, set like the other contact titles */
+.oc-sched:not(.is-live) .oc-now { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: var(--text); }
+/* inside .contacts__item every span is a grey block line (home.css): the status keeps its own look */
+.oc-sched .oc__text, .oc-sched .oc__text span { display: inline; font-size: inherit; color: inherit; }
+:is([data-oc-state="open"], [data-oc-state="soon"]).oc-sched .oc__text .oc__word { color: var(--oc-c); }
+.oc-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); max-width: 27rem; margin-top: 0.85rem; box-shadow: inset 0 0 0 1px var(--line-2); }
+.oc-week li { position: relative; display: grid; align-content: start; justify-items: center; gap: 0.25rem; padding: 0.6rem 0.15rem 0.55rem; text-align: center; }
+.oc-week li + li { box-shadow: inset 1px 0 0 var(--line); }
+.oc-sched .oc-week__d { display: block; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.oc-sched .oc-week__t { display: block; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.25; color: var(--text); white-space: nowrap; }
+.oc-sched .is-off .oc-week__t { color: var(--text-3); }
+.oc-sched .is-note .oc-week__t { font-size: 0.66rem; white-space: normal; color: var(--text-2); }
+/* today: the state colour frames the day, a bar on top like a marker on a dial */
+.oc-week li.is-today { background: rgba(var(--oc-rgb), 0.09); box-shadow: inset 0 0 0 1px var(--oc-c); }
+.oc-week li.is-today::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--oc-c); }
+.oc-sched .is-today .oc-week__d { color: var(--oc-c); }
+.oc-note { margin-top: 0.7rem; font-size: 0.82rem; line-height: 1.45; color: var(--text-3); text-wrap: pretty; }
+/* /contacts/: the week under its own heading, a size up */
+.oc-sched--big .oc-now { font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem); }
+.oc-sched--big .oc-now .oc__dot { width: 10px; height: 10px; margin-top: calc(0.71em - 5px); }
+.oc-sched--big .oc-week { max-width: 36rem; margin-top: 1.1rem; }
+.oc-sched--big .oc-week li { padding-block: 0.8rem 0.75rem; }
+.oc-sched--big .oc-week__t { font-size: 0.86rem; }
+/* phones: seven cells of 41–55px; «10–19» (five monospace signs) has to fit the narrowest */
+@media (max-width: 480px) {
+  .oc-sched .oc-week li { padding-inline: 0.1rem; }
+  .oc-sched .oc-week .oc-week__t { font-size: 0.74rem; }
+  .oc-sched .oc-week .is-note .oc-week__t { font-size: 0.6rem; }
+}
+
+/* ---------- «Как добраться»: three tiles; the route is the main one ---------- */
+.contacts__list + .oc-go { margin-top: 2.2rem; }
+.oc-go__title { display: flex; align-items: center; gap: 0.7em; margin-bottom: 0.85rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+.oc-go__title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.oc-go__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+/* the outline is the tile's own background showing 1px around ::before, as on .btn--ghost: clip-path would cut a border */
+.oc-go__btn {
+  --chamfer: 10px;
+  position: relative; isolation: isolate;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 1rem 0.5rem;
+  min-height: 104px; padding: 1rem 1.1rem 1.05rem; text-align: left; color: var(--text); background: var(--line-2);
+  clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer));
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.oc-go__btn[hidden] { display: none; }
+.oc-go__btn::before {
+  content: ""; position: absolute; inset: 1px; z-index: -1; background: var(--oc-go-bg, var(--bg));
+  clip-path: polygon(calc(var(--chamfer) - 0.5px) 0, 100% 0, 100% calc(100% - var(--chamfer) + 0.5px), calc(100% - var(--chamfer) + 0.5px) 100%, 0 100%, 0 calc(var(--chamfer) - 0.5px));
+  transition: background-color var(--dur) var(--ease);
+}
+.section--black .oc-go { --oc-go-bg: var(--black); }
+.oc-go__btn .ic { grid-area: 1 / 1; width: 22px; height: 22px; color: var(--accent); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.oc-go__tag { grid-area: 1 / 2; justify-self: end; font-family: var(--font-mono); font-size: 0.62rem; line-height: 1.6; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.oc-go__label { grid-area: 2 / 1 / 3 / -1; align-self: end; font-weight: 700; font-size: 0.95rem; line-height: 1.25; }
+.oc-go__btn:hover { background: var(--accent); }
+.oc-go__btn:hover::before { background: var(--ink-800); }
+/* touch: hover styles exist only for a mouse (build/css_tools.py), so the press itself answers */
+.oc-go__btn:active { transform: translateY(1px); background: var(--accent); }
+.oc-go__btn:active::before { background: var(--ink-800); }
+/* focus: a ring inside the tile (clip-path hides an outline drawn outside it) */
+.oc-go__btn:focus-visible { outline: none; }
+.oc-go__btn:focus-visible::after { content: ""; position: absolute; inset: 5px; box-shadow: 0 0 0 2px var(--accent); pointer-events: none; }
+.oc-go__btn--main { background: var(--green); color: #fff; }
+.oc-go__btn--main::before { display: none; }
+.oc-go__btn--main .ic, .oc-go__btn--main .oc-go__tag { color: #fff; }
+.oc-go__btn--main .oc-go__tag { opacity: 0.8; }
+.oc-go__btn--main:hover, .oc-go__btn--main:active { background: var(--green-bright); color: #06120a; }
+.oc-go__btn--main:hover .ic, .oc-go__btn--main:hover .oc-go__tag, .oc-go__btn--main:active .ic, .oc-go__btn--main:active .oc-go__tag { color: #06120a; }
+.oc-go__btn--main:focus-visible::after { box-shadow: 0 0 0 2px #fff; }
+/* copied: the copy icon gives way to a check for a moment */
+.oc-go__btn .oc-go__ok { opacity: 0; transform: scale(0.6); }
+.oc-go__btn.is-done .oc-go__ic { opacity: 0; transform: scale(0.6); }
+.oc-go__btn.is-done .oc-go__ok { opacity: 1; transform: none; }
+/* phones: the route across the width, the other two side by side */
+@media (max-width: 520px) {
+  .oc-go__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .oc-go__btn { min-height: 96px; padding: 0.9rem 0.95rem 0.95rem; }
+  .oc-go__btn--main { grid-column: 1 / -1; min-height: 60px; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto; align-items: center; gap: 0.75rem; }
+  .oc-go__btn--main .oc-go__label { grid-area: 1 / 2; align-self: center; font-size: 1rem; }
+  .oc-go__btn--main .oc-go__tag { grid-area: 1 / 3; }
+}
+/* /contacts/: the tiles run across the whole column, so on a wide screen each one is a row: icon, label, tag */
+@media (min-width: 961px) {
+  .oc-go--row .oc-go__btn { min-height: 68px; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto; align-items: center; gap: 0.8rem; padding-block: 0.9rem; }
+  .oc-go--row .oc-go__label { grid-area: 1 / 2; align-self: center; }
+  .oc-go--row .oc-go__tag { grid-area: 1 / 3; align-self: center; }
+}
+.oc-go__more { margin-top: 1rem; }
+/* the shared toast sits at left: 50%, so its shrink-to-fit width stopped at half the screen and «Адрес скопирован»
+   broke in two on a phone; it now takes its text's width, within the max-width of components.css */
+.toast { width: max-content; }

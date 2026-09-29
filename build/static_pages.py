@@ -3,7 +3,7 @@
 import re
 
 from . import data as D
-from . import schema
+from . import otkryto, schema
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
                      request_section, review_card)
@@ -62,9 +62,6 @@ def render_about():
 def render_contacts():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
-    route = f"https://yandex.ru/maps/?rtext=~{lat}%2C{lon}"
-    hours = "".join(f"<li><span>{esc(d)}</span><span>{esc(h)}</span></li>" for d, h in D.HOURS)
-    shop_hours = "".join(f"<li><span>{esc(d)}</span><span>{esc(h)}</span></li>" for d, h in D.SHOP_HOURS)
     hero = page_hero("Контакты", [("Главная", "/"), ("Контакты", None)], eyebrow="Как нас найти", aside=phone_aside("Заказать звонок"), mark_icon="steering",
                      lead=f"{esc(D.ADDRESS_FULL)}. Автосервис и магазин запчастей «Гараж».")
     body = f"""{hero}
@@ -76,17 +73,18 @@ def render_contacts():
       <li>{icon('mail')}<div><b>E-mail</b><a href="mailto:{D.EMAIL}">{D.EMAIL}</a></div></li>
       <li>{icon('vk')}<div><b>Мы в соцсетях</b><a href="{D.VK_URL}" target="_blank" rel="noopener">vk.com/garagebest</a></div></li>
     </ul>
-    <div class="reveal">
+    <div class="reveal">{otkryto.actions(row=True)}</div>
+    <div class="reveal" id="hours">
       <div class="block-title"><span class="tag-num">// часы</span><h2 class="h3">Часы работы автосервиса</h2></div>
-      <ul class="hours">{hours}</ul>
+      {otkryto.schedule(D.HOURS, big=True)}
     </div>
     <div class="reveal">
       <div class="block-title"><span class="tag-num">// магазин</span><h2 class="h3">Магазин запчастей</h2></div>
-      <ul class="hours">{shop_hours}</ul>
+      {otkryto.schedule(D.SHOP_HOURS, label="Часы работы магазина по дням недели", holidays=False, big=True)}
     </div>
     <div class="map reveal" style="min-height:440px">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a class="map__label" href="{route}" target="_blank" rel="noopener">{icon('pin')} Схема проезда — построить маршрут</a>
+      <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} Схема проезда — построить маршрут</a>
     </div>
   </div>
   {_side()}
