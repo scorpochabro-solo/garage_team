@@ -4,6 +4,7 @@ import json
 
 from . import data as D
 from . import schema
+from . import svet
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 
@@ -19,8 +20,7 @@ HERO_SUB = ("Ремонт и обслуживание автомобилей л�
 
 
 def hero():
-    # a dimmed background: on a phone the 800px copy looks the same and is the first-screen image three times lighter
-    photo = D.img("/data/images/gallerymain/BV5A0791.jpg")
+    # «Свет ламп» (build/svet.py): the background is the brick wall of the office with two pendant lamps and the neon sign
     title = "".join(
         f'<span class="hero__line{" hero__line--accent" if i >= HERO_ACCENT_FROM else ""}"><span style="--i:{i}">{esc(t)}</span></span>'
         for i, t in enumerate(HERO_LINES)
@@ -32,12 +32,9 @@ def hero():
       <li><b><span data-countup="360">360</span> <i>дн.</i></b><span>гарантия на работы*</span></li>
       <li><b>5,5 <i>т</i></b><span>коммерческая техника</span></li>
     </ul>"""
-    return f"""<section class="hero" id="top" aria-labelledby="hero-title">
+    return f"""<section class="hero hero--svet" id="top" aria-labelledby="hero-title">
   <div class="hero__bg" aria-hidden="true">
-    <picture><source media="(max-width: 640px)" srcset="{photo.replace('.webp', '-800.webp')}"><img class="hero__photo" src="{photo}" alt="" width="1600" height="1067" fetchpriority="high" decoding="async"></picture>
-    <div class="hero__grid grid-bg"></div>
-    <div class="hero__veil"></div>
-    <div class="hero__glow"></div>
+    {svet.wall()}
   </div>
   <div class="wrap hero__in">
     <div class="hero__copy">
@@ -60,6 +57,7 @@ def hero():
       {facts}
     </aside>
   </div>
+  {svet.room()}
   <div class="hero__scroll" aria-hidden="true"><span class="mono">листайте</span><i></i></div>
 </section>"""
 
@@ -233,7 +231,8 @@ def contacts_strip():
     hours = "<br>".join(f"{esc(d)}: {esc(h)}" for d, h in D.HOURS)
     return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
   <div class="wrap contacts">
-    <div class="reveal">
+    <div class="reveal svet-lit">
+      {svet.mini()}
       <p class="eyebrow">// 06 — Контакты</p>
       <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
       <ul class="contacts__list">

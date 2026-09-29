@@ -11,7 +11,7 @@ WEBP_QUALITY = 82
 # Review avatars are 56px circles, team photos at most ~210px wide.
 FOLDER_MAX_SIDE = {"review": 168, "team": 640}
 # Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages).
-RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800}
+RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800, "real": 800}
 
 
 def scaled_size(src: Path, max_side: int = MAX_SIDE) -> tuple[int, int]:
