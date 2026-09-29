@@ -1,0 +1,163 @@
+/* ============================================================
+   winter checklist on the home page (#zima, build/zima.py + js/zima.js):
+   gauge card (dial, status, engine switch), checklist, actions
+   Motion: the needle turns and the segments fade — transform and opacity only.
+   ============================================================ */
+/* no overflow clipping on the section: it would become the scroll container of the sticky mini bar */
+.zima-sec::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image:
+  linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+  linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 64px 64px; mask-image: radial-gradient(ellipse 60% 70% at 18% 55%, #000 10%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 60% 70% at 18% 55%, #000 10%, transparent 75%); }
+.zima-sec .wrap { position: relative; }
+
+/* layout, wide screens: gauge card and the two buttons on the left, the list on the right — the whole block fits
+   one laptop screen. Narrower (below 1240px): one column, gauge → list → buttons, with a slim bar following the list. */
+.zima { display: grid; grid-template-columns: minmax(300px, 340px) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 0.9rem clamp(1.5rem, 0.8rem + 2.4vw, 3.5rem); align-items: start; }
+.zima__gauge { grid-column: 1; grid-row: 1; }
+.zima__list { grid-column: 2; grid-row: 1 / span 2; min-width: 0; }
+.zima__actions { grid-column: 1; grid-row: 2; display: grid; gap: 0.6rem; }
+
+/* ---------- gauge card ---------- */
+.zima-gauge { position: relative; background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); padding: 1.35rem 1.4rem 1.25rem; }
+.zima-gauge::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: repeating-linear-gradient(-45deg, var(--green) 0 10px, transparent 10px 20px); }
+.zima-gauge__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.2rem; }
+.zima-gauge__label { display: inline-flex; align-items: center; gap: 0.6em; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.zima-gauge__label .ic { width: 16px; height: 16px; }
+.zima-gauge__reset { display: inline-flex; align-items: center; min-height: 32px; padding: 0 0.1rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-2); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-2); transition: color var(--dur) var(--ease); }
+.zima-gauge__reset:hover { color: var(--text); text-decoration-color: var(--accent); }
+.zima-gauge__reset:disabled { color: var(--text-3); opacity: 0.45; cursor: default; text-decoration-color: transparent; }
+@media (pointer: coarse) { .zima-gauge__reset { min-height: 44px; min-width: 44px; justify-content: flex-end; } }
+
+/* the dial: an SVG instrument with an HTML readout; container units keep the readout in scale with the drawing */
+.zima-dial { position: relative; container-type: inline-size; width: 100%; max-width: 340px; margin: 0.6rem auto 0; padding-bottom: 1.1rem; }
+.zima-dial__svg { position: relative; width: 100%; height: auto; overflow: visible; }
+.zima-dial__glow { position: absolute; left: 14%; right: 14%; top: 12%; height: 76%; border-radius: 50%; background: radial-gradient(closest-side, rgba(var(--green-rgb), 0.34), rgba(var(--green-rgb), 0.08) 60%, transparent); opacity: 0; transition: opacity 0.9s var(--ease); pointer-events: none; }
+.zima-dial__ring { fill: none; stroke: rgba(var(--green-bright-rgb), 0.22); stroke-width: 1; stroke-dasharray: 2 5; }
+.zima-dial__tick { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 1; }
+.zima-dial__tick--major { stroke: rgba(255, 255, 255, 0.42); stroke-width: 1.5; }
+.zima-dial__track { fill: none; stroke: rgba(255, 255, 255, 0.075); stroke-width: 10; }
+.zima-dial__seg { fill: none; stroke: url(#zima-grad); stroke-width: 10; opacity: 0; transition: opacity 0.3s var(--ease); }
+.zima-dial__seg.is-on { opacity: 1; transition-delay: 0.16s; }   /* lights up as the needle arrives; goes dark at once */
+.zima-dial__needle { transition: transform 0.85s cubic-bezier(0.3, 1.35, 0.5, 1); }
+.zima.is-awake .zima-dial__needle { transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1); }   /* first sweep to the saved value (zima.js WAKE_MS): no overshoot */
+.zima-dial__needle path { fill: #fff; filter: drop-shadow(0 0 4px rgba(var(--green-bright-rgb), 0.55)); }
+/* readout: the percentage in the middle, the count low in the sector the needle never enters (y = 150 and 206 of 232) */
+.zima-dial__pct, .zima-dial__count { position: absolute; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.zima-dial__pct { top: calc(150 / 232 * (100% - 1.1rem)); display: flex; align-items: flex-start; font-family: var(--font-display); font-weight: 800; font-size: 3.2rem; font-size: 15.5cqw; line-height: 0.9; letter-spacing: -0.045em; color: #fff; font-variant-numeric: tabular-nums; }
+.zima-dial__pct small { font-size: 0.36em; margin: 0.12em 0 0 0.12em; letter-spacing: 0; color: var(--text-2); }
+.zima-dial__count { top: calc(206 / 232 * (100% - 1.1rem)); font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+/* end labels under the ends of the arc (x = 49 and 271 of 320) */
+.zima-dial__end { position: absolute; bottom: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+.zima-dial__end--lo { left: 15.3%; }
+.zima-dial__end--hi { left: 84.7%; }
+.zima.is-empty .zima-dial__end--lo { color: var(--text-2); }
+.zima.is-ready .zima-dial__end--hi, .zima.is-ready .zima-dial__pct, .zima.is-ready .zima-dial__pct small { color: var(--green-bright); }
+.zima.is-ready .zima-dial__needle path { fill: var(--green-bright); }
+
+/* status under the dial: fixed height, so a tick never makes the card jump */
+.zima-status { margin-top: 0.9rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.zima-status__title { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 700; font-size: 1.08rem; line-height: 1.3; letter-spacing: -0.01em; }
+.zima-status__ok { width: 22px; height: 22px; flex: none; padding: 3px; color: #fff; background: var(--green); display: none; }
+.zima.is-ready .zima-status__title { color: var(--green-bright); }
+.zima.is-ready .zima-status__ok { display: block; }
+.zima-status__text { margin-top: 0.35rem; min-height: calc(2 * 1.5 * 0.9rem); font-size: 0.9rem; line-height: 1.5; color: var(--text-2); text-wrap: pretty; }
+
+/* engine switch: native radios in the site's .radio chips */
+.zima-engine { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.zima-engine__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+.zima-engine .radio-group { gap: 0.4rem; }
+.zima-engine .radio span { min-width: 5.6rem; justify-content: center; }
+
+/* ---------- checklist ---------- */
+.zima-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+.zima-item { position: relative; display: flex; flex-direction: column; align-items: flex-start; padding: 1.05rem 1.2rem 0.8rem; background: var(--black); }
+.zima-item[hidden] { display: none; }
+.zima-item.is-swap { animation: zima-in 0.5s var(--ease); }   /* the item of the other engine, after the switch */
+@keyframes zima-in { from { opacity: 0; transform: translateY(8px); } }
+/* the whole card is the label (a stretched ::after); only the service link sits above it */
+.zima-item__main { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 0.3rem 0.85rem; align-items: start; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.zima-item__main::after { content: ""; position: absolute; inset: 0; background: rgba(var(--green-rgb), 0.075); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.zima-item::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; z-index: 1; background: var(--green-bright); transform: scaleY(0); transform-origin: bottom; transition: transform var(--dur-slow) var(--ease); pointer-events: none; }
+.zima-item__input { position: absolute; top: 1.05rem; left: 1.2rem; width: 24px; height: 24px; margin: 0; opacity: 0; pointer-events: none; }
+.zima-item__box { position: relative; grid-row: 1; grid-column: 1; width: 24px; height: 24px; margin-top: 0.05rem; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--line-2); transition: box-shadow var(--dur) var(--ease); }
+.zima-item__box::before { content: ""; position: absolute; inset: 0; background: var(--green); opacity: 0; transform: scale(0.5); transition: opacity 0.25s var(--ease), transform 0.35s var(--ease); }
+.zima-item__box .ic { position: relative; width: 16px; height: 16px; color: #fff; opacity: 0; transform: scale(0.4) rotate(-12deg); transition: opacity 0.25s var(--ease), transform 0.4s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.zima-item__name { grid-row: 1; grid-column: 2; align-self: center; font-family: var(--font-display); font-weight: 700; font-size: 1rem; line-height: 1.3; letter-spacing: -0.01em; color: var(--text); text-wrap: balance; }
+.zima-item__ic { grid-row: 1; grid-column: 3; color: var(--text-3); transition: color var(--dur) var(--ease); }
+.zima-item__ic .ic { width: 26px; height: 26px; display: block; }
+.zima-item__why { grid-row: 2; grid-column: 2 / -1; font-size: 0.875rem; line-height: 1.5; color: var(--text-2); text-wrap: pretty; }
+.zima-item__link { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 0.4em; margin: 0.45rem 0 0 calc(24px + 0.85rem); font-size: 0.84rem; font-weight: 700; color: var(--accent); }
+.zima-item__link .ic { width: 1em; height: 1em; transition: transform var(--dur) var(--ease); }
+.zima-item__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.zima-item__link:hover .ic { transform: translate(2px, -2px); }
+@media (pointer: coarse) { .zima-item__link { min-height: 44px; margin-top: 0.15rem; margin-bottom: -0.45rem; } }
+
+.zima-item:hover .zima-item__box { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.zima-item.is-done::before { transform: scaleY(1); }
+.zima-item.is-done .zima-item__main::after { opacity: 1; }
+.zima-item.is-done .zima-item__box::before { opacity: 1; transform: none; }
+.zima-item.is-done .zima-item__box .ic { opacity: 1; transform: none; }
+.zima-item.is-done .zima-item__ic { color: var(--accent); }
+/* keyboard focus: the box and the whole card */
+.zima-item__input:focus-visible + .zima-item__box { outline: 2px solid var(--accent); outline-offset: 3px; }
+.zima-item:has(.zima-item__input:focus-visible) { outline: 1px solid rgba(var(--green-bright-rgb), 0.5); outline-offset: -1px; z-index: 1; }
+
+.zima__tip { display: flex; gap: 0.6rem; align-items: flex-start; margin-top: 1rem; font-size: 0.85rem; line-height: 1.5; color: var(--text-3); }
+.zima__tip .ic { width: 1.1rem; height: 1.1rem; margin-top: 0.1rem; color: var(--accent); flex: none; }
+
+/* ---------- actions ---------- */
+.zima__actions .btn { --h: 56px; width: 100%; height: auto; min-height: var(--h); padding-block: 0.7em; white-space: normal; text-align: center; line-height: 1.2; text-wrap: balance; }
+.zima__add { --btn-bg: var(--black); }
+.zima__store { margin-top: 0.2rem; font-size: 0.8rem; color: var(--text-3); text-align: center; text-wrap: balance; }
+
+/* reduced motion: base.css shortens every transition to nothing; the delays go too, so the state shows at once */
+@media (prefers-reduced-motion: reduce) { .zima-dial__seg, .zima-dial__seg.is-on { transition-delay: 0s !important; } }
+
+/* ---------- slim progress bar that follows the list on phones (hidden elsewhere) ---------- */
+.zima-mini { display: none; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1239px) {
+  .zima { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 1rem; }
+  .zima__gauge, .zima__list, .zima__actions { grid-column: auto; grid-row: auto; }
+  .zima__actions { grid-template-columns: 1fr 1fr; align-items: start; }
+  .zima__store { grid-column: 1 / -1; }
+  .zima-mini { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 5; display: flex; align-items: center; gap: 0.8rem; height: 48px; margin-top: 0.75rem; padding: 0 1rem;
+    background: rgba(12, 13, 12, 0.97); box-shadow: inset 0 0 0 1px var(--line-2), 0 16px 40px -12px rgba(0, 0, 0, 0.9);
+    opacity: 0; transform: translateY(10px); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); pointer-events: none; }
+  .zima.is-away .zima-mini { opacity: 1; transform: none; }
+  .zima-mini__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .zima-mini__bar { flex: 1; display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; height: 8px; }
+  .zima-mini__bar i { position: relative; background: rgba(255, 255, 255, 0.1); }
+  .zima-mini__bar i::after { content: ""; position: absolute; inset: 0; background: var(--green-bright); opacity: 0; transition: opacity 0.3s var(--ease); }
+  .zima-mini__bar i.is-on::after { opacity: 1; }
+  .zima-mini__pct { min-width: 3.2em; text-align: right; font-family: var(--font-display); font-weight: 800; font-size: 1rem; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .zima.is-ready .zima-mini__pct { color: var(--green-bright); }
+}
+/* tablets: the gauge card lies on its side — dial on the left, status and engine on the right */
+@media (min-width: 721px) and (max-width: 1239px) {
+  .zima-gauge { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); grid-template-areas: "head head" "dial status" "dial engine"; column-gap: clamp(1.5rem, 4vw, 3.5rem); padding: 1.35rem 1.6rem 1.25rem; }
+  .zima-gauge__head { grid-area: head; }
+  .zima-dial { grid-area: dial; margin: 0.8rem 0 0; }
+  .zima-status { grid-area: status; align-self: end; margin: 0; padding: 0; border-top: 0; }
+  .zima-engine { grid-area: engine; align-self: start; max-width: 26rem; }
+}
+@media (max-width: 720px) {
+  .zima-list { grid-template-columns: minmax(0, 1fr); }
+  .zima__actions { grid-template-columns: minmax(0, 1fr); }
+  .zima-gauge { padding: 1.25rem 1.1rem 1.1rem; }
+  .zima-item { padding: 1rem 1rem 0.75rem; }
+  .zima-item__input { top: 1rem; left: 1rem; }
+}
+/* the fixed «Позвонить / Заявка» bar is at the bottom of phones: the mini bar floats above it */
+@media (max-width: 640px) { .zima-mini { bottom: calc(78px + env(safe-area-inset-bottom)); } }
+/* phones in landscape (350–430px of height): a smaller dial keeps it on screen together with the status */
+@media (max-height: 500px) and (orientation: landscape) { .zima-dial { max-width: 250px; } .zima-gauge { grid-template-columns: minmax(220px, 250px) minmax(0, 1fr); } }
+/* the narrowest phones (320px): the label and «Сбросить» share one line, the two chips share the full width */
+@media (max-width: 359px) {
+  .zima-gauge__label, .zima-gauge__reset { letter-spacing: 0.1em; }
+  .zima-gauge__label .ic { display: none; }
+  .zima-engine .radio-group { flex: 1 1 100%; }
+  .zima-engine .radio { flex: 1; }
+  .zima-engine .radio span { width: 100%; min-width: 0; }
+}

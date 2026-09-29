@@ -6,6 +6,7 @@ from . import data as D
 from . import schema
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
+from .zima import zima_section
 
 esc = D.esc
 S = D.SITE
@@ -265,6 +266,7 @@ def render_home():
         gallery(),
         team(),
         reviews_section(paper=True),
+        zima_section(),
         request_section("Оставить запрос"),
         green_note_wrap(),
         contacts_strip(),
