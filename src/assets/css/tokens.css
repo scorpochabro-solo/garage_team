@@ -75,6 +75,7 @@
   --section-y: clamp(4.5rem, 3rem + 6vw, 9.5rem);
   --header-h: 76px;
   --topline-h: 36px;
+  --nav-px: 0.85rem;   /* side padding of a header nav link; its hover underline is inset by the same amount */
 
   /* shape */
   --chamfer: 12px;

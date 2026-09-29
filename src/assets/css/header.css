@@ -8,8 +8,10 @@
 .topline__item:hover { color: #fff; }
 .topline__spacer { flex: 1; }
 .topline__item[data-count]:not([data-count="0"])::after { content: attr(data-count); font-family: var(--font-mono); font-size: 0.68rem; background: var(--green); color: #fff; padding: 0.1em 0.45em; }
-/* between 1100 and 1240px the six items do not fit in one line: the e-mail goes (it is in the footer and on /contacts/) */
-@media (max-width: 1240px) { .topline__item--mail { display: none; } }
+/* the six items need ~1190px of .wrap: ~1290px of viewport with a 17px scrollbar (Windows). Up to 1320px the e-mail goes
+   (it is in the footer and on /contacts/); the other five need ~1020px (~1120px of viewport), so up to 1200px they sit closer */
+@media (max-width: 1320px) { .topline__item--mail { display: none; } }
+@media (max-width: 1200px) { .topline__in { gap: 1rem; } }
 @media (max-width: 1100px) { .topline { display: none; } }
 
 .site-header { position: sticky; top: 0; z-index: var(--z-header); background: rgba(12, 13, 12, 0.72); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid var(--line); transition: background-color var(--dur) var(--ease); }
@@ -22,8 +24,8 @@
 .logo--footer img { width: 221px; height: 80px; }
 
 .nav { display: flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; }
-.nav__link { position: relative; display: inline-flex; align-items: center; height: 40px; padding: 0 0.85rem; font-weight: 600; font-size: 0.93rem; color: var(--gray-300); transition: color var(--dur) var(--ease); }
-.nav__link::after { content: ""; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 6px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform var(--dur) var(--ease); }
+.nav__link { position: relative; display: inline-flex; align-items: center; height: 40px; padding: 0 var(--nav-px); font-weight: 600; font-size: 0.93rem; white-space: nowrap; color: var(--gray-300); transition: color var(--dur) var(--ease); }
+.nav__link::after { content: ""; position: absolute; left: var(--nav-px); right: var(--nav-px); bottom: 6px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform var(--dur) var(--ease); }
 .nav__link:hover, .nav__link.is-active { color: #fff; }
 .nav__link:hover::after, .nav__link.is-active::after { transform: scaleX(1); }
 
@@ -38,7 +40,11 @@
 .burger[aria-expanded="true"] .ic--menu { display: none; }
 .burger[aria-expanded="true"] .ic--close { display: block; }
 
-@media (max-width: 1240px) { .site-header__actions .btn--ghost { display: none; } }
+/* the row needs ~1250px of .wrap with «Заказать звонок»: ~1360px of viewport with a 17px scrollbar. Up to 1365px the call-back
+   button goes (the phone and «Оставить заявку» stay); without it the row needs ~1060px (~1160px of viewport),
+   so up to 1200px the nav links sit closer */
+@media (max-width: 1365px) { .site-header__actions .btn--ghost { display: none; } }
+@media (max-width: 1200px) { :root { --nav-px: 0.5rem; } .nav { gap: 0; } }
 @media (max-width: 1100px) {
   :root { --topline-h: 0px; }
   .nav { display: none; }
