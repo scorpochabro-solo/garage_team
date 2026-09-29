@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Homepage renderer."""
 import json
+import math
 
 from . import data as D
 from . import schema
@@ -18,9 +19,15 @@ HERO_SUB = ("Ремонт и обслуживание автомобилей л�
             "запчасти в наличии и под заказ, гарантия на работы до 360 дней*.")
 
 
+# «Кладка»: the first screen is the real brick wall of the building, lit from above like the office under its pendant lamps.
+# Up to 1000px (one column) a portrait crop of the office wall: the wide close-up would show two bricks per screen there.
+HERO_WALL = "/assets/img/real/brick-texture.webp"          # 1600×708; the left third, under the dark veil, softened (−57 KB)
+HERO_WALL_PHONE = "/assets/img/real/brick-wall.webp"       # 640×730
+LOUNGE_WALL = "/assets/img/real/brick-lounge.webp"         # 1090×355, the half bricks of the advantages grid
+HERO_WALL_CAPTION = "Кирпичная стена · ул. Красная слобода, 9"
+
+
 def hero():
-    # a dimmed background: on a phone the 800px copy looks the same and is the first-screen image three times lighter
-    photo = D.img("/data/images/gallerymain/BV5A0791.jpg")
     title = "".join(
         f'<span class="hero__line{" hero__line--accent" if i >= HERO_ACCENT_FROM else ""}"><span style="--i:{i}">{esc(t)}</span></span>'
         for i, t in enumerate(HERO_LINES)
@@ -32,13 +39,14 @@ def hero():
       <li><b><span data-countup="360">360</span> <i>дн.</i></b><span>гарантия на работы*</span></li>
       <li><b>5,5 <i>т</i></b><span>коммерческая техника</span></li>
     </ul>"""
-    return f"""<section class="hero" id="top" aria-labelledby="hero-title">
+    return f"""<section class="hero hero--brick" id="top" aria-labelledby="hero-title">
   <div class="hero__bg" aria-hidden="true">
-    <picture><source media="(max-width: 640px)" srcset="{photo.replace('.webp', '-800.webp')}"><img class="hero__photo" src="{photo}" alt="" width="1600" height="1067" fetchpriority="high" decoding="async"></picture>
-    <div class="hero__grid grid-bg"></div>
+    <picture><source media="(max-width: 1000px)" srcset="{HERO_WALL_PHONE}" width="640" height="730"><img class="hero__photo" src="{HERO_WALL}" alt="" width="1600" height="708" fetchpriority="high" decoding="async"></picture>
     <div class="hero__veil"></div>
+    <div class="hero__lamp"></div>
     <div class="hero__glow"></div>
   </div>
+  <p class="hero__caption" aria-hidden="true">{esc(HERO_WALL_CAPTION)}</p>
   <div class="wrap hero__in">
     <div class="hero__copy">
       <p class="eyebrow" lang="en">{esc(HERO_EYEBROW)}</p>
@@ -145,6 +153,38 @@ def services_map():
 </section>"""
 
 
+# «Кладка»: the director's photo is an arched window of the office: a round head whose top is a ring of bricks laid on
+# edge, flush with the sides of the photo like the brick arches over the windows, with light mortar in the joints.
+# Drawn once at build time over the photo, in units of its width (100; the photo is 4:5, so the view box is 100×125).
+ARCH_DEPTH = 5.5      # one brick on edge
+ARCH_JOINT = 0.45     # radial joints, at mid-depth
+ARCH_BED = 0.6        # mortar bed between the ring and the photo
+ARCH_BRICKS = 37      # odd: a keystone at the top
+ARCH_TONES = (0, 1, 0, 2, 0, 1, 2, 0)    # three close kiln shades (kladka.css .arch .t0–.t2), stepped so no pattern shows
+
+
+def arch_svg():
+    cx = cy = ro = 50.0                   # the round head: a half circle over the full width of the photo
+    ri = ro - ARCH_DEPTH
+    rb = ri - ARCH_BED
+    gap = ARCH_JOINT / ((ri + ro) / 2)    # radians
+    step = math.pi / ARCH_BRICKS
+
+    def pt(r, a):
+        return f"{cx + r * math.cos(a):.2f} {cy - r * math.sin(a):.2f}"
+
+    def ring(r0, r1, a0, a1):
+        return f"M{pt(r0, a0)} L{pt(r1, a0)} A{r1} {r1} 0 0 1 {pt(r1, a1)} L{pt(r0, a1)} A{r0} {r0} 0 0 0 {pt(r0, a0)}Z"
+
+    parts = [f'<path class="mortar" d="{ring(rb, ro, math.pi, 0)}"/>']
+    for i in range(ARCH_BRICKS):
+        # the springers stand flush on the sides of the photo: no joint on their outer ends
+        a0 = math.pi - i * step - (gap / 2 if i else 0)
+        a1 = math.pi - (i + 1) * step + (gap / 2 if i < ARCH_BRICKS - 1 else 0)
+        parts.append(f'<path class="t{ARCH_TONES[(i * 3) % len(ARCH_TONES)]}" d="{ring(ri, ro, a0, a1)}"/>')
+    return '<svg class="arch" viewBox="0 0 100 125" aria-hidden="true" focusable="false">' + "".join(parts) + "</svg>"
+
+
 def advantages():
     items = S["advantages"]
     big_idx = next((i for i, t in enumerate(items) if "Гарантия" in t), len(items) - 1)
@@ -159,6 +199,15 @@ def advantages():
             continue
         cells.append(f'<div class="adv__item reveal" style="--d:{(n - 1) * 60}ms"><span class="adv__num">// {n:02d}</span><p class="adv__text">{esc(t)}</p></div>')
         n += 1
+    # «Кладка»: on a wide screen the cards are laid in running bond, three bricks per course, joints in mortar colour.
+    # The middle course is shifted by half a brick, so it starts and ends with a half brick — there the real wall of the
+    # client lounge shows through. Decorative only: the halves are hidden below 1000px, where the grid has 2 or 1 columns.
+    # a half is ~210px tall with the strip cropped to cover it, so the image is drawn ~650px wide: the 800px copy at 1x
+    half = (f'<span class="adv__half adv__half--{{}}" aria-hidden="true"><img src="{LOUNGE_WALL}" '
+            f'srcset="{LOUNGE_WALL.replace(".webp", "-800.webp")} 800w, {LOUNGE_WALL} 1090w" sizes="660px" alt="" '
+            f'width="1090" height="355" loading="lazy" decoding="async"></span>')
+    cells[3:3] = [half.format("start")]
+    cells[6:6] = [half.format("end")]
     d = S["director"]
     return f"""<section class="section theme-paper section--paper" id="advantages" aria-labelledby="adv-title">
   <div class="wrap">
@@ -166,13 +215,16 @@ def advantages():
       <div><p class="eyebrow">// 02 — Преимущества</p><h2 class="h2 sec-head__title" id="adv-title">Почему выбирают<br>Гараж</h2></div>
       <p class="sec-head__aside">Полный цикл: диагностика, ремонт, запчасти, кузов и дополнительное оборудование — в одном месте, с {D.FOUNDED} года.</p>
     </div>
-    <div class="adv__grid">{"".join(cells)}</div>
+    <div class="adv__grid adv__grid--bond">{"".join(cells)}</div>
     <p class="adv__note">{esc(S['advantages_note'])}</p>
 
     <div class="director reveal" id="director">
-      <div class="director__photo">
-        <img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async">
-        <span class="badge director__badge">{icon('shield', 'ic--sm')} генеральный директор</span>
+      <div class="director__window">
+        <div class="director__photo">
+          <img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async">
+          <span class="badge director__badge">{icon('shield', 'ic--sm')} генеральный директор</span>
+        </div>
+        {arch_svg()}
       </div>
       <blockquote class="director__quote">
         {icon('quote', 'ic--quote')}

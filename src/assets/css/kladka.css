@@ -1,0 +1,123 @@
+/* ============================================================
+   «Кладка»: the material of the building brought into the page —
+   the brick wall of the office in the hero, running bond in the
+   advantages grid, the director in an arched window, courses of
+   brick at the section joints.
+   Colours: --brick* / --mortar / --lamp (tokens.css). Nothing here
+   moves: the only motion is the existing hero parallax and reveals.
+   ============================================================ */
+
+/* ---------- hero: the brick wall at night, lit by a pendant lamp just above the frame ---------- */
+.hero--brick { background: #0a0807; }
+/* the close-up was shot under whiter light: brought back to the red of the lamp-lit brick in the office */
+.hero--brick .hero__photo { object-position: 88% 50%; opacity: 0.94; filter: saturate(1.7) hue-rotate(-6deg) contrast(1.1) brightness(0.92); }
+/* the copy stays on the shadowed left of the wall (AA contrast for the lead text), the lit brick opens up on the right */
+.hero--brick .hero__veil { background:
+  linear-gradient(90deg, rgba(10,8,7,0.95) 0%, rgba(10,8,7,0.9) 30%, rgba(10,8,7,0.8) 44%, rgba(10,8,7,0.45) 58%, rgba(10,8,7,0.14) 72%, rgba(10,8,7,0.3) 100%),
+  linear-gradient(180deg, rgba(10,8,7,0.25) 0%, transparent 22%, transparent 52%, rgba(10,8,7,0.92) 100%); }
+/* the pool of light: warm, from above, over the right column — a plain gradient, no blend modes or blur */
+.hero__lamp { position: absolute; inset: 0; pointer-events: none; background:
+  radial-gradient(30% 64% at 77% -6%, rgba(var(--lamp-rgb), 0.24), rgba(var(--lamp-rgb), 0.08) 50%, transparent 76%); }
+.hero--brick .hero__glow { opacity: 0.28; }
+/* the small hours line under the phone sits where the veil thins out over the brick: one grey lighter keeps it above 4.5:1 */
+.hero--brick .hero__phone span { color: var(--gray-400); }
+.hero__caption {
+  position: absolute; z-index: 1; right: max(var(--gutter-safe), (100% - var(--container)) / 2); bottom: 1.1rem;
+  display: flex; align-items: center; gap: 0.7em;
+  font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(var(--lamp-rgb), 0.62);
+}
+/* a brick for a bullet (the eyebrows have a green square) */
+.hero__caption::before { content: ""; width: 14px; height: 6px; background: var(--brick-lit); flex: none; }
+/* one column (tablets, phones): the copy runs over the whole width. The portrait crop of the office wall, turned so its
+   light falls from the top right, covers the copy only and fades into the dark wall below — the wide close-up stretched
+   over a 900–1100px-tall hero would show two bricks per screen. The photo is lit itself: no painted light on top */
+@media (max-width: 1000px) {
+  .hero--brick .hero__photo { bottom: auto; height: min(100%, 900px); object-position: 60% 0; opacity: 0.85; filter: saturate(0.95) hue-rotate(-6deg);
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent); mask-image: linear-gradient(180deg, #000 50%, transparent); }
+  /* title over the lit wall, lead text from ~38% of the height down on deep shade */
+  .hero--brick .hero__veil { background:
+    linear-gradient(90deg, rgba(10,8,7,0.3), transparent 80%),
+    linear-gradient(180deg, rgba(10,8,7,0.66) 0%, rgba(10,8,7,0.58) 30%, rgba(10,8,7,0.84) 37%, rgba(10,8,7,0.9) 52%, rgba(10,8,7,0.95) 80%); }
+  .hero__lamp { display: none; }
+}
+@media (max-width: 640px) {
+  .hero--brick .hero__photo { height: min(100%, 760px); }
+  /* the small eyebrow on shade, the title over the lit wall (≈40% of the photo shows), the lead text over ≈15% of it */
+  .hero--brick .hero__veil { background:
+    linear-gradient(90deg, rgba(10,8,7,0.3), transparent 80%),
+    linear-gradient(180deg, rgba(10,8,7,0.72) 0%, rgba(10,8,7,0.7) 5.5%, rgba(10,8,7,0.52) 8.5%, rgba(10,8,7,0.55) 17%, rgba(10,8,7,0.8) 21%, rgba(10,8,7,0.86) 45%, rgba(10,8,7,0.95) 72%); }
+  /* in the flow under the facts, on the content edge: at 320–360px the line wraps and, pinned to the corner, ran into them */
+  .hero__caption { order: 1; position: relative; right: auto; bottom: auto; margin: 1.4rem var(--gutter-safe) 0; letter-spacing: 0.08em; }
+}
+
+/* ---------- advantages: running bond ---------- */
+/* joints in mortar colour instead of hairlines, around the edge too; the paper cards are the whitewashed bricks */
+.adv__grid--bond { gap: 5px; padding: 5px; background: var(--mortar); box-shadow: none; }
+@media (max-width: 1000px) { .adv__grid--bond { gap: 4px; padding: 4px; } }
+/* a card is a brick now, not a double one: the outlined 360 moves up next to the number, clear of the text */
+.adv__grid--bond .adv__big { top: 0.5rem; bottom: auto; right: 1.1rem; font-size: clamp(3.6rem, 2.4rem + 2.2vw, 5.2rem); }
+.adv__half { display: none; }
+@media (min-width: 1001px) {
+  /* three bricks per course; the middle course is shifted by half a brick and closed with half bricks at both ends */
+  .adv__grid--bond { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .adv__grid--bond .adv__item, .adv__grid--bond .adv__item--big { grid-column: span 2; }
+  /* where the whitewash is off: the real wall of the client lounge, sunk a little behind the face of the cards */
+  .adv__half { display: block; position: relative; overflow: hidden; background: var(--brick-deep); }
+  .adv__half img { width: 100%; height: 100%; object-fit: cover; }
+  /* two different stretches of the same lounge wall: in the half-light, and under the spot */
+  .adv__half--start img { object-position: 26% 50%; }
+  .adv__half--end img { object-position: 80% 50%; }
+  .adv__half::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 14px 20px -12px rgba(20, 10, 6, 0.65), inset 12px 0 18px -14px rgba(20, 10, 6, 0.5); }
+}
+
+/* ---------- director: the photo is an arched window of the office, its round head a ring of bricks (build/home.py arch_svg) ---------- */
+.director__window { position: relative; }
+/* a semicircular head: 50% of the width, 40% of the 4:5 height; the ring is drawn over it, flush with the sides */
+.director__window .director__photo { border-radius: 50% 50% 0 0 / 40% 40% 0 0; }
+.director__window .director__photo::after { border-radius: inherit; }
+.director__window .arch { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* the old lamp-lit brick of the office, a little darker than --brick-lit so the ring stays calm on paper */
+.arch .mortar { fill: var(--mortar); }
+.arch .t0 { fill: #8e4431; }
+.arch .t1 { fill: var(--brick); }
+.arch .t2 { fill: #7c3b2b; }
+.director__quote .ic--quote { color: var(--brick); }
+@media (max-width: 860px) { .director__window { max-width: 420px; } }
+
+/* ---------- brick courses at the section joints, drawn in gradients (no image) ---------- */
+/* one course: brick faces, vertical joints every --len, a darker and a lighter brick at co-prime steps so no repeat shows;
+   the second course (plinth) is the same shifted by half a brick */
+.page-home .section--paper::before, .page-home .site-footer::before {
+  --course: 11px; --len: 42px; --jt: 2px;
+  /* the brick in the shade of the lamps, not the lit face: a quiet edge, not a stripe */
+  --face: #7d3a29; --joint: #3a221a; --dark: rgba(49, 28, 22, 0.35); --lit: rgba(181, 85, 58, 0.35);
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: var(--course); pointer-events: none;
+  background-color: var(--face);
+  background-image:
+    repeating-linear-gradient(180deg, transparent 0 calc(var(--course) - var(--jt)), var(--joint) 0 var(--course)),
+    linear-gradient(90deg, var(--joint) var(--jt), transparent 0),
+    linear-gradient(90deg, var(--joint) var(--jt), transparent 0),
+    linear-gradient(180deg, rgba(var(--lamp-rgb), 0.1), rgba(0, 0, 0, 0.18)),
+    linear-gradient(90deg, var(--dark) 0 var(--len), transparent 0),
+    linear-gradient(90deg, var(--lit) 0 var(--len), transparent 0),
+    linear-gradient(90deg, var(--dark) 0 var(--len), transparent 0),
+    linear-gradient(90deg, var(--lit) 0 var(--len), transparent 0);
+  background-size:
+    auto, var(--len) var(--course), var(--len) var(--course), 100% var(--course),
+    calc(var(--len) * 3) var(--course), calc(var(--len) * 5) var(--course), calc(var(--len) * 4) var(--course), calc(var(--len) * 7) var(--course);
+  background-position:
+    0 0, 0 0, calc(var(--len) / 2) var(--course), 0 0,
+    var(--len) 0, calc(var(--len) * 3) 0, calc(var(--len) * 1.5) var(--course), calc(var(--len) * 2.5) var(--course);
+  background-repeat: repeat, repeat-x, repeat-x, repeat-y, repeat-x, repeat-x, repeat-x, repeat-x;
+}
+/* the footer stands on a plinth of two courses of the dark, shadowed brick of the facade */
+.page-home .site-footer::before {
+  --course: 12px; --len: 44px;
+  --face: #3a2119; --joint: #151110; --dark: rgba(20, 10, 6, 0.35); --lit: rgba(74, 42, 31, 0.8);
+  height: calc(var(--course) * 2); top: -1px;
+}
+@media (max-width: 640px) {
+  .page-home .section--paper::before { --course: 9px; --len: 34px; }
+  .page-home .site-footer::before { --course: 10px; --len: 36px; }
+}

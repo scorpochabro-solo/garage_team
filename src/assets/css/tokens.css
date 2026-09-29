@@ -29,6 +29,15 @@
   --paper: #f3f4f4;
   --white: #ffffff;
 
+  /* material of the building on Красная слобода: old red brick, light mortar, warm light of the pendant lamps.
+     Measured from the photos of the office; used sparingly (kladka.css) — the brand colour stays green */
+  --brick: #9c4a32;
+  --brick-lit: #b5553a;
+  --brick-deep: #4a2a1f;
+  --mortar: #d8cfc2;
+  --lamp: #ffcf8a;
+  --lamp-rgb: 255, 207, 138;
+
   /* semantic (dark surfaces by default) */
   --bg: var(--ink-900);
   --bg-2: var(--ink-800);
