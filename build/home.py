@@ -3,6 +3,7 @@
 import json
 
 from . import data as D
+from . import pashalki
 from . import schema
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
@@ -45,7 +46,7 @@ def hero():
       <h1 class="h-giant hero__title" id="hero-title">{title}</h1>
       <p class="lead hero__sub">{esc(HERO_SUB)}</p>
       <div class="hero__actions">
-        <a class="btn btn--primary btn--lg" href="#request">{icon('check')} Оставить заявку</a>
+        <a class="btn btn--primary btn--lg btn--tach" href="#request">{pashalki.tach_icon()} Оставить заявку</a>
         <button class="btn btn--ghost btn--lg" type="button" data-modal="call" style="--btn-bg:#070807">{icon('phone')} Заказать звонок</button>
         <a class="hero__phone" href="tel:{D.PHONE_TEL}"><b>{esc(D.PHONE)}</b><span>Пн–Пт 9–19 · Сб 9–17</span></a>
       </div>
@@ -268,6 +269,8 @@ def render_home():
         request_section("Оставить запрос"),
         green_note_wrap(),
         contacts_strip(),
+        pashalki.wall(),
+        pashalki.v8_gauge(),
     ])
     title, desc = D.page_meta(
         "home", "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж",

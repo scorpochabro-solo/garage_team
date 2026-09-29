@@ -10,8 +10,9 @@ WEBP_QUALITY = 82
 # Folders shown much smaller than MAX_SIDE: the longest side is capped at the display size × 3 (iPhone screens).
 # Review avatars are 56px circles, team photos at most ~210px wide.
 FOLDER_MAX_SIDE = {"review": 168, "team": 640}
-# Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages).
-RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800}
+# Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages,
+# photos of the workshop itself in real/).
+RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800, "real": 800}
 
 
 def scaled_size(src: Path, max_side: int = MAX_SIDE) -> tuple[int, int]:
