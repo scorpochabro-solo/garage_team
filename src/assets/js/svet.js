@@ -2,6 +2,7 @@
    «Свет ламп»: the pendant lamps on the first screen (markup build/svet.py, styles svet.css).
    A lamp is a toggle button: it switches off and on with a short flicker. With every lamp off the room goes dark,
    the neon sign of the workshop lights up and, with a mouse, the cursor becomes a hand lamp over the brick.
+   Switching any lamp back on brings the light back.
    The lamps sway a little when the page scrolls, when the cursor brushes them and when they are switched.
    What keeps it cheap:
      1. lamps and the hand lamp move with transform only, lights switch with opacity (CSS keyframes);
@@ -21,7 +22,6 @@
     f: 0.85 + (i % 3) * 0.12,              // each lamp takes a push a little differently, so they never swing in step
     x: 0, y: 0, shown: true,               // dome centre in hero coordinates; a lamp hidden by CSS is skipped
   }));
-  const allBtn = room.querySelector('[data-svet-all]');
   const status = room.querySelector('[data-svet-status]');
   const torch = hero.querySelector('.svet-wall__torch');
   const reduced = !!G.reducedMotion;
@@ -118,7 +118,6 @@
     if (on === dark) return;
     dark = on;
     hero.classList.toggle('is-dark', on);
-    if (allBtn) allBtn.hidden = !on;
     if (status) status.textContent = on ? 'Свет в офисе выключен' : '';
     if (on && useTorch) { tx = gx; ty = gy; placeTorch(); }
   }
@@ -141,15 +140,6 @@
       sync();
     });
   });
-  if (allBtn) {
-    allBtn.addEventListener('click', () => {
-      const shown = lamps.filter((l) => l.shown);
-      // the button disappears with the dark: keyboard focus goes to the first lamp instead of the page top
-      if (document.activeElement === allBtn && shown[0]) shown[0].btn.focus();
-      shown.forEach((l, i) => setTimeout(() => setLamp(l, true), reduced ? 0 : i * 130));
-      setDark(false);
-    });
-  }
 
   /* ---------- the cursor brushes the lamps; in the dark it carries the hand lamp ---------- */
   let px = -1; let py = -1;

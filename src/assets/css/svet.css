@@ -74,7 +74,7 @@
 
 /* ---------- lamps ---------- */
 /* after the copy in the markup (the lamps are the last stops of the keyboard tour), under it on screen: no z-index of
-   its own, so the lamps stay under .hero__in while the «Включить свет» button can rise above it */
+   its own, so the lamps stay under .hero__in */
 .svet-room { position: absolute; left: 0; right: 0; top: 0; height: var(--band); pointer-events: none; }
 /* its own layer: the swing (svet.js) then only moves a texture, nothing is repainted */
 .svet-lamp { position: absolute; top: 0; left: calc(var(--x) * 1% - var(--lamp-w) / 2); width: var(--lamp-w); height: calc(var(--cord) + var(--lamp-h)); transform-origin: 50% 0; will-change: transform; }
@@ -104,17 +104,6 @@
 .svet-neon { width: 100%; height: auto; aspect-ratio: 396 / 138; overflow: visible; }
 .svet-neon__lit { opacity: 0; }
 .hero--svet.is-dark .svet-neon__lit { opacity: 1; animation: svet-neon 1.5s 0.25s linear backwards; }
-/* after the lamps in the markup, so Tab reaches it right after the last lamp; on screen it hangs under the sign.
-   On short screens the (empty) top of .hero__in reaches up under it: z-index keeps it clickable there */
-.svet-switch { position: absolute; z-index: 2; left: 0; right: 0; top: calc(var(--sign-top) + var(--sign-w) * 0.35 + var(--switch-gap, 0.9rem)); width: max-content; margin-inline: auto;
-  display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px; padding: 0 1rem; pointer-events: auto; white-space: nowrap;
-  font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: rgb(var(--neon));
-  box-shadow: inset 0 0 0 1px rgba(var(--neon), 0.4); background: rgba(6, 8, 7, 0.6); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
-  animation: fade-up 0.6s 1.1s var(--ease) backwards; }
-.svet-switch::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: rgb(var(--warm)); box-shadow: 0 0 8px 2px rgba(var(--warm), 0.6); }
-.svet-switch[hidden] { display: none; }
-.svet-switch:hover { background: rgba(var(--neon), 0.14); color: #fff; }
-.svet-switch:active { background: rgba(var(--neon), 0.2); }
 
 /* the eyebrow sits on lit brick: a small dark plate keeps the mono type crisp */
 .hero--svet .hero__copy > .eyebrow { padding: 0.5em 0.75em; margin-left: -0.75em; background: rgba(8, 7, 6, 0.78); }
@@ -144,10 +133,9 @@
   .hero--svet { --lamp-w: clamp(84px, 13.5svh, 120px); --cord: 2.6svh; --band: calc(var(--rim) + 26px); }
 }
 /* ---------- phones in landscape and other very short screens ---------- */
-/* the sign rides a little higher and the band is a little taller, so «Включить свет» fits above the eyebrow */
+/* the sign rides a little higher and the band is a little taller, so the sign clears the eyebrow */
 @media (max-height: 500px) and (min-width: 641px) {
   .hero--svet { --lamp-w: 76px; --cord: 10px; --band: calc(var(--rim) + 44px); --sign-w: 150px; --sign-top: 6px; }
-  .svet-switch { --switch-gap: 0.4rem; min-height: 40px; }
 }
 /* ---------- phones: smaller lamps close to the edges, the sign between them ---------- */
 @media (max-width: 640px) {
@@ -158,7 +146,6 @@
   .svet-wall__scrim { background: linear-gradient(180deg, transparent calc(var(--band) + 2rem), rgba(7, 8, 7, 0.5) 62%, #070807 80%); }
   .svet-lamp--1, .svet-pool--1 { --x: 15; }
   .svet-lamp--2, .svet-pool--2 { --x: 85; }
-  .svet-switch { --switch-gap: 0.4rem; }
 }
 
 /* ---------- a small pendant over «Приезжайте в Гараж»: it switches on when the block scrolls into view ---------- */
@@ -175,5 +162,3 @@
   mask-image: radial-gradient(ellipse 50% 100% at 50% 0%, #000 10%, rgba(0, 0, 0, 0.5) 45%, transparent 85%); }
 .svet-lit.is-in :is(.svet-mini .svet-lamp__bulb, .svet-mini__glow) { opacity: 1; animation: svet-on 1s 0.7s linear backwards; }
 @media (max-width: 640px) { .svet-lit { --mini-w: 46px; } }
-/* no motion: the way back to the light is there at once, without the entrance delay */
-@media (prefers-reduced-motion: reduce) { .svet-switch { animation: none; } }

@@ -4,7 +4,7 @@ dome pendants that light it, and between them the «GARAGE TEAM» neon sign from
 
     wall()   decorative layers inside .hero__bg: the brick photo, the light pools under the lamps, the shade that keeps
              the headline readable, the night / hand-lamp layers of the dark room and the glow of the neon
-    room()   the lamps (real toggle buttons), the neon sign and the «Включить свет» button
+    room()   the lamps (real toggle buttons) and the neon sign
     mini()   the same pendant, small, over the «Приезжайте в Гараж» heading: it lights up when the heading scrolls in
 
 Behaviour is in src/assets/js/svet.js, styles in src/assets/css/svet.css. Without JavaScript the room is simply lit.
@@ -125,7 +125,6 @@ def room():
     <svg class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">{_lamp_symbol()}</svg>
     <div class="svet-sign">{_neon()}</div>
     {lamps}
-    <button class="svet-switch" type="button" data-svet-all hidden>Включить свет</button>
     <p class="sr-only" data-svet-status aria-live="polite"></p>
   </div>"""
 
