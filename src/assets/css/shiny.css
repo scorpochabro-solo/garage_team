@@ -1,0 +1,191 @@
+/* ============================================================
+   «Шинный калькулятор» on the tyre-fitting page (build/shiny.py, js/shiny.js):
+   two sizes, a to-scale drawing (side and front view), results, marking strip
+   ============================================================ */
+.shiny__intro { max-width: 70ch; margin-bottom: 1.4rem; font-size: 1.02rem; line-height: 1.7; color: var(--text-2); }
+
+/* the instrument: a surface with HUD brackets on two corners, like the cover photo above it */
+.shiny__panel { container-type: inline-size; position: relative; padding: clamp(1rem, 0.6rem + 1.6vw, 1.9rem); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.shiny__panel::before, .shiny__panel::after { content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none; border: 0 solid var(--accent); }
+.shiny__panel::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.shiny__panel::after { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* ---------- sizes: «Сейчас стоит» ⇄ «Хочу поставить» ---------- */
+.shiny__sizes { display: grid; gap: 0.9rem; }
+.shiny__size { min-width: 0; margin: 0; padding: 0; border: 0; }
+.shiny__legend { display: flex; align-items: center; gap: 0.65em; padding: 0; margin-bottom: 0.2rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.shiny__swatch { width: 20px; height: 0; border-top: 2px dashed var(--gray-400); }
+.shiny__size--b .shiny__swatch { border-top-style: solid; border-color: var(--green-bright); }
+.shiny__size--b .shiny__legend { color: var(--accent); }
+
+/* the size as it is written on the tyre: a real text field, tap and type «205/55 R16» */
+.shiny__typed { position: relative; }
+.shiny__text {
+  width: 100%; height: 58px; padding: 0 2.4rem 0 0; background: transparent; border: 0; border-radius: 0; box-shadow: inset 0 -1px 0 var(--line-2);
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(1.45rem, 1.2rem + 1vw, 1.9rem); letter-spacing: -0.01em; color: var(--text);
+  -webkit-appearance: none; appearance: none; transition: box-shadow var(--dur) var(--ease);
+}
+.shiny__text:focus { outline: none; box-shadow: inset 0 -2px 0 var(--accent); }
+.shiny__text[aria-invalid="true"] { box-shadow: inset 0 -2px 0 var(--danger); }
+.shiny__pen { position: absolute; right: 0.2rem; top: 50%; width: 20px; height: 20px; margin-top: -10px; fill: none; stroke: var(--text-3); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; transition: stroke var(--dur) var(--ease); }
+.shiny__typed:focus-within .shiny__pen { stroke: var(--accent); }
+.shiny__err { margin-top: 0.45rem; font-size: 0.82rem; line-height: 1.45; color: var(--danger); }
+
+.shiny__selects { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr); gap: 0.5rem; align-items: end; margin-top: 0.8rem; }
+.shiny__field { display: grid; gap: 0.3rem; min-width: 0; }
+.shiny__field > span { font-size: 0.78rem; font-weight: 600; color: var(--text-3); }
+.shiny__field .select { height: 46px; padding: 0 1.9rem 0 0.75rem; background-position: right 0.55rem center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.shiny__slash { padding-bottom: 0.7rem; color: var(--text-3); font-weight: 600; }
+
+/* the swap button sits on a thin divider: horizontal while the sizes are stacked, vertical when they stand in a row */
+.shiny__swapbox { display: grid; place-items: center; background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat; }
+.shiny__swap { width: 46px; height: 46px; display: grid; place-items: center; color: var(--accent); background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); transition: box-shadow var(--dur) var(--ease), color var(--dur) var(--ease); }
+.shiny__swap .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transform: rotate(calc(var(--turn, 0) * 180deg + 90deg)); transition: transform 0.5s var(--ease); }
+.shiny__swap:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* ---------- drawing + results ---------- */
+.shiny__main { display: grid; gap: 1.6rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.shiny__figure { min-width: 0; width: 100%; max-width: 30rem; margin: 0 auto; }
+.shiny__stage {
+  position: relative; background-color: var(--ink-900); box-shadow: inset 0 0 0 1px var(--line);
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px; background-position: -1px -1px;
+}
+.shiny-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.shiny-svg * { vector-effect: non-scaling-stroke; }
+.shiny-svg__tyre circle { fill: #0f1511; stroke: var(--green-bright); stroke-width: 1.6; }
+.shiny-svg__tyre .shiny-svg__tread { fill: none; stroke: rgba(var(--green-bright-rgb), 0.28); stroke-width: 1; }
+.shiny-svg__rim > circle { fill: #161a17; stroke: rgba(var(--green-bright-rgb), 0.85); stroke-width: 1.2; }
+.shiny-svg__rim .shiny-svg__lip { fill: #0d100e; stroke: rgba(var(--green-bright-rgb), 0.3); stroke-width: 1; }
+.shiny-svg__spoke { fill: #1b211d; stroke: rgba(var(--green-bright-rgb), 0.55); stroke-width: 1; stroke-linejoin: round; }
+.shiny-svg__rim .shiny-svg__hub { fill: #1b211d; stroke: rgba(var(--green-bright-rgb), 0.55); }
+.shiny-svg__lug { fill: #0d100e; stroke: rgba(var(--green-bright-rgb), 0.4); stroke-width: 0.8; }
+.shiny-svg__rim .shiny-svg__bore { fill: var(--ink-900); stroke: rgba(var(--green-bright-rgb), 0.4); }
+.shiny-svg__front rect { fill: #0f1511; stroke: var(--green-bright); stroke-width: 1.6; }
+.shiny-svg__groove { stroke: rgba(var(--green-bright-rgb), 0.3); stroke-width: 1; }
+.shiny-svg__ghost circle, .shiny-svg__ghost rect { fill: none; stroke: var(--gray-300); stroke-width: 1.3; stroke-dasharray: 5 4; }
+.shiny-svg__ghost--rim circle { stroke: var(--gray-400); stroke-width: 1; }
+.shiny-svg__proj { stroke: rgba(var(--green-bright-rgb), 0.35); stroke-width: 1; stroke-dasharray: 2 4; }
+.shiny-svg__proj--a { stroke: rgba(255, 255, 255, 0.2); }
+.shiny-svg__floor { stroke: var(--line-2); stroke-width: 1; }
+.shiny-svg__earth { fill: url(#shiny-hatch); }
+#shiny-hatch line { stroke: rgba(255, 255, 255, 0.1); stroke-width: 1; }
+.shiny-svg__bar { fill: none; stroke: var(--text-3); stroke-width: 1; }
+/* labels over the drawing are HTML: they keep their size on a phone, where the drawing is scaled down */
+.shiny__view { position: absolute; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); pointer-events: none; white-space: nowrap; }
+.shiny__view--side { left: 0.7rem; top: 0.55rem; }
+.shiny__view--front { right: 0.7rem; top: 0.55rem; }
+.shiny__view--bar { left: 14%; top: 96.06%; transform: translateY(-50%); }
+
+.shiny__keys { display: flex; flex-wrap: wrap; gap: 0.35rem 1.3rem; margin-top: 0.8rem; font-size: 0.86rem; color: var(--text-2); }
+.shiny__key { display: inline-flex; align-items: center; gap: 0.55rem; }
+.shiny__key i { width: 22px; height: 0; border-top: 2px dashed var(--gray-300); }
+.shiny__key--b i { border-top-style: solid; border-color: var(--green-bright); }
+.shiny__key b { font-weight: 700; color: var(--text); white-space: nowrap; }
+.shiny__keys-note { flex-basis: 100%; font-size: 0.78rem; line-height: 1.5; color: var(--text-3); }
+
+.shiny__out { min-width: 0; }
+.shiny__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); text-align: left; }
+/* the readout: percent large (the meter below is in percent), millimetres in words next to it */
+.shiny__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.9rem; margin-top: 0.4rem; }
+.shiny__pct { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 1.5rem + 1.3vw, 2.5rem); line-height: 1.05; letter-spacing: -0.03em; color: var(--accent); white-space: nowrap; }
+.shiny__say { font-weight: 700; font-size: 1.02rem; color: var(--text); }
+
+/* deviation meter −6…+6 %, the usual ±3 % in green; the marker slides by transform */
+.shiny__meter { position: relative; margin-top: 1.1rem; padding-inline: 8px; }
+.shiny__track { position: relative; height: 8px; background: repeating-linear-gradient(90deg, var(--line-2) 0 1px, transparent 1px calc(100% / 12)); box-shadow: inset -1px 0 0 var(--line-2), inset 0 -1px 0 var(--line-2); }
+.shiny__zone { position: absolute; left: 25%; width: 50%; top: 0; bottom: 0; background: rgba(var(--green-bright-rgb), 0.16); box-shadow: inset 0 -2px 0 var(--green-bright); }
+.shiny__rail { position: absolute; left: 0; right: 0; top: -7px; height: 22px; overflow: hidden; pointer-events: none; }
+.shiny__pos { position: absolute; left: 8px; right: 8px; top: 0; bottom: 0; transition: transform 0.55s var(--ease); }
+.shiny__pos i { position: absolute; left: -1px; top: 0; width: 2px; height: 22px; background: var(--text); }
+.shiny__pos i::before { content: ""; position: absolute; left: -4px; top: 0; border: 5px solid transparent; border-top-color: var(--text); border-bottom: 0; }
+.shiny__ticks { position: relative; height: 1.1rem; margin-top: 0.45rem; font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.shiny__ticks span { position: absolute; top: 0; transform: translateX(-50%); }
+
+/* numbers: now · want · difference */
+.shiny__table { width: 100%; margin-top: 1.3rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.shiny__table th, .shiny__table td { padding: 0.55rem 0 0.55rem 0.7rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.shiny__table tr:last-child > * { border-bottom: 0; }
+.shiny__table th[scope="row"] { padding-left: 0; text-align: left; font-weight: 600; color: var(--text-2); white-space: normal; }
+.shiny__table thead th, .shiny__table thead td { padding-top: 0; font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); border-bottom-color: var(--line-2); }
+.shiny__table td { color: var(--text-3); }
+.shiny__table td:nth-child(3) { color: var(--text); font-weight: 700; }
+.shiny__table td:last-child { color: var(--accent); font-weight: 700; }
+.shiny__table .shiny__hint { text-align: left; font-size: 0.78rem; font-weight: 400; color: var(--text-3); white-space: normal; }
+.shiny__speed { min-width: 0; }
+.shiny__table--speed { margin-top: 0; }
+.shiny__table--speed caption { margin-bottom: 0.3rem; }
+.shiny__table--speed td { width: 17%; }
+.shiny__table.shiny__table--speed td { color: var(--text-2); font-weight: 600; }
+.shiny__table.shiny__table--speed tr + tr td { color: var(--text); font-weight: 700; }
+.shiny__foot { margin-top: 0.5rem; font-size: 0.78rem; line-height: 1.5; color: var(--text-3); }
+
+/* ---------- verdict and call to action ---------- */
+.shiny__verdict { display: flex; gap: 0.85rem; align-items: flex-start; padding: 1rem 1.15rem; font-size: 0.95rem; line-height: 1.6; color: var(--text-2); background: rgba(var(--green-bright-rgb), 0.06); box-shadow: inset 3px 0 0 var(--green); }
+.shiny__verdict p { max-width: 78ch; }
+.shiny__verdict b { font-weight: 700; color: var(--text); }
+.shiny__verdict [data-o="verdict-more"]:empty { display: none; }
+.shiny__verdict-ic { flex: none; display: grid; margin-top: 0.1em; color: var(--accent); }
+.shiny__verdict-ic .ic { width: 22px; height: 22px; }
+.shiny__verdict:not([data-state="over"]) .shiny__verdict-ic .ic + .ic, .shiny__verdict[data-state="over"] .shiny__verdict-ic .ic:first-child { display: none; }
+.shiny__verdict[data-state="over"] { background: rgba(240, 169, 59, 0.07); box-shadow: inset 3px 0 0 #f0a93b; }
+.shiny__verdict[data-state="over"] .shiny__verdict-ic { color: #f0a93b; }
+/* outside the usual ±3 % the big number and the marker turn amber too: the colour never says «всё в порядке» while the text warns */
+.shiny:has(.shiny__verdict[data-state="over"]) .shiny__pct { color: #f0a93b; }
+.shiny:has(.shiny__verdict[data-state="over"]) .shiny__pos i { background: #f0a93b; }
+.shiny:has(.shiny__verdict[data-state="over"]) .shiny__pos i::before { border-top-color: #f0a93b; }
+.shiny__act { min-width: 0; }
+.shiny__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.6rem; margin-top: 1.3rem; }
+
+/* ---------- «Как читать маркировку»: a piece of sidewall, every part is a button ---------- */
+.shiny-mark { margin-top: clamp(1.8rem, 1.4rem + 1.5vw, 2.6rem); }
+.shiny-mark__title { font-family: var(--font-text); font-size: 1.1rem; font-weight: 700; letter-spacing: 0; line-height: 1.35; }
+.shiny-mark__hint { margin-top: 0.25rem; font-size: 0.92rem; color: var(--text-3); }
+.shiny-mark__wall {
+  container-type: inline-size; position: relative; margin-top: 1rem; padding: 0.95rem 0.5rem 0.8rem;
+  /* rubber: the fine radial ribbing of a sidewall and two moulded ridges along the edges */
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #161816 0%, #0e0f0e 22%, #0b0c0b 50%, #0e0f0e 78%, #161816 100%);
+  box-shadow: inset 0 0 0 1px var(--line), inset 0 7px 0 -6px rgba(255, 255, 255, 0.07), inset 0 -7px 0 -6px rgba(255, 255, 255, 0.07);
+}
+/* every part is a segment with a thin underline; the green bar slides to the chosen one (js/shiny.js) */
+.shiny-mark__line { position: relative; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; row-gap: 0.35rem; }
+.shiny-mark__part {
+  position: relative; min-width: 44px; min-height: 58px; padding: 0 0.12em 10px; font-family: var(--font-display); font-weight: 800;
+  font-size: 1.6rem; font-size: clamp(1.4rem, 7.2cqw, 2.8rem); line-height: 1; letter-spacing: 0; color: var(--gray-400);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.08); transition: color var(--dur) var(--ease);
+}
+.shiny-mark__part::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: 0; height: 2px; background: var(--line-2); }
+.shiny-mark__part:hover { color: var(--gray-200); }
+.shiny-mark__part.is-active { color: var(--green-bright); }
+.shiny-mark__part:focus-visible { outline-offset: -2px; }
+.shiny-mark__sep { padding: 0 0.02em 13px; font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; font-size: clamp(1.4rem, 7.2cqw, 2.8rem); line-height: 1; color: var(--ink-400); }
+.shiny-mark__gap { width: 0.5rem; width: clamp(2px, 2cqw, 1.1rem); }
+/* the narrowest phones: «205/55 R16» and «91V» on two lines, never a lone letter */
+.shiny-mark__break { display: none; flex-basis: 100%; height: 0; }
+@container (max-width: 316px) { .shiny-mark__break { display: block; } }
+.shiny-mark__bar { position: absolute; left: 0; top: 0; width: 100px; height: 2px; background: var(--green-bright); transform-origin: 0 0; transition: transform 0.45s var(--ease); pointer-events: none; }
+.shiny-mark__panel { margin-top: 1rem; min-height: 5.2rem; }
+.shiny-mark__about { max-width: 64ch; font-size: 0.97rem; line-height: 1.6; color: var(--text-2); }
+.shiny-mark__name { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.25rem; font-weight: 700; color: var(--text); }
+.shiny-mark__name b { font-family: var(--font-display); font-weight: 800; color: var(--accent); }
+
+/* ---------- wider panel: sizes in one row, drawing next to the numbers ---------- */
+@container (min-width: 640px) {
+  .shiny__sizes { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 1.4rem; }
+  .shiny__swapbox { background-size: 1px 100%; }
+  .shiny__swap .ic { transform: rotate(calc(var(--turn, 0) * 180deg)); }
+}
+/* two columns: drawing and speedometer on the left, numbers and verdict on the right */
+@container (min-width: 720px) {
+  .shiny__main { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); grid-template-areas: "fig out" "fig act" "speed act"; grid-template-rows: auto auto 1fr; gap: 1.6rem 2.2rem; align-items: start; }
+  .shiny__figure { grid-area: fig; max-width: none; }
+  .shiny__out { grid-area: out; }
+  .shiny__speed { grid-area: speed; }
+  .shiny__act { grid-area: act; }
+}
+@media (max-width: 380px) {
+  .shiny__table th, .shiny__table td { padding-left: 0.5rem; }
+  .shiny__table { font-size: 0.86rem; }
+}
