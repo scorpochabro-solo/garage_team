@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Варианты оформления · Гараж</title>
+<link rel="icon" href="/garage_team/v/base/favicon.ico">
+<style>
+@font-face { font-family: "Unbounded"; font-weight: 200 900; font-display: swap; src: url("/garage_team/v/base/assets/fonts/unbounded-cyrillic.woff2") format("woff2"); unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Unbounded"; font-weight: 200 900; font-display: swap; src: url("/garage_team/v/base/assets/fonts/unbounded-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Manrope"; font-weight: 200 800; font-display: swap; src: url("/garage_team/v/base/assets/fonts/manrope-cyrillic.woff2") format("woff2"); unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "Manrope"; font-weight: 200 800; font-display: swap; src: url("/garage_team/v/base/assets/fonts/manrope-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("/garage_team/v/base/assets/fonts/jetbrains-mono-cyrillic.woff2") format("woff2"); unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("/garage_team/v/base/assets/fonts/jetbrains-mono-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+
+:root {
+  color-scheme: dark;
+  --bg: #0c0d0c; --card: #121412; --line: rgba(255, 255, 255, 0.10); --line-2: rgba(255, 255, 255, 0.18);
+  --text: #f3f4f4; --text-2: #b8bdb8; --text-3: #7c827c;
+  --green: #00963d; --green-bright: #1fc463; --brick: #b5553a; --lamp: #ffcf8a;
+  --gutter: clamp(16px, 0.6rem + 2.6vw, 56px);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.6 "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 var(--gutter); }
+
+.head { padding: clamp(40px, 7vw, 96px) 0 clamp(28px, 4vw, 48px); border-bottom: 1px solid var(--line); }
+.eyebrow { font: 500 12px/1 "JetBrains Mono", ui-monospace, Menlo, monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green-bright); display: flex; align-items: center; gap: 10px; margin: 0 0 18px; }
+.eyebrow::before { content: ""; width: 9px; height: 9px; background: var(--green-bright); }
+h1 { font: 800 clamp(30px, 1.2rem + 4vw, 64px)/1.02 "Unbounded", "Manrope", sans-serif; text-transform: uppercase; margin: 0 0 20px; letter-spacing: -0.01em; }
+h1 span { color: var(--brick); }
+.lead { color: var(--text-2); max-width: 760px; margin: 0; font-size: clamp(16px, 0.95rem + 0.3vw, 19px); }
+.notes { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 24px 0 0; padding: 0; list-style: none; }
+.notes li { font: 500 12px/1.3 "JetBrains Mono", ui-monospace, Menlo, monospace; color: var(--text-2); border: 1px solid var(--line-2); padding: 7px 10px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 20px; padding: clamp(28px, 4vw, 56px) 0; }
+.card { background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; }
+.card--base { border-style: dashed; }
+.shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 1px solid var(--line); background: #070807; }
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.body { padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.num { font: 500 12px/1 "JetBrains Mono", ui-monospace, Menlo, monospace; color: var(--green-bright); letter-spacing: 0.1em; }
+h2 { font: 800 22px/1.15 "Unbounded", "Manrope", sans-serif; margin: 0; text-transform: uppercase; }
+.body p { margin: 0; color: var(--text-2); font-size: 15px; }
+.try { color: var(--text); font-size: 14px; border-left: 2px solid var(--lamp); padding-left: 12px; }
+.try b { color: var(--lamp); font: 500 11px/1 "JetBrains Mono", ui-monospace, Menlo, monospace; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.actions { margin-top: auto; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; font: 600 14px/1 "Manrope", sans-serif; text-decoration: none; border: 1px solid var(--line-2); }
+.btn--primary { background: var(--green); border-color: var(--green); color: #fff; }
+.btn:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
+
+.foot { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--text-3); font-size: 14px; }
+.foot p { margin: 0 0 8px; max-width: 820px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .shot img { transform: scale(1.03); }
+  .btn:hover { border-color: var(--green-bright); }
+  .btn--primary:hover { background: #0c6e34; }
+}
+@media (prefers-reduced-motion: reduce) { .shot img { transition: none; } }
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="wrap">
+    <p class="eyebrow">garage.team · черновики оформления</p>
+    <h1>Варианты <span>по фото</span> автосервиса</h1>
+    <p class="lead">Пять вариантов оформления по настоящим фото «Гаража»: кирпич, арки, лампы, ворота. Каждый вариант — полная копия сайта, по ней можно ходить как по обычному сайту. Для сравнения первой идёт текущая версия без изменений.</p>
+    <ul class="notes">
+      <li>основной сайт не изменён</li>
+      <li>страницы закрыты от поисковиков</li>
+      <li>смотрите на компьютере и на телефоне</li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap grid">
+  <article class="card card--base">
+    <a class="shot" href="base/" aria-hidden="true" tabindex="-1"><img src="thumbs/base.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 00</span>
+      <h2>Как сейчас</h2>
+      <p>Текущая версия с новыми текстами услуг, без изменений в оформлении. Чтобы было с чем сравнивать.</p>
+      <div class="actions"><a class="btn btn--primary" href="base/">Открыть</a></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="kladka/" aria-hidden="true" tabindex="-1"><img src="thumbs/kladka.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 01</span>
+      <h2>Кладка</h2>
+      <p>Спокойный вариант без игрушек. На первом экране настоящая кирпичная стена в тёплом свете лампы, блок «Почему выбирают Гараж» уложен как кирпичная кладка, директор — в арочном окне под кирпичным сводом.</p>
+      <p class="try"><b>Что попробовать</b>Посмотреть первый экран, навести курсор на карточки преимуществ, долистать до директора.</p>
+      <div class="actions"><a class="btn btn--primary" href="kladka/">Открыть</a><a class="btn" href="kladka/#advantages">К кладке</a></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="arki/#inside" aria-hidden="true" tabindex="-1"><img src="thumbs/arki.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 02</span>
+      <h2>Арки</h2>
+      <p>Новый блок «Как у нас»: цех, офис, ниша и столик на V8 в арочных окнах с чёрными переплётами. Окна зажигаются по очереди. Та же арка у фото директора и у фасада в контактах.</p>
+      <p class="try"><b>Что попробовать</b>Поводить курсором по окнам, кликнуть по окну. На телефоне — пролистать окна пальцем.</p>
+      <div class="actions"><a class="btn btn--primary" href="arki/#inside">К блоку «Как у нас»</a><a class="btn" href="arki/">С начала</a></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="svet/" aria-hidden="true" tabindex="-1"><img src="thumbs/svet.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 03</span>
+      <h2>Свет ламп</h2>
+      <p>На первом экране кирпичная стена и две чёрные лампы-купола, как в офисе. Лампы можно выключать. Если погасить обе, загорается неоновая вывеска GARAGE TEAM, как в конце цеха.</p>
+      <p class="try"><b>Что попробовать</b>Нажать на одну лампу, потом на вторую. Потом «Включить свет».</p>
+      <div class="actions"><a class="btn btn--primary" href="svet/">Открыть</a></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="vorota/#contacts" aria-hidden="true" tabindex="-1"><img src="thumbs/vorota.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 04</span>
+      <h2>Ворота</h2>
+      <p>Сцена «Приезжайте в Гараж» на фото вашего фасада: вывеска загорается, при прокрутке ворота поднимаются, и вид переходит внутрь цеха. Меню и окно «Заказать звонок» открываются как ставня.</p>
+      <p class="try"><b>Что попробовать</b>Медленно прокрутить сцену или нажать зелёную кнопку на «пульте» у ворот. На телефоне открыть меню.</p>
+      <div class="actions"><a class="btn btn--primary" href="vorota/#contacts">К воротам</a><a class="btn" href="vorota/">С начала</a></div>
+    </div>
+  </article>
+
+  <article class="card">
+    <a class="shot" href="pashalki/#lounge" aria-hidden="true" tabindex="-1"><img src="thumbs/pashalki.webp" alt="" width="960" height="600" loading="lazy"></a>
+    <div class="body">
+      <span class="num">// 05</span>
+      <h2>Пасхалки</h2>
+      <p>Мелкие находки. Блок «Пока ждёте машину» на кирпичной стене: фото столика на V8 и ниша с вещицами, как у вас в офисе. В углу при прокрутке работает маленький V8, в кнопке «Оставить заявку» — тахометр.</p>
+      <p class="try"><b>Что попробовать</b>Навести на фото столика, нажимать на нишу. Покрутить страницу и посмотреть на V8 в углу.</p>
+      <div class="actions"><a class="btn btn--primary" href="pashalki/#lounge">К стене с нишей</a><a class="btn" href="pashalki/">С начала</a></div>
+    </div>
+  </article>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Варианты можно смешивать: например, «Кладку» на весь сайт, «Ворота» в контактах и нишу из «Пасхалок».</p>
+    <p>Новые подписи на фото — черновые. Перед запуском их нужно подтвердить у владельца.</p>
+  </div>
+</footer>
+</body>
+</html>
