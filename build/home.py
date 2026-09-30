@@ -8,6 +8,7 @@ from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 from .pribory import pribory_section
 from .stuk import stuk_section
+from .zima import zima_section
 
 esc = D.esc
 S = D.SITE
@@ -269,6 +270,7 @@ def render_home():
         team(),
         reviews_section(paper=True),
         stuk_section(),
+        zima_section(),
         request_section("Оставить запрос"),
         green_note_wrap(),
         contacts_strip(),
