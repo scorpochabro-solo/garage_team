@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from build import data as D  # noqa: E402
+from build import kraska  # noqa: E402
 from build.css_tools import guard_hover  # noqa: E402
 from build.home import render_home  # noqa: E402
 from build.images import make_logo_assets, process_images  # noqa: E402
@@ -41,7 +42,7 @@ def _arg(name, default):
 BASE = _arg("--base", "").rstrip("/")
 DIST = ROOT / _arg("--out", "dist")
 D.set_base(BASE)
-CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "zima.css", "car.css", "pribory.css", "stuk.css", "pages.css", "service.css", "shiny.css", "footer.css", "otkryto.css", "arki.css", "svet.css", "vorota.css"]
+CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "zima.css", "car.css", "pribory.css", "stuk.css", "pages.css", "service.css", "shiny.css", "footer.css", "otkryto.css", "arki.css", "svet.css", "vorota.css", "kraska.css"]
 JS_ORDER = ["core.js", "car.js", "pribory.js", "gallery.js", "form.js", "zima.js", "stuk.js", "pages.js", "shiny.js", "otkryto.js", "arki.js", "svet.js", "vorota.js"]
 UNICODE = {
     "latin": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
@@ -99,6 +100,7 @@ def main(verbose=False):
     D.ASSET_VERSION.update(css=hashlib.sha1(css.encode("utf-8")).hexdigest()[:10],
                            js=hashlib.sha1(js.encode("utf-8")).hexdigest()[:10])
     (DIST / STUK_DATA.lstrip("/")).write_text(stuk_data(), encoding="utf-8")  # «Что стучит?»: loaded when the section is near
+    kraska.write_assets(DIST)  # «Краска на кирпиче»: the bricks and paint masks kraska.css points at
 
     # pages
     urls = []

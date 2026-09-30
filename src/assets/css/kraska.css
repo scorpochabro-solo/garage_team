@@ -1,0 +1,156 @@
+/* ============================================================
+   «Краска на кирпиче»: the big numerals of the site as ghost signs — old paint on a brick wall,
+   in the materials of the facade on Красная слобода: red brick with white-grey joints, a field of black paint
+   (like the brickwork around the gate), the old green paint under it, cream numerals on top.
+   Markup: build/kraska.py (layers()); the SVG files in /assets/kraska/ are written by the build.
+   A wall, bottom to top:
+     host background   the bricks (brick-day.svg / brick-night.svg)
+     .kraska__green    the old green, seen where the black has flaked off
+     .kraska__field    the black field of the sign
+     .kraska__paint    the host's own numeral in cream (.adv__big, .promo-ticket__num)
+     .kraska__relief   the surface over all the paint: joint shadows, lit arrises, grain — so the paint follows the brick
+     .kraska__light    (night) the shade of the unlit wall and the light of the lamp above
+   A coat's mask, bottom to top: the joint map (joints.svg: how much paint every brick face and every stretch of joint
+   kept) plus a floor of its own (the least any joint kept of this coat), times its wear (wear-*.svg: flakes, pits,
+   fading). All tiles start at the corner of the host, so the joints of the masks lie on the joints of the bricks.
+   Everything is static — each SVG is rastered once by the browser — except the one-time brush of the reveal, which
+   only moves one mask. Without CSS masks nothing inside @supports applies: the card and the ticket keep their plain
+   look and their outline numerals.
+   ============================================================ */
+.kraska {
+  --kr-scale: 1;                                           /* 1: bricks of 68 × 18 px (build/kraska.py) */
+  --kr-bg: url('/assets/kraska/brick-day.svg') 0 0 / calc(936px * var(--kr-scale)) calc(352px * var(--kr-scale)), #a44c35;
+  --kr-joints: url('/assets/kraska/joints.svg');           /* 9 bricks × 16 courses */
+  --kr-joints-size: calc(648px * var(--kr-scale)) calc(352px * var(--kr-scale));
+  --kr-relief-size: calc(72px * var(--kr-scale)) calc(44px * var(--kr-scale));   /* relief.svg: two courses */
+  --kr-wear-size: 480px 300px;                             /* wear-*.svg: the flakes, pores and streaks */
+  --kr-wear-dx: 0px;                                       /* where the noise of the wear starts (all coats alike) */
+  --kr-wear-dy: 0px;
+  --kr-inset: 10px;                                        /* bare brick around the black field */
+  --kr-at: calc(-1 * var(--kr-inset));                     /* puts the masks of an inset coat back on the host's corner */
+  --kr-keep: linear-gradient(transparent, transparent);    /* where the field keeps its paint: set per host (the text) */
+  --kr-cream: #ebe2cd;
+  --kr-black: #151211;
+  --kr-green: #3e7f51;                                     /* the green paint of the upper floor */
+}
+/* in the hero the photo around the ticket is the bare brick: the black field runs to the edges of the ticket,
+   a panel painted on that wall, and the bricks under it are as large as the bricks of the photo */
+.kraska--night {
+  --kr-scale: 1.25;
+  --kr-bg: url('/assets/kraska/brick-night.svg') 0 0 / calc(576px * var(--kr-scale)) calc(264px * var(--kr-scale)), #3a1d15;
+  --kr-inset: 0px;
+  --kr-wear-size: 360px 225px;                             /* a smaller numeral: finer flakes and pores */
+  --kr-wear-dx: 80px;                                      /* measured: no flake takes the minus at 320–1920 px */
+  --kr-wear-dy: -60px;
+  --warm: 255, 212, 158;
+}
+/* out of the flow even without mask support: an empty span must not become a grid or flex item of the host */
+.kraska__wall { position: absolute; inset: 0; pointer-events: none; }
+
+@supports ((-webkit-mask-image: linear-gradient(#000, #000)) or (mask-image: linear-gradient(#000, #000))) {
+  .kraska { isolation: isolate; background: var(--kr-bg); }
+  .kraska__wall > span { position: absolute; inset: 0; }
+  .kraska__wall > .kraska__green, .kraska__wall > .kraska__field { inset: var(--kr-inset); }
+
+  /* ---------- the coats ---------- */
+  .kraska__green { z-index: 1; background: var(--kr-green);
+    -webkit-mask-image: url('/assets/kraska/wear-green.svg'), linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), var(--kr-joints);
+    mask-image: url('/assets/kraska/wear-green.svg'), linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), var(--kr-joints);
+    -webkit-mask-size: var(--kr-wear-size), 100% 100%, var(--kr-joints-size); mask-size: var(--kr-wear-size), 100% 100%, var(--kr-joints-size);
+    -webkit-mask-position: calc(var(--kr-at) + var(--kr-wear-dx)) calc(var(--kr-at) + var(--kr-wear-dy)), 0 0, var(--kr-at) var(--kr-at); mask-position: calc(var(--kr-at) + var(--kr-wear-dx)) calc(var(--kr-at) + var(--kr-wear-dy)), 0 0, var(--kr-at) var(--kr-at);
+    -webkit-mask-repeat: repeat, no-repeat, repeat; mask-repeat: repeat, no-repeat, repeat;
+    -webkit-mask-composite: source-in, source-over; mask-composite: intersect, add; }
+  /* the field adds --kr-keep on top of its wear: where the text sits it keeps its paint (up to 86 %), so the text
+     always has the contrast of black paint behind it; the joints still show there through the relief */
+  .kraska__field { z-index: 2; background: var(--kr-black);
+    -webkit-mask-image: var(--kr-keep), url('/assets/kraska/wear-field.svg'), linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), var(--kr-joints);
+    mask-image: var(--kr-keep), url('/assets/kraska/wear-field.svg'), linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), var(--kr-joints);
+    -webkit-mask-size: 100% 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size); mask-size: 100% 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size);
+    -webkit-mask-position: 0 0, calc(var(--kr-at) + var(--kr-wear-dx)) calc(var(--kr-at) + var(--kr-wear-dy)), 0 0, var(--kr-at) var(--kr-at); mask-position: 0 0, calc(var(--kr-at) + var(--kr-wear-dx)) calc(var(--kr-at) + var(--kr-wear-dy)), 0 0, var(--kr-at) var(--kr-at);
+    -webkit-mask-repeat: no-repeat, repeat, no-repeat, repeat; mask-repeat: no-repeat, repeat, no-repeat, repeat;
+    -webkit-mask-composite: source-over, source-in, source-over; mask-composite: add, intersect, add; }
+  /* the cream */
+  .kraska .kraska__paint { position: absolute; inset: 0; z-index: 3; display: flex;
+    color: var(--kr-cream); -webkit-text-stroke: 0; letter-spacing: -0.03em;
+    -webkit-mask-image: url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+    mask-image: url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+    -webkit-mask-size: var(--kr-wear-size), 100% 100%, var(--kr-joints-size); mask-size: var(--kr-wear-size), 100% 100%, var(--kr-joints-size);
+    -webkit-mask-position: var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0; mask-position: var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0;
+    -webkit-mask-repeat: repeat, no-repeat, repeat; mask-repeat: repeat, no-repeat, repeat;
+    -webkit-mask-composite: source-in, source-over; mask-composite: intersect, add; }
+  /* «paint appears»: once, when the card or the ticket scrolls in (core.js adds .is-in to every .reveal), a brush
+     crosses the numeral from left to right. The brush is a fourth mask on top of the cream's own (brush.svg, 16 em wide,
+     its front in the middle, so it spans the numeral at any size and covers the whole host at every moment — WebKit
+     leaves the area outside a non-repeating mask uncomposited). It exists only during the animation (no forwards fill):
+     afterwards the image is not referenced any more and the cream is back to its three masks. Only the position of the
+     brush moves; every image stays as rastered. With reduced motion there is no brush at all (base.css would shorten
+     the animation, but not its delay). */
+  .kraska.is-in .kraska__paint { animation: kraska-brush 1.5s cubic-bezier(0.45, 0.05, 0.3, 1) 0.45s backwards; }
+  .kraska--night.is-in .kraska__paint { animation-delay: 1.3s; }   /* after the lamps of the hero have come on */
+  @media (prefers-reduced-motion: reduce) { .kraska.is-in .kraska__paint { animation: none; } }
+  /* the front starts at the left of the numeral (numeral and front are right-aligned) and ends beyond the host */
+  @keyframes kraska-brush {
+    from {
+      -webkit-mask-image: url('/assets/kraska/brush.svg'), url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+      mask-image: url('/assets/kraska/brush.svg'), url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+      -webkit-mask-size: 16em 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size); mask-size: 16em 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size);
+      -webkit-mask-repeat: no-repeat, repeat, no-repeat, repeat; mask-repeat: no-repeat, repeat, no-repeat, repeat;
+      -webkit-mask-composite: source-in, source-in, source-over; mask-composite: intersect, intersect, add;
+      -webkit-mask-position: right -4.8em top 0, var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0; mask-position: right -4.8em top 0, var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0;
+    }
+    to {
+      -webkit-mask-image: url('/assets/kraska/brush.svg'), url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+      mask-image: url('/assets/kraska/brush.svg'), url('/assets/kraska/wear-paint.svg'), linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), var(--kr-joints);
+      -webkit-mask-size: 16em 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size); mask-size: 16em 100%, var(--kr-wear-size), 100% 100%, var(--kr-joints-size);
+      -webkit-mask-repeat: no-repeat, repeat, no-repeat, repeat; mask-repeat: no-repeat, repeat, no-repeat, repeat;
+      -webkit-mask-composite: source-in, source-in, source-over; mask-composite: intersect, intersect, add;
+      -webkit-mask-position: right -8em top 0, var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0; mask-position: right -8em top 0, var(--kr-wear-dx) var(--kr-wear-dy), 0 0, 0 0;
+    }
+  }
+
+  /* ---------- the surface over the paint ---------- */
+  .kraska__relief { z-index: 4;
+    background: url('/assets/kraska/relief.svg') 0 0 / var(--kr-relief-size), url('/assets/kraska/grain.svg') 0 0 / 256px 256px; }
+  /* night: the pendant of the hero hangs above the ticket (at 1440 px over a third of its width): its light falls
+     from above, the wall darkens downwards and a little towards the text on the left */
+  .kraska__light { z-index: 5;
+    background:
+      radial-gradient(ellipse 85% 95% at 40% -18%, rgba(var(--warm), 0.13), rgba(var(--warm), 0.04) 55%, transparent 78%),
+      linear-gradient(180deg, rgba(9, 7, 6, 0.16) 0%, rgba(9, 7, 6, 0.55) 55%, rgba(9, 7, 6, 0.74) 100%),
+      linear-gradient(90deg, rgba(9, 7, 6, 0.26), transparent 50%); }
+  /* the host's own corner marks and hover bar stay over the wall */
+  .kraska::before, .kraska::after { z-index: 7; }
+
+  /* ---------- «Почему выбирают Гараж»: the big card is a piece of the facade in daylight ---------- */
+  /* the wall stays on hover (no repaint of the paint): the green bar under the card is its hover state */
+  .adv__item--big.kraska, .adv__item--big.kraska:hover { container-type: inline-size; background: var(--kr-bg); }
+  .adv__item--big.kraska > .adv__num, .adv__item--big.kraska > .adv__text { position: relative; z-index: 6; }
+  .adv__item--big.kraska .kraska__field { --kr-keep: linear-gradient(90deg, rgba(0, 0, 0, 0.86) 0 40%, transparent 62%); }
+  .adv__item--big.kraska .adv__big { font-size: clamp(5rem, 16cqw, 9.5rem); align-items: flex-end; justify-content: flex-end;
+    padding: 0 clamp(1.4rem, 3.4cqw, 2.6rem) 0.9rem 0; }
+  /* a narrow card (two columns or one): the text right under its label, the numeral painted below it. The text keeps
+     the room under itself (the digits reach 0.88 em above the numeral's box bottom) and pushes the free space down. */
+  @container (max-width: 540px) {
+    .adv__item--big.kraska > .adv__text { margin-bottom: auto; padding-bottom: calc(clamp(4.4rem, 26cqw, 6rem) * 0.88 + 0.6rem); }
+    .adv__item--big.kraska .adv__big { font-size: clamp(4.4rem, 26cqw, 6rem); }
+    .adv__item--big.kraska .kraska__field { --kr-keep: linear-gradient(180deg, rgba(0, 0, 0, 0.86) 0 52%, transparent 72%); }
+  }
+
+  /* ---------- the promo ticket: the same wall in the dark hero, under the lamp ---------- */
+  /* (svet.css gives .hero--svet .promo-ticket its own background, hence the longer selector) */
+  .hero--svet .promo-ticket.kraska { container-type: inline-size; background: var(--kr-bg); }
+  .promo-ticket.kraska > :not(.kraska__wall):not(.kraska__paint) { position: relative; z-index: 6; }
+  .promo-ticket.kraska .kraska__field { --kr-keep: radial-gradient(ellipse 72% 88% at 24% 72%, rgba(0, 0, 0, 0.86) 58%, transparent 100%); }
+  /* laid out on the courses, as a sign painter would: the thin minus of «-5%» sits on the face of the second course
+     (a joint across it would cut it in two). Unbounded 900: the baseline is 0.868 em below the top of the line box,
+     the minus is 0.25–0.45 em above it, so its middle is at padding-top + 0.52 em; the face of the second course is
+     27.5–50 px at bricks × 1.25 (middle 38.75). Sizes in px for the same reason: the bricks are in px. */
+  .promo-ticket.kraska .promo-ticket__num { font-size: 64px; line-height: 1; align-items: flex-start; justify-content: flex-end;
+    padding: 5.5px 1.2rem 0 0; }
+  /* a narrow ticket (phones, and the aside of 1001–1250 px screens): the numeral takes the row of the label,
+     the text starts under it */
+  @container (max-width: 340px) {
+    .promo-ticket.kraska .promo-ticket__text { margin-top: 1.7rem; }
+    .promo-ticket.kraska .promo-ticket__num { font-size: 58px; padding-top: 8.6px; }
+  }
+}

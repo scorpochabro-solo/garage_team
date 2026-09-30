@@ -2,7 +2,7 @@
 """Homepage renderer."""
 import json
 
-from . import arki, otkryto, schema, svet
+from . import arki, kraska, otkryto, schema, svet
 from . import data as D
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
@@ -23,7 +23,8 @@ HERO_SUB = ("Ремонт и обслуживание автомобилей л�
 
 
 def hero():
-    # «Свет ламп» (build/svet.py): the background is the brick wall of the office with two pendant lamps and the neon sign
+    # «Свет ламп» (build/svet.py): the background is the brick wall of the office with two pendant lamps and the neon sign;
+    # «Краска на кирпиче» (build/kraska.py): the promo ticket is a black panel painted on that wall, the -5% old paint on it
     title = "".join(
         f'<span class="hero__line{" hero__line--accent" if i >= HERO_ACCENT_FROM else ""}"><span style="--i:{i}">{esc(t)}</span></span>'
         for i, t in enumerate(HERO_LINES)
@@ -51,11 +52,12 @@ def hero():
       </div>
     </div>
     <aside class="hero__aside">
-      <div class="promo-ticket corner reveal">
+      <div class="promo-ticket corner reveal {kraska.HOST} {kraska.HOST}--night">
+        {kraska.layers(night=True)}
         <span class="mono accent">Акция</span>
         <p class="promo-ticket__text">{promo_text}</p>
         <a class="btn btn--white btn--sm" href="/registration/">{esc(S['promo_btn'])}</a>
-        <span class="promo-ticket__num" aria-hidden="true">-5%</span>
+        <span class="promo-ticket__num {kraska.PAINT}" aria-hidden="true">-5%</span>
       </div>
       {facts}
     </aside>
@@ -149,10 +151,12 @@ def services_map():
 def advantages():
     items = S["advantages"]
     big_idx = next((i for i, t in enumerate(items) if "Гарантия" in t), len(items) - 1)
-    cells = [f"""<div class="adv__item adv__item--big reveal">
+    # «Краска на кирпиче» (build/kraska.py): the card is a piece of brick wall, the 360 is old paint on it
+    cells = [f"""<div class="adv__item adv__item--big reveal {kraska.HOST} {kraska.HOST}--day">
+      {kraska.layers()}
       <span class="adv__num">// 01</span>
       <p class="adv__text">{esc(items[big_idx])}</p>
-      <span class="adv__big" aria-hidden="true">360</span>
+      <span class="adv__big {kraska.PAINT}" aria-hidden="true">360</span>
     </div>"""]
     n = 2
     for i, t in enumerate(items):
