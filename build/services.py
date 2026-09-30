@@ -6,6 +6,7 @@ from . import data as D
 from . import schema
 from . import service_blocks as B
 from . import shiny
+from . import stena
 from .icons import icon, icon_for_href
 from .images import RESPONSIVE_WIDTHS, scaled_size
 from .layout import (document, page_hero, phone_aside, contact_card, side_index, green_note,
@@ -68,19 +69,19 @@ def _card_text(href):
     return sentence if len(sentence) <= 220 else sentence[:217].rsplit(" ", 1)[0] + "…"
 
 
-def render_services_index():
-    cards = []
+def _directions():
+    """The 28 directions for «Стена направлений» (build/stena.py): number, link, name, count, works or short text."""
+    items = []
     for i, c in enumerate(D.CATEGORIES):
-        subs = "".join(f'<a href="{s["href"]}">{esc(s["name"])}</a>' for s in c["subs"])
-        count = f'{len(c["subs"])} {_plural(len(c["subs"]), "услуга", "услуги", "услуг")}' if c["subs"] else "направление"
-        cards.append(f"""<article class="cat-card reveal" data-title="{esc(c['name'])}" style="--d:{(i % 6) * 40}ms">
-      <a class="cat-card__head" href="{c['href']}">
-        <span class="cat-card__icon">{icon(icon_for_href(c['href']))}</span>
-        <span><span class="cat-card__title">{esc(c['name'])}</span><span class="cat-card__count">{i + 1:02d} · {count}</span></span>
-      </a>
-      {f'<div class="cat-card__subs">{subs}</div>' if subs else f'<p class="muted" style="font-size:.9rem">{esc(_card_text(c["href"]))}</p>'}
-      <a class="link-arrow link-arrow--inline cat-card__more" href="{c['href']}">Подробнее {icon('arrow')}</a>
-    </article>""")
+        n = len(c["subs"])
+        count = f'{n} {_plural(n, "услуга", "услуги", "услуг")}' if n else "направление"
+        items.append(stena.Direction(i + 1, c["href"], c["name"], count, tuple((s["href"], s["name"]) for s in c["subs"]),
+                                     "" if n else _card_text(c["href"])))
+    return items
+
+
+def render_services_index():
+    directions = _directions()
     total = len(D.SERVICES)
     lead = (f"{len(D.CATEGORIES)} направлений и {total} видов работ: от компьютерной диагностики до кузовного ремонта и хранения шин. "
             "Сервис и ремонт любых марок, обслуживание коммерческой техники до 5,5 тонн.")
@@ -93,8 +94,9 @@ def render_services_index():
       <div class="filter__input">{icon('search')}<input class="input" type="search" placeholder="Найти услугу: ГРМ, тормоза, кондиционер…" aria-label="Поиск по услугам" data-filter autocomplete="off"></div>
       <span class="filter__count" data-filter-count>{len(D.CATEGORIES)} направлений</span>
     </div>
-    <div class="cat-grid">{"".join(cards)}</div>
+    {stena.wall(directions)}
     <p class="empty-state">Ничего не нашли. Позвоните нам — подскажем: <a class="accent" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a></p>
+    {stena.index(directions)}
   </div>
 </section>
 <div class="wrap" style="padding-bottom:var(--section-y)">{green_note()}</div>

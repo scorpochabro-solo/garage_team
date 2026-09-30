@@ -1,0 +1,309 @@
+/* ============================================================
+   «Стена направлений»: /services.html — the 28 directions laid as the red-brick wall of the workshop.
+   Markup and the look of every brick: build/stena.py; the search mirror and the one-time entrance: js/stena.js.
+
+   Geometry. The wall is a grid of 2·N half-brick columns (N bricks a course); a brick spans two columns and in every
+   other course the first brick starts one column in — running bond. What the bricks do not cover is the wall's own
+   background: the mortar, the half-bricks (bats) at the ends of the offset courses, the plain course under the beam
+   and the empty end of a short last course. Its joints are repeating gradients sized in % of the wall width plus the
+   joint, so they meet the grid gaps exactly at any width; masks tell the two kinds of courses apart.
+   Light. The lamps light the plain course under the beam and stop at its lower joint; a brick pulled into the light
+   gets --lit under its lettering. tests/test_stena.py checks every brick's clay against --paint / --paint-lit with
+   --pool and --lit on top as the worst case (WCAG AA). The shade far from the lamps is under the lettering, never over it.
+   Cost. Gradients, SVG tiles of plain dots and small inline SVG — no SVG filters: a turbulence background is recomputed
+   on every re-raster in Chrome (lifting a brick cost 100+ ms), and no light layer over the bricks: it would be
+   re-rasterised whenever a brick is lifted.
+   Motion is transform and opacity only; no blur filters, no blend modes, no loops.
+   ============================================================ */
+.stena {
+  --n: 4;                  /* bricks in a course */
+  --j: 7px;                /* mortar joint */
+  --h: 96px;               /* a course: the height of a brick */
+  --beam: 20px;
+  --pad-y: 0.8rem;
+  --pad-x: 1rem;
+  --name-fs: 1rem;
+  --icon: 20px;
+  --lamp-w: 72px;
+  --cord: 22px;
+  --lay-step: 28ms;        /* the entrance: a brick every 28 ms after 260 ms, each laid in 600 ms (js/stena.js reads these) */
+  --lay-delay: 260ms;
+  --lay-dur: 600ms;
+  --x1: 25%;               /* the two lamps, in % of the wall width */
+  --x2: 75%;
+  --rim: calc(var(--cord) + var(--lamp-w) * 0.78);       /* the lamp's glowing rim, from under the beam */
+
+  --mortar: #bdb5a7;
+  --mortar-lo: #847c70;    /* the joint in the shadow of the brick above */
+  --clay: #6d2f21;         /* plain bricks */
+  --paint: #faf2e6;        /* the painted lettering */
+  --paint-lit: #ffffff;
+  --lamp: 255, 207, 138;   /* warm lamp light, as --arch-lamp-rgb */
+  --pool: 0.05;            /* the lamp light a labelled course may get (the pools stop above it; the tests assume it) */
+  --lit: 0.1;              /* a brick pulled out into the light, under its lettering */
+  --shade: 0.24;           /* the lowest course, farthest from the lamps */
+
+  --P: calc((100% + var(--j)) / var(--n));   /* a brick and a joint: the bond's step, in % of the box that draws it */
+  /* the grain tiles (--grain-clay-a, --grain-clay-b, --grain-sand) come from build/stena.py in the wall's style attribute */
+  position: relative; isolation: isolate;   /* the beam, the light and the lamps stack inside the wall, not over the page */
+}
+/* the wall is laid brick by brick, not faded in as a block */
+.stena.reveal { opacity: 1; transform: none; transition: none; }
+
+/* ---------- the steel beam the wall stands under: rivets, and the bottom flange marked like a low beam in the workshop ---------- */
+.stena__beam {
+  position: relative; z-index: 3; height: var(--beam);
+  background:
+    repeating-linear-gradient(-45deg, var(--green) 0 7px, #101211 7px 14px) 0 100% / 100% 5px no-repeat,   /* the safety stripe */
+    radial-gradient(circle, #777b76 0 1.1px, #2b2e2c 1.6px, rgba(0, 0, 0, 0) 2.4px) 28px calc(50% - 2px) / 56px 8px repeat-x,   /* rivets */
+    linear-gradient(180deg, #555955 0, #2c2f2d 1px, #1f2120 4px, #0b0c0b 5px, #191b1a 6px, #141615 calc(var(--beam) - 7px), #0a0b0a calc(var(--beam) - 6px), #303331 calc(var(--beam) - 5px));
+  box-shadow: 0 7px 12px -3px rgba(0, 0, 0, 0.75);
+}
+
+/* ---------- the wall: mortar, bats and plain bricks behind the links ---------- */
+.stena__wall {
+  --T: calc(2 * (var(--h) + var(--j)));      /* two courses */
+  position: relative; isolation: isolate;
+  display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); grid-auto-rows: var(--h); gap: var(--j);
+  padding-top: calc(var(--h) + var(--j));    /* the plain course the lamps hang in front of */
+  background:
+    /* far from the lamps the wall falls into shadow; the ends of the wall a little darker */
+    linear-gradient(180deg, rgba(9, 6, 5, 0) 18%, rgba(9, 6, 5, var(--shade))),
+    linear-gradient(90deg, rgba(10, 5, 3, 0.28), rgba(10, 5, 3, 0) 7%, rgba(10, 5, 3, 0) 93%, rgba(10, 5, 3, 0.28)),
+    /* every course: the top arris catches the light, the bottom one is in shadow, then the bed joint */
+    repeating-linear-gradient(180deg,
+      rgba(255, 226, 196, 0.1) 0 1px, rgba(255, 226, 196, 0) 1px calc(var(--h) - 3px), rgba(0, 0, 0, 0.3) calc(var(--h) - 3px) var(--h),
+      var(--mortar-lo) var(--h) calc(var(--h) + 2px), var(--mortar) calc(var(--h) + 2px) calc(var(--h) + var(--j))),
+    var(--grain-clay-a) 0 0 / 72px 56px, var(--grain-clay-b) 31px 17px / 97px 83px,
+    /* a cloud of soot on each plain brick */
+    radial-gradient(45% 70% at 38% 55%, rgba(16, 6, 3, 0.3), rgba(16, 6, 3, 0)) 0 0 / var(--P) calc(var(--h) + var(--j)),
+    var(--clay);
+}
+/* head joints: ::before for the offset courses (the plain one under the beam, then every second), ::after for the
+   courses that start with a whole brick; each is masked to its own courses */
+.stena__wall::before, .stena__wall::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+}
+.stena__wall::before {
+  background: repeating-linear-gradient(90deg,
+    rgba(0, 0, 0, 0) 0 calc(var(--P) / 2 - var(--j) - 2px), rgba(0, 0, 0, 0.26) 0 calc(var(--P) / 2 - var(--j)),
+    var(--mortar) 0 calc(var(--P) / 2), rgba(255, 226, 196, 0.07) 0 calc(var(--P) / 2 + 1px), rgba(0, 0, 0, 0) 0 var(--P));
+  -webkit-mask: repeating-linear-gradient(180deg, #000 0 var(--h), transparent 0 var(--T));
+  mask: repeating-linear-gradient(180deg, #000 0 var(--h), transparent 0 var(--T));
+}
+.stena__wall::after {
+  background: repeating-linear-gradient(90deg,
+    rgba(255, 226, 196, 0.07) 0 1px, rgba(0, 0, 0, 0) 0 calc(var(--P) - var(--j) - 2px), rgba(0, 0, 0, 0.26) 0 calc(var(--P) - var(--j)),
+    var(--mortar) 0 var(--P));
+  -webkit-mask: repeating-linear-gradient(180deg, transparent 0 calc(var(--h) + var(--j)), #000 0 calc(2 * var(--h) + var(--j)), transparent 0 var(--T));
+  mask: repeating-linear-gradient(180deg, transparent 0 calc(var(--h) + var(--j)), #000 0 calc(2 * var(--h) + var(--j)), transparent 0 var(--T));
+}
+
+/* ---------- running bond: the first brick of every other course starts one column in ---------- */
+.stena__slot {
+  position: relative; z-index: 0; display: grid; grid-column: span 2;
+  transition: z-index 0s 0.35s;
+}
+/* the mortar bed around a face that sits a little inside it; it comes with its brick, so before the laying the empty
+   slots show the plain wall behind them */
+.stena__slot::after { content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--grain-sand) 0 0 / 46px 38px, var(--mortar); }
+.stena__slot[hidden] { display: none; }
+/* four a course: 4 + (½ + 3 + ½) */
+@media (min-width: 1024px) {
+  .stena__slot:nth-child(7n + 5) { grid-column: 2 / span 2; }
+  @supports selector(:nth-child(1 of a)) {
+    .stena__slot:nth-child(7n + 5) { grid-column: span 2; }
+    .stena__slot:nth-child(7n + 5 of :not([hidden])) { grid-column: 2 / span 2; }
+  }
+}
+/* three a course: 3 + (½ + 2 + ½) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .stena { --n: 3; --j: 6px; --h: 92px; --name-fs: 0.94rem; --x1: 22%; --x2: 78%; }
+  .stena__wall { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .stena__slot:nth-child(5n + 4) { grid-column: 2 / span 2; }
+  @supports selector(:nth-child(1 of a)) {
+    .stena__slot:nth-child(5n + 4) { grid-column: span 2; }
+    .stena__slot:nth-child(5n + 4 of :not([hidden])) { grid-column: 2 / span 2; }
+  }
+}
+/* two a course: 2 + (½ + 1 + ½); the wall runs from edge to edge of the phone */
+@media (max-width: 767px) {
+  .stena {
+    --n: 2; --j: 5px; --h: 90px; --beam: 16px; --pad-y: 0.7rem; --pad-x: 0.7rem; --name-fs: 0.84rem; --icon: 18px;
+    --lamp-w: 48px; --cord: 16px;
+    margin-left: calc(env(safe-area-inset-left, 0px) - var(--gutter-safe));
+    margin-right: calc(env(safe-area-inset-right, 0px) - var(--gutter-safe));
+    overflow-x: clip;   /* edge to edge: a brick being laid or pressed never widens the page */
+    --lay-from: translateY(-14px);
+  }
+  .stena__wall { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stena__slot:nth-child(3n + 3) { grid-column: 2 / span 2; }
+  @supports selector(:nth-child(1 of a)) {
+    .stena__slot:nth-child(3n + 3) { grid-column: span 2; }
+    .stena__slot:nth-child(3n + 3 of :not([hidden])) { grid-column: 2 / span 2; }
+  }
+}
+/* the lettering follows the width of a brick: the longest name («Ремонт и промывка системы охлаждения») keeps to two
+   lines on the narrowest brick of each layout, to three on phones (with room for a face set 1.5px into its bed on
+   both sides) and to four below 375px, where the courses grow */
+@media (min-width: 1024px) and (max-width: 1279px) { .stena { --h: 92px; --name-fs: 0.94rem; } }
+@media (min-width: 1024px) and (max-width: 1199px) { .stena { --name-fs: 0.88rem; } }
+@media (min-width: 768px) and (max-width: 899px) { .stena { --name-fs: 0.88rem; } }
+@media (max-width: 419px) { .stena { --h: 96px; --pad-x: 0.6rem; --name-fs: 0.8rem; } }
+@media (max-width: 374px) { .stena { --h: 106px; } }
+
+/* ---------- a brick ---------- */
+.brick {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas: "name name" "label icon"; align-items: end; gap: 0.35rem 0.6rem;
+  margin: var(--ins, 0); padding: var(--pad-y) var(--pad-x);
+  border-radius: var(--r, 3px);
+  color: var(--paint);
+  background:
+    linear-gradient(rgba(9, 6, 5, calc(var(--k, 0) * var(--shade))), rgba(9, 6, 5, calc(var(--k, 0) * var(--shade)))),   /* lower = darker */
+    linear-gradient(var(--burn-dir, 90deg), rgba(26, 9, 5, var(--burn, 0)), rgba(26, 9, 5, 0) 50%),   /* the fire-flashed end */
+    linear-gradient(180deg, rgba(255, 228, 200, 0.07), rgba(255, 228, 200, 0) 30%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.16)),
+    /* the fired clay: pores and sand grains, two tiles of co-prime sizes starting at a different place on every brick */
+    var(--grain-clay-a) var(--gx, 0) var(--gy, 0) / 72px 56px, var(--grain-clay-b) var(--gy, 0) var(--gx, 0) / 97px 83px,
+    /* soot and firing clouds, placed per brick (build/stena.py) */
+    radial-gradient(var(--m1s, 40% 80%) at var(--m1, 30% 40%), rgba(16, 6, 3, var(--m1a, 0.2)), rgba(16, 6, 3, calc(var(--m1a, 0.2) * 0.4)) 50%, rgba(16, 6, 3, 0)),
+    radial-gradient(var(--m2s, 30% 70%) at var(--m2, 70% 60%), rgba(16, 6, 3, var(--m2a, 0.15)), rgba(16, 6, 3, calc(var(--m2a, 0.15) * 0.4)) 50%, rgba(16, 6, 3, 0)),
+    radial-gradient(var(--m3s, 25% 60%) at var(--m3, 50% 80%), rgba(16, 6, 3, var(--m3a, 0.15)), rgba(16, 6, 3, calc(var(--m3a, 0.15) * 0.4)) 50%, rgba(16, 6, 3, 0)),
+    var(--b, #8a3726);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 228, 200, 0.17), inset 0 -2px 0 rgba(0, 0, 0, 0.26),
+    inset 1px 0 0 rgba(255, 228, 200, 0.06), inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    inset 0 0 14px rgba(24, 8, 4, 0.42),     /* worn, rounded arrises */
+    0 2px 1px rgba(0, 0, 0, 0.34);            /* the arris' shadow in the joint below */
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.35s var(--ease);
+}
+.brick__wear { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.brick__pits { fill: #1a0a05; }
+.brick__chip { fill: rgba(22, 9, 5, 0.62); stroke: rgba(255, 226, 196, 0.12); stroke-width: 0.6; }
+.brick__crack { fill: none; stroke: rgba(18, 7, 4, 0.55); stroke-width: 0.8; stroke-linecap: round; stroke-linejoin: round; }
+.brick__paint { fill: rgb(46, 104, 70); }
+/* the lamp light on a brick pulled out of the wall: a bright top arris, then at most --lit under the lettering */
+.brick::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+  background: linear-gradient(180deg, rgba(var(--lamp), 0.36) 0, rgba(var(--lamp), var(--lit)) 7px, rgba(var(--lamp), 0.05) 48%, rgba(var(--lamp), 0) 82%);
+  transition: opacity 0.35s var(--ease);
+}
+.brick__name {
+  grid-area: name; align-self: start;
+  font-family: var(--font-display); font-weight: 600; font-size: var(--name-fs); line-height: 1.17; letter-spacing: -0.01em;
+  text-wrap: balance; overflow-wrap: break-word;
+  -webkit-hyphens: none; hyphens: none;       /* the soft hyphen in «автокондиционеров» is for phone bricks only */
+  text-shadow: 0 1px 0 rgba(20, 8, 4, 0.4);   /* paint on a rough face */
+}
+@media (max-width: 767px) { .brick__name { -webkit-hyphens: manual; hyphens: manual; } }
+.brick__label {
+  grid-area: label; min-width: 0; white-space: nowrap;
+  font-family: var(--font-mono); font-size: 0.72rem; line-height: 1.25; letter-spacing: 0.08em; text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(20, 8, 4, 0.4);
+}
+.brick__icon { grid-area: icon; width: var(--icon); height: var(--icon); }
+
+/* ---------- pulled out of the wall: pointer or keyboard ---------- */
+.stena__slot::before {
+  content: ""; position: absolute; left: 1%; right: 1%; top: 32%; bottom: -26px; z-index: -1; pointer-events: none;
+  border-radius: 50%; background: radial-gradient(closest-side, rgba(6, 3, 2, 0.86), rgba(6, 3, 2, 0.42) 55%, rgba(6, 3, 2, 0));
+  opacity: 0; transform: scale(0.86, 0.55); transform-origin: 50% 30%;
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.stena__slot:hover, .stena__slot:has(.brick:focus-visible) { z-index: 1; transition-delay: 0s; }
+.stena__slot:hover::before, .stena__slot:has(.brick:focus-visible)::before { opacity: 1; transform: none; }
+.brick:hover, .brick:focus-visible { transform: translateY(-4px) scale(1.05); color: var(--paint-lit); }
+.brick:hover::after, .brick:focus-visible::after { opacity: 1; }
+.brick:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: var(--r, 3px); }
+/* touch: pressed into the wall */
+.brick:active { transform: scale(0.97); transition-duration: 0.08s; }
+.brick:active::after { opacity: 1; transition-duration: 0.08s; }
+
+/* ---------- the plinth: the bottom of the wall painted black, as on the facade ----------
+   not positioned: it paints under the wall, so a pulled-out brick of the lowest course and its shadow stay on top */
+.stena__plinth {
+  height: calc(var(--h) * 0.42);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0 1px, rgba(255, 255, 255, 0.1) 1px 2px, rgba(255, 255, 255, 0) 2px 6px, rgba(0, 0, 0, 0.35) 6px 7px, rgba(0, 0, 0, 0) 7px),   /* the painted-over bed joint */
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0) 0 calc(var(--P) - var(--j)), rgba(0, 0, 0, 0.4) 0 calc(var(--P) - var(--j) + 1px), rgba(255, 255, 255, 0.045) 0 var(--P)),   /* head joints under the paint */
+    var(--grain-sand) 0 0 / 46px 38px,   /* dust */
+    linear-gradient(180deg, #1b1b1a, #0d0e0d);
+}
+
+/* ---------- the lamps and their light: the pools light the plain course, and end before the first labelled one ---------- */
+.stena__light {
+  position: absolute; left: 0; right: 0; top: var(--beam); height: calc(var(--h) + var(--j)); z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(ellipse calc(var(--lamp-w) * 2.3) 30px at var(--x1) var(--rim), rgba(var(--lamp), 0.5), rgba(var(--lamp), 0.16) 50%, rgba(var(--lamp), 0)),
+    radial-gradient(ellipse calc(var(--lamp-w) * 2.3) 30px at var(--x2) var(--rim), rgba(var(--lamp), 0.5), rgba(var(--lamp), 0.16) 50%, rgba(var(--lamp), 0)),
+    /* the glow on the plain course, gone by its top and bottom edges */
+    radial-gradient(ellipse 22% 50% at var(--x1) 50%, rgba(var(--lamp), 0.16), rgba(var(--lamp), var(--pool)) 60%, rgba(var(--lamp), 0)),
+    radial-gradient(ellipse 22% 50% at var(--x2) 50%, rgba(var(--lamp), 0.16), rgba(var(--lamp), var(--pool)) 60%, rgba(var(--lamp), 0));
+}
+.stena__lamps { position: absolute; left: 0; right: 0; top: var(--beam); height: calc(var(--h) + var(--j)); z-index: 3; pointer-events: none; }
+.stena__lamp { position: absolute; top: 0; width: var(--lamp-w); height: 100%; margin-left: calc(var(--lamp-w) / -2); }
+.stena__lamp--1 { left: var(--x1); }
+.stena__lamp--2 { left: var(--x2); }
+.stena__cord { position: absolute; left: 50%; top: 0; width: 2px; height: calc(var(--cord) + 2px); margin-left: -1px; background: linear-gradient(90deg, #0d0c0c, #3a3530); }
+.stena__dome { position: absolute; left: 0; top: var(--cord); width: 100%; height: auto; aspect-ratio: 64 / 54; overflow: visible; }
+/* the diffuser seen from below, and its glow on the shade's lip */
+.stena__bulb {
+  position: absolute; left: 7%; width: 86%; top: calc(var(--cord) + var(--lamp-w) * 0.77); height: calc(var(--lamp-w) * 0.07); border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 35%, #fffaf0 0%, #ffeac4 55%, #ffd08e 100%);
+  box-shadow: 0 0 10px 2px rgba(var(--lamp), 0.55);
+}
+
+/* ---------- entrance: the lamps come on, the bricks are laid course by course (once; js/stena.js ends it) ----------
+   Only where scripts run (core.js adds .is-in): without them, or in a browser that cannot tell, the wall is simply there */
+@media (scripting: enabled) {
+  .stena.reveal:not(.is-in) :is(.brick, .stena__bulb, .stena__light), .stena.reveal:not(.is-in) .stena__slot::after { opacity: 0; }
+  .stena.is-in:not(.is-laid) .brick { animation: stena-lay var(--lay-dur) cubic-bezier(0.2, 0.85, 0.3, 1.12) calc(var(--i) * var(--lay-step) + var(--lay-delay)) backwards; }
+  .stena.is-in:not(.is-laid) .stena__slot::after { animation: stena-bed var(--lay-dur) linear calc(var(--i) * var(--lay-step) + var(--lay-delay)) backwards; }
+  .stena.is-in:not(.is-laid) :is(.stena__bulb, .stena__light) { animation: stena-on 0.9s linear backwards; }
+}
+@keyframes stena-lay {
+  0% { opacity: 0; transform: var(--lay-from, translateY(-16px) scale(1.035)); }
+  55% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes stena-bed { from { opacity: 0; } 50%, to { opacity: 1; } }
+@keyframes stena-on { 0%, 10% { opacity: 0; } 14% { opacity: 0.85; } 19% { opacity: 0.15; } 27% { opacity: 1; } 31% { opacity: 0.4; } 42%, 100% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  /* no movement, only light */
+  .brick, .stena__slot::before { transition: none; }
+  .brick:hover, .brick:focus-visible, .brick:active { transform: none; }
+  .stena__slot::before { display: none; }
+}
+/* high contrast: the brick outlines stay, the pictures of brick go */
+@media (forced-colors: active) {
+  .brick { background: Canvas; border: 1px solid CanvasText; box-shadow: none; }
+  .brick__wear, .stena__slot::before, .stena__slot::after, .stena__wall::before, .stena__wall::after, .stena__light, .stena__lamps { display: none; }
+  .stena__wall, .stena__beam, .stena__plinth { background: none; box-shadow: none; }
+}
+
+/* ---------- «Все услуги по направлениям»: the works of every direction (the content of the old cards) ---------- */
+.stena-index { margin-top: clamp(2.75rem, 2rem + 2.5vw, 4.5rem); }
+.stena-index__title {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 44px; padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line); cursor: pointer; list-style: none;
+  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h4); letter-spacing: -0.01em; text-transform: uppercase;
+}
+.stena-index__title::-webkit-details-marker { display: none; }
+.stena-index__ic { width: 22px; height: 22px; color: var(--accent); transition: transform var(--dur) var(--ease); }
+.stena-index[open] .stena-index__ic { transform: rotate(45deg); }
+.stena-index__title:hover .stena-index__ic { transform: rotate(90deg); }
+.stena-index[open] .stena-index__title:hover .stena-index__ic { transform: rotate(135deg); }
+.stena-index__list { columns: 3 17rem; column-gap: clamp(2rem, 1rem + 2.5vw, 3.5rem); margin-top: 1.6rem; }
+.stena-index .cat-card { display: block; padding: 0 0 1.5rem; background: none; break-inside: avoid; }
+.stena-index .cat-card.is-hidden { display: none; }   /* the search (pages.js) hides a direction */
+.stena-index .cat-card:hover { background: none; }
+.stena-index .cat-card__head { display: flex; align-items: baseline; gap: 0.6rem; min-height: 32px; margin-bottom: 0.45rem; color: var(--text); }
+.stena-index__swatch { flex: none; width: 18px; height: 9px; border-radius: 2px 3px 2px 2px; background: var(--b); box-shadow: inset 0 1px 0 rgba(255, 228, 200, 0.2), 0 0 0 2px rgba(181, 173, 159, 0.35); transform: translateY(-1px); }
+.stena-index__n { flex: none; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.1em; color: var(--text-3); }
+.stena-index .cat-card__title { font-size: 0.98rem; }
+.stena-index .cat-card__subs { padding-left: 1.6rem; }
+.stena-index__text { padding-left: 1.6rem; font-size: 0.9rem; line-height: 1.55; color: var(--text-2); max-width: 46ch; }
+@media (pointer: coarse) { .stena-index .cat-card__head { min-height: 44px; align-items: center; } }
