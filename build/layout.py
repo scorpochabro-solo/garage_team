@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
+from . import otkryto
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -71,11 +72,10 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 
 # ---------- header ----------
 def topline():
-    hours = "Пн–Пт 9:00–19:00 · Сб 9:00–17:00"
     return f"""<div class="topline">
   <div class="wrap topline__in">
     <span class="topline__item">{icon('pin')} {esc(D.ADDRESS_SHORT)}</span>
-    <span class="topline__item">{icon('clock')} {esc(hours)}</span>
+    {otkryto.topline_item()}
     <a class="topline__item topline__item--mail" href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
     <span class="topline__spacer"></span>
     <a class="topline__item" href="{D.VK_URL}" target="_blank" rel="noopener">{icon('vk')} Подпишитесь на нас</a>
@@ -103,13 +103,12 @@ def header():
 
 def mobile_menu():
     links = "".join(f'<a class="mobile-menu__link" href="{h}">{esc(n)} {icon("arrow-up-right")}</a>' for n, h in D.NAV)
-    hours = "<br>".join(f"{esc(d)}: {esc(h)}" for d, h in D.HOURS)
     return f"""<div class="mobile-menu" id="mobile-menu">
   <nav class="mobile-menu__nav" aria-label="Мобильное меню">{links}</nav>
   <div class="mobile-menu__meta">
     <a class="mobile-menu__phone" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a>
+    {otkryto.menu_item()}
     <span>{icon('pin')} {esc(D.ADDRESS_SHORT)}</span>
-    <span>{icon('clock')} <span>{hours}</span></span>
     <a href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
     <a href="{D.VK_URL}" target="_blank" rel="noopener">{icon('vk')} Мы ВКонтакте</a>
     <button type="button" data-modal="login">{icon('user')} Вход в личный кабинет</button>

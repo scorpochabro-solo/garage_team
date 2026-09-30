@@ -3,7 +3,7 @@
 import json
 
 from . import data as D
-from . import schema
+from . import otkryto, schema
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 from .pribory import pribory_section
@@ -232,8 +232,6 @@ def team():
 def contacts_strip():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
-    route = f"https://yandex.ru/maps/?rtext=~{lat}%2C{lon}"
-    hours = "<br>".join(f"{esc(d)}: {esc(h)}" for d, h in D.HOURS)
     return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
   <div class="wrap contacts">
     <div class="reveal">
@@ -242,14 +240,15 @@ def contacts_strip():
       <ul class="contacts__list">
         <li class="contacts__item">{icon('pin')}<div><b>{esc(D.ADDRESS_FULL)}</b><span>Автосервис и магазин запчастей</span></div></li>
         <li class="contacts__item">{icon('phone')}<div><a class="big" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a><span>Звоните по телефонам горячей линии</span></div></li>
-        <li class="contacts__item">{icon('clock')}<div><b>Часы работы</b><span>{hours}</span></div></li>
+        <li class="contacts__item">{icon('clock')}{otkryto.schedule(D.HOURS, title="Часы работы")}</li>
         <li class="contacts__item">{icon('mail')}<div><a class="big" href="mailto:{D.EMAIL}" style="font-size:1.2rem">{D.EMAIL}</a><span>Ответим в рабочие часы</span></div></li>
       </ul>
-      <div class="row" style="margin-top:2rem"><a class="btn btn--primary" href="{route}" target="_blank" rel="noopener">{icon('pin')} Схема проезда</a><a class="btn btn--ghost is-on-dark" href="/contacts/">Страница контактов {icon('arrow')}</a></div>
+      {otkryto.actions()}
+      <a class="link-arrow link-arrow--inline oc-go__more" href="/contacts/">Страница контактов {icon('arrow')}</a>
     </div>
     <div class="map reveal">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a class="map__label" href="{route}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
+      <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
     </div>
   </div>
 </section>"""
