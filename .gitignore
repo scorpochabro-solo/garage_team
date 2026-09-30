@@ -9,3 +9,8 @@ _plans/
 .env
 tools/.kie_tasks.json
 seo/collect.log
+
+# local previews of variants and perks (tools/preview_variants.py)
+_preview/
+# worktrees of Claude Code agents
+.claude/worktrees/
