@@ -19,7 +19,9 @@
 <link rel="apple-touch-icon" href="/garage_team/v/base/assets/logo/apple-touch-icon.png">
 <link rel="preload" href="/garage_team/v/base/assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/garage_team/v/base/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/garage_team/v/base/assets/css/site.css?v=8d44d26e6b">
+<link rel="preload" href="/garage_team/v/base/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/garage_team/v/base/assets/fonts/unbounded-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/garage_team/v/base/assets/css/site.css?v=242d447d35">
 
 <meta name="robots" content="noindex, nofollow"><style>.vbadge{position:fixed;left:12px;bottom:12px;z-index:250;display:inline-flex;align-items:center;gap:.5em;padding:.55em .9em;border:1px solid rgba(255,255,255,.18);background:rgba(9,10,9,.88);color:#f3f4f4;font:500 12px/1.2 "JetBrains Mono",ui-monospace,Menlo,monospace;letter-spacing:.04em;text-decoration:none;border-radius:4px}.vbadge b{color:#1fc463;font-weight:500}.vbadge:hover{border-color:#1fc463}@media (max-width:640px){.vbadge{bottom:calc(80px + env(safe-area-inset-bottom));left:8px;font-size:11px;padding:.45em .7em}.vbadge__all{display:none}}.is-menu-open .vbadge{display:none}</style></head>
 <body class="page-contacts">
@@ -28,7 +30,7 @@
 <div class="topline">
   <div class="wrap topline__in">
     <span class="topline__item"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Н. Новгород, ул. Красная слобода, 9</span>
-    <span class="topline__item"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg> Пн–Пт 9:00–19:00 · Сб 9:00–17:00</span>
+    <a class="topline__item oc" href="/garage_team/v/base/contacts/#hours" data-oc="{&quot;week&quot;:[[540,1140],[540,1140],[540,1140],[540,1140],[540,1140],[540,1020],null]}" data-oc-brief><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><i class="oc__dot" aria-hidden="true"></i><span class="oc__text">Пн–Пт 9:00–19:00 · Сб 9:00–17:00</span><span class="sr-only">, часы работы</span></a>
     <a class="topline__item topline__item--mail" href="mailto:info@garage.team"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg> info@garage.team</a>
     <span class="topline__spacer"></span>
     <a class="topline__item" href="https://vk.com/garagebest" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg> Подпишитесь на нас</a>
@@ -52,8 +54,8 @@
   <nav class="mobile-menu__nav" aria-label="Мобильное меню"><a class="mobile-menu__link" href="/garage_team/v/base/services.html">Услуги <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/base/avtozapchasti/">Автозапчасти <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/base/oplata.html">Оплата <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/base/about/">О компании <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/base/contacts/">Контакты <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a></nav>
   <div class="mobile-menu__meta">
     <a class="mobile-menu__phone" href="tel:+78314161677">(831) 416-16-77</a>
+    <div class="oc oc-menu" data-oc="{&quot;week&quot;:[[540,1140],[540,1140],[540,1140],[540,1140],[540,1140],[540,1020],null]}"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><i class="oc__dot" aria-hidden="true"></i><p><b class="oc__text" hidden></b><span>Понедельник – пятница: 9:00 – 19:00<br>Суббота: 9:00 – 17:00</span></p></div>
     <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Н. Новгород, ул. Красная слобода, 9</span>
-    <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg> <span>Понедельник – пятница: 9:00 – 19:00<br>Суббота: 9:00 – 17:00</span></span>
     <a href="mailto:info@garage.team"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg> info@garage.team</a>
     <a href="https://vk.com/garagebest" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg> Мы ВКонтакте</a>
     <button type="button" data-modal="login"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-user"/></svg> Вход в личный кабинет</button>
@@ -86,17 +88,36 @@
       <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg><div><b>E-mail</b><a href="mailto:info@garage.team">info@garage.team</a></div></li>
       <li><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg><div><b>Мы в соцсетях</b><a href="https://vk.com/garagebest" target="_blank" rel="noopener">vk.com/garagebest</a></div></li>
     </ul>
-    <div class="reveal">
+    <div class="reveal"><div class="oc-go oc-go--row" role="group" aria-labelledby="oc-go-title">
+  <p class="oc-go__title" id="oc-go-title">Как добраться</p>
+  <div class="oc-go__grid">
+    <a class="oc-go__btn oc-go__btn--main" href="https://yandex.ru/maps/?rtext=~56.328949%2C44.027199&amp;rtt=auto" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 3.5 3.8 10.4l7.1 2.7 2.7 7.1z"/></g></svg><span class="oc-go__label">Маршрут</span><span class="oc-go__tag">Яндекс Карты</span></a>
+    <button class="oc-go__btn" type="button" data-oc-copy="603155, г. Нижний Новгород, ул. Красная слобода, 9" data-oc-toast="Адрес скопирован" hidden><svg class="ic oc-go__ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="1.5"/><path d="M15.5 8.5V5A1.5 1.5 0 0 0 14 3.5H5A1.5 1.5 0 0 0 3.5 5v9A1.5 1.5 0 0 0 5 15.5h3.5"/></g></svg><svg class="ic oc-go__ok" aria-hidden="true" focusable="false"><use href="#i-check"/></svg><span class="oc-go__label">Скопировать адрес</span></button>
+    <button class="oc-go__btn" type="button" data-oc-vcard="[&quot;BEGIN:VCARD&quot;,&quot;VERSION:3.0&quot;,&quot;N:;;;;&quot;,&quot;FN:Автосервис «Гараж»&quot;,&quot;ORG:Гараж&quot;,&quot;X-ABShowAs:COMPANY&quot;,&quot;TEL;TYPE=WORK,VOICE:+78314161677&quot;,&quot;EMAIL;TYPE=INTERNET,WORK:info@garage.team&quot;,&quot;ADR;TYPE=WORK:;;ул. Красная слобода\\, 9;Нижний Нов&quot;,&quot; город;;603155;Россия&quot;,&quot;URL:https://garage.team&quot;,&quot;GEO:56.328949;44.027199&quot;,&quot;NOTE:Автосервис: пн–пт 9:00–19:00\\, сб 9:00–17:00\\nМ&quot;,&quot; агазин запчастей: пн–пт 10:00–19:00\\, сб 10:00–&quot;,&quot; 17:00\\, вс по предварительной записи&quot;,&quot;END:VCARD&quot;]" data-oc-file="garage.vcf" data-oc-toast="Откройте файл garage.vcf, чтобы добавить «Гараж» в контакты" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="4"/><path d="M2.5 20.5a7 7 0 0 1 14 0"/><path d="M19.5 8v6M16.5 11h6"/></g></svg><span class="oc-go__label">Сохранить в&nbsp;контакты</span><span class="oc-go__tag" aria-hidden="true">.vcf</span></button>
+  </div>
+</div></div>
+    <div class="reveal" id="hours">
       <div class="block-title"><span class="tag-num">// часы</span><h2 class="h3">Часы работы автосервиса</h2></div>
-      <ul class="hours"><li><span>Понедельник – пятница</span><span>9:00 – 19:00</span></li><li><span>Суббота</span><span>9:00 – 17:00</span></li></ul>
+      <div class="oc-sched oc-sched--big" data-oc="{&quot;week&quot;:[[540,1140],[540,1140],[540,1140],[540,1140],[540,1140],[540,1020],null]}"><p class="oc oc-now" hidden><i class="oc__dot" aria-hidden="true"></i><span class="oc__text"></span></p><ol class="oc-week" aria-label="Часы работы по дням недели"><li class="oc-week__day" data-day="0"><span class="oc-week__d" aria-hidden="true">Пн</span><span class="oc-week__t" aria-hidden="true">9–19</span><span class="sr-only">понедельник: с 9:00 до 19:00</span></li><li class="oc-week__day" data-day="1"><span class="oc-week__d" aria-hidden="true">Вт</span><span class="oc-week__t" aria-hidden="true">9–19</span><span class="sr-only">вторник: с 9:00 до 19:00</span></li><li class="oc-week__day" data-day="2"><span class="oc-week__d" aria-hidden="true">Ср</span><span class="oc-week__t" aria-hidden="true">9–19</span><span class="sr-only">среда: с 9:00 до 19:00</span></li><li class="oc-week__day" data-day="3"><span class="oc-week__d" aria-hidden="true">Чт</span><span class="oc-week__t" aria-hidden="true">9–19</span><span class="sr-only">четверг: с 9:00 до 19:00</span></li><li class="oc-week__day" data-day="4"><span class="oc-week__d" aria-hidden="true">Пт</span><span class="oc-week__t" aria-hidden="true">9–19</span><span class="sr-only">пятница: с 9:00 до 19:00</span></li><li class="oc-week__day" data-day="5"><span class="oc-week__d" aria-hidden="true">Сб</span><span class="oc-week__t" aria-hidden="true">9–17</span><span class="sr-only">суббота: с 9:00 до 17:00</span></li><li class="oc-week__day is-off" data-day="6"><span class="oc-week__d" aria-hidden="true">Вс</span><span class="oc-week__t" aria-hidden="true">—</span><span class="sr-only">воскресенье: закрыто</span></li></ol><p class="oc-note">В праздничные дни график может отличаться — уточняйте по телефону.</p></div>
     </div>
     <div class="reveal">
       <div class="block-title"><span class="tag-num">// магазин</span><h2 class="h3">Магазин запчастей</h2></div>
-      <ul class="hours"><li><span>Понедельник – пятница</span><span>10:00 – 19:00</span></li><li><span>Суббота</span><span>10:00 – 17:00</span></li><li><span>Воскресенье</span><span>по предварительной записи</span></li></ul>
+      <div class="oc-sched oc-sched--big" data-oc="{&quot;week&quot;:[[600,1140],[600,1140],[600,1140],[600,1140],[600,1140],[600,1020],{&quot;note&quot;:&quot;по предварительной записи&quot;}]}"><p class="oc oc-now" hidden><i class="oc__dot" aria-hidden="true"></i><span class="oc__text"></span></p><ol class="oc-week" aria-label="Часы работы магазина по дням недели"><li class="oc-week__day" data-day="0"><span class="oc-week__d" aria-hidden="true">Пн</span><span class="oc-week__t" aria-hidden="true">10–19</span><span class="sr-only">понедельник: с 10:00 до 19:00</span></li><li class="oc-week__day" data-day="1"><span class="oc-week__d" aria-hidden="true">Вт</span><span class="oc-week__t" aria-hidden="true">10–19</span><span class="sr-only">вторник: с 10:00 до 19:00</span></li><li class="oc-week__day" data-day="2"><span class="oc-week__d" aria-hidden="true">Ср</span><span class="oc-week__t" aria-hidden="true">10–19</span><span class="sr-only">среда: с 10:00 до 19:00</span></li><li class="oc-week__day" data-day="3"><span class="oc-week__d" aria-hidden="true">Чт</span><span class="oc-week__t" aria-hidden="true">10–19</span><span class="sr-only">четверг: с 10:00 до 19:00</span></li><li class="oc-week__day" data-day="4"><span class="oc-week__d" aria-hidden="true">Пт</span><span class="oc-week__t" aria-hidden="true">10–19</span><span class="sr-only">пятница: с 10:00 до 19:00</span></li><li class="oc-week__day" data-day="5"><span class="oc-week__d" aria-hidden="true">Сб</span><span class="oc-week__t" aria-hidden="true">10–17</span><span class="sr-only">суббота: с 10:00 до 17:00</span></li><li class="oc-week__day is-note" data-day="6"><span class="oc-week__d" aria-hidden="true">Вс</span><span class="oc-week__t" aria-hidden="true">по записи</span><span class="sr-only">воскресенье: по предварительной записи</span></li></ol></div>
     </div>
-    <div class="map reveal" style="min-height:440px">
-      <iframe src="https://yandex.ru/map-widget/v1/?ll=44.027199%2C56.328949&z=16&pt=44.027199%2C56.328949%2Cpm2gnm&text=Нижний Новгород, улица Красная Слобода, 9" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a class="map__label" href="https://yandex.ru/maps/?rtext=~56.328949%2C44.027199" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Схема проезда — построить маршрут</a>
+    <div class="find">
+      <figure class="arch arch--door reveal" style="--d:120ms">
+      <div class="arch__opening">
+        <span class="arch__wall" aria-hidden="true"><svg class="arch__ring" viewBox="-122 -122 244 122" aria-hidden="true" focusable="false"><path d="M-120 0A120 120 0 0 1 120 0M-106 0A106 106 0 0 1 106 0M-105.16 -13.29L-119.05 -15.04M-102.67 -26.36L-116.23 -29.84M-98.56 -39.02L-111.57 -44.17M-92.89 -51.07L-105.16 -57.81M-85.76 -62.31L-97.08 -70.53M-77.27 -72.56L-87.48 -82.15M-67.57 -81.67L-76.49 -92.46M-56.80 -89.50L-64.30 -101.32M-45.13 -95.91L-51.09 -108.58M-32.76 -100.81L-37.08 -114.13M-19.86 -104.12L-22.49 -117.87M-6.66 -105.79L-7.53 -119.76M6.66 -105.79L7.53 -119.76M19.86 -104.12L22.49 -117.87M32.76 -100.81L37.08 -114.13M45.13 -95.91L51.09 -108.58M56.80 -89.50L64.30 -101.32M67.57 -81.67L76.49 -92.46M77.27 -72.56L87.48 -82.15M85.76 -62.31L97.08 -70.53M92.89 -51.07L105.16 -57.81M98.56 -39.02L111.57 -44.17M102.67 -26.36L116.23 -29.84M105.16 -13.29L119.05 -15.04"/></svg></span>
+        <div class="arch__win">
+          <picture><source media="(max-width: 900px)" srcset="/garage_team/v/base/assets/img/real/arch/facade.webp"><img class="arch__img" src="/garage_team/v/base/assets/img/real/arch/facade-tall.webp" alt="Фасад автосервиса Гараж: кирпичное здание, чёрный портал ворот и вывеска Garage Team над ними" width="560" height="1005" loading="lazy" decoding="async"></picture>
+        </div>
+      </div>
+      <figcaption class="arch__cap"><span class="arch__n">Ориентир</span><span>Кирпичное здание, ворота в чёрном портале, над ними вывеска GARAGE TEAM</span></figcaption>
+    </figure>
+      <div class="map reveal">
+        <iframe src="https://yandex.ru/map-widget/v1/?ll=44.027199%2C56.328949&z=16&pt=44.027199%2C56.328949%2Cpm2gnm&text=Нижний Новгород, улица Красная Слобода, 9" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a class="map__label" href="https://yandex.ru/maps/?rtext=~56.328949%2C44.027199&amp;rtt=auto" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Схема проезда — построить маршрут</a>
+      </div>
     </div>
   </div>
   <aside class="page-grid__side"><div class="contact-card">
@@ -288,6 +309,6 @@
   <button class="lightbox__btn lightbox__btn--next" type="button" data-next aria-label="Следующее фото"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg></button>
   <button class="lightbox__close" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
 </dialog>
-<script src="/garage_team/v/base/assets/js/site.js?v=154d6ca6c1" defer></script>
+<script src="/garage_team/v/base/assets/js/site.js?v=4165cde9d5" defer></script>
 <a class="vbadge" href="/garage_team/v/">← <span class="vbadge__all">все варианты · </span><b>Как сейчас</b></a></body>
 </html>

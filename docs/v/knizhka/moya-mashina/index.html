@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru" data-base="/garage_team/v/knizhka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сервисная книжка автомобиля в браузере — «Моя машина» | Гараж</title>
+<meta name="description" content="Сервисная книжка в браузере: паспорт машины, журнал работ и расчёт, сколько осталось до ТО по вашему интервалу. Данные хранятся только в вашем браузере.">
+
+<link rel="canonical" href="https://garage.team/moya-mashina/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Сервисная книжка автомобиля в браузере — «Моя машина» | Гараж">
+<meta property="og:description" content="Сервисная книжка в браузере: паспорт машины, журнал работ и расчёт, сколько осталось до ТО по вашему интервалу. Данные хранятся только в вашем браузере.">
+<meta property="og:url" content="https://garage.team/moya-mashina/">
+<meta property="og:image" content="https://garage.team/assets/img/misc/advantages-bg.webp">
+<meta property="og:locale" content="ru_RU">
+<meta name="theme-color" content="#0c0d0c">
+<link rel="icon" href="/garage_team/v/knizhka/favicon.ico" sizes="any">
+<link rel="icon" href="/garage_team/v/knizhka/assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/garage_team/v/knizhka/assets/logo/apple-touch-icon.png">
+<link rel="preload" href="/garage_team/v/knizhka/assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/garage_team/v/knizhka/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/garage_team/v/knizhka/assets/css/site.css?v=68b6a661cb">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Главная", "item": "https://garage.team/"}, {"@type": "ListItem", "position": 2, "name": "Моя машина", "item": "https://garage.team/moya-mashina/"}]}</script>
+<meta name="robots" content="noindex, nofollow"><style>.vbadge{position:fixed;left:12px;bottom:12px;z-index:250;display:inline-flex;align-items:center;gap:.5em;padding:.55em .9em;border:1px solid rgba(255,255,255,.18);background:rgba(9,10,9,.88);color:#f3f4f4;font:500 12px/1.2 "JetBrains Mono",ui-monospace,Menlo,monospace;letter-spacing:.04em;text-decoration:none;border-radius:4px}.vbadge b{color:#1fc463;font-weight:500}.vbadge:hover{border-color:#1fc463}@media (max-width:640px){.vbadge{bottom:calc(80px + env(safe-area-inset-bottom));left:8px;font-size:11px;padding:.45em .7em}.vbadge__all{display:none}}.is-menu-open .vbadge{display:none}</style></head>
+<body class="page-knizhka">
+<svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="i-diag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5"/><path d="M2 20h20"/><path d="M6.5 11h2l1.5-3 2 6 1.5-3h4"/></g></symbol><symbol id="i-engine" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h2.5l1.5-2h6l1.5 2H20v7h-2.5l-1 2H8l-1.5-2H4z"/><path d="M9 8V5h4v3"/><path d="M4 13H2v2h2"/><path d="M20 12h2"/></g></symbol><symbol id="i-suspension" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2"/><path d="M8 5h8"/><path d="M8 7l8 2-8 2 8 2-8 2 8 2"/><path d="M8 19h8"/><path d="M12 19v2"/></g></symbol><symbol id="i-chip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/><rect x="10" y="10" width="4" height="4"/><path d="M9 4v3M12 4v3M15 4v3M9 17v3M12 17v3M15 17v3M4 9h3M4 12h3M4 15h3M17 9h3M17 12h3M17 15h3"/></g></symbol><symbol id="i-brake" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2"/><path d="M17 5.5a8.5 8.5 0 0 1 2.9 3.9" stroke-width="3"/></g></symbol><symbol id="i-cooling" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="1"/><path d="M6 6v12M9 6v12M12 6v12"/><path d="M19 8v8"/><path d="M17 12h5"/><path d="M20.5 9.5 22 8M20.5 14.5 22 16"/></g></symbol><symbol id="i-electric" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></g></symbol><symbol id="i-ac" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/><path d="M12 2l-2 2M12 2l2 2M12 22l-2-2M12 22l2-2M2 12l2-2M2 12l2 2M22 12l-2-2M22 12l-2 2"/></g></symbol><symbol id="i-injector" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h14"/><rect x="8" y="6" width="3" height="4"/><path d="M15 9h2l2 2v7a1.5 1.5 0 0 0 3 0v-6l-2-2"/></g></symbol><symbol id="i-diesel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><path d="M10 12v6M10 12h2.5a3 3 0 0 1 0 6H10"/></g></symbol><symbol id="i-exhaust" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="13" height="7" rx="3.5"/><path d="M16 12.5h3l2-2"/><path d="M19 12.5l2 2"/><path d="M6 12.5h7"/><path d="M8 5v2M11 4v3"/></g></symbol><symbol id="i-clutch" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="7"/><circle cx="15" cy="12" r="7"/><circle cx="12" cy="12" r="1.5"/></g></symbol><symbol id="i-mkpp" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M12 5v14M18 5v14M6 12h12"/><circle cx="6" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></g></symbol><symbol id="i-akpp" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.2 1.3 2.6-.2 1.2 2.3 2.3 1.2-.2 2.6L21.5 12l-1.4 2.2.2 2.6-2.3 1.2-1.2 2.3-2.6-.2L12 21.5l-2.2-1.4-2.6.2-1.2-2.3-2.3-1.2.2-2.6L2.5 12l1.4-2.2-.2-2.6 2.3-1.2 1.2-2.3 2.6.2z"/><circle cx="12" cy="12" r="3.5"/></g></symbol><symbol id="i-paint" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="6" rx="1.5"/><path d="M16 7h3a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-8v2"/><rect x="9.5" y="14" width="3" height="7" rx="1"/></g></symbol><symbol id="i-equipment" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--bg,#0a0a0a)"/><circle cx="15" cy="12" r="2" fill="var(--bg,#0a0a0a)"/><circle cx="8" cy="17" r="2" fill="var(--bg,#0a0a0a)"/></g></symbol><symbol id="i-polish" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.6 4.2 4.8 8.4 9 9-4.2.6-8.4 4.8-9 9-.6-4.2-4.8-8.4-9-9 4.2-.6 8.4-4.8 9-9z"/><path d="M5 3l.5 1.5L7 5l-1.5.5L5 7l-.5-1.5L3 5l1.5-.5z"/></g></symbol><symbol id="i-body" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14l1.5-4.5A2 2 0 0 1 6.4 8h9.2l3.6 4H21a1 1 0 0 1 1 1v3h-2"/><path d="M3 14v2h2"/><circle cx="7.5" cy="16.5" r="2"/><circle cx="17.5" cy="16.5" r="2"/><path d="M9.5 16.5h6"/><path d="M11 8v4h5"/></g></symbol><symbol id="i-inspection" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="1.5"/><path d="M9 4V2.5h6V4"/><path d="M8.5 13l2.5 2.5 4.5-5"/></g></symbol><symbol id="i-plastidip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><circle cx="9.5" cy="14" r="1"/><circle cx="13.5" cy="16.5" r="1.3"/><circle cx="13" cy="11.5" r=".8"/></g></symbol><symbol id="i-alignment" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="4" height="10" rx="1.5"/><rect x="17" y="7" width="4" height="10" rx="1.5"/><path d="M7 12h10"/><path d="M12 9v6"/><path d="M9.5 10.5 12 9l2.5 1.5M9.5 13.5 12 15l2.5-1.5"/></g></symbol><symbol id="i-clean" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6l1-9H8z"/><path d="M10 12V7a2 2 0 0 1 2-2h4"/><path d="M16 3v4"/><circle cx="19" cy="9" r="1.2"/><circle cx="20" cy="13.5" r=".9"/><circle cx="16.5" cy="9.5" r=".7"/></g></symbol><symbol id="i-turbo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="13" r="7"/><circle cx="11" cy="13" r="2.5"/><path d="M11 6a7 7 0 0 1 7 7h4"/><path d="M4 13a7 7 0 0 0 7 7"/></g></symbol><symbol id="i-tnvd" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="12" height="10" rx="1.5"/><path d="M9 8V4h6v4"/><path d="M12 11v4M10 13h4"/><path d="M6 13H3M21 13h-3"/><path d="M12 18v3"/></g></symbol><symbol id="i-tire" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></g></symbol><symbol id="i-parts" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-4 9 4-9 4z"/><path d="M3 8v9l9 4 9-4V8"/><path d="M12 12v9"/><path d="M7.5 6l9 4"/></g></symbol><symbol id="i-maintenance" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a3.5 3.5 0 0 0 4 4l2.5 2.5-3 3-2.5-2.5a3.5 3.5 0 0 0-4-4L4 3l3-3"/><path d="M14 11l-9.5 9.5a1.4 1.4 0 0 1-2-2L12 9"/></g></symbol><symbol id="i-oil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-5.5 6-5.5 10a5.5 5.5 0 0 0 11 0C17.5 9 12 3 12 3z"/><path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5"/></g></symbol><symbol id="i-storage" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v4c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 10v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4"/><path d="M4 14v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4"/></g></symbol><symbol id="i-headlight" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6a6 6 0 0 0 0 12h2c1.5 0 2-1 2-2V8c0-1-.5-2-2-2z"/><path d="M15 8h5M15 11h6M15 14h6M15 17h5"/></g></symbol><symbol id="i-steering" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M3.2 11c3-1.3 5.5-1.6 8.8-1.6s5.8.3 8.8 1.6"/><path d="M12 14.5V21M9.8 13.3 5 18M14.2 13.3 19 18"/></g></symbol><symbol id="i-glass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16L6.5 7h11L20 16z"/><path d="M2 16h20"/><path d="M8 12.5l5-3"/><path d="M6 20l4-3"/></g></symbol><symbol id="i-vinyl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="10" rx="1"/><path d="M16 9h2.5a2.5 2.5 0 0 1 0 5H16"/><path d="M3 11h13M3 14h13" stroke-dasharray="1.5 2"/></g></symbol><symbol id="i-climate" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.5V5a2 2 0 1 1 4 0v9.5a3.5 3.5 0 1 1-4 0z"/><path d="M12 9v6"/><path d="M18 5h3M18 8h3"/></g></symbol><symbol id="i-spray" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h8l2-3h2l1 2v6l-1 2h-2l-2-3H4z"/><path d="M4 9v4"/><path d="M8 13v6a1 1 0 0 0 2 0v-6"/><path d="M19 6h2M19 9h3M19 12h2"/></g></symbol><symbol id="i-phone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></g></symbol><symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></g></symbol><symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></g></symbol><symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol><symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></g></symbol><symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.5 11h11L21 7H7"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></g></symbol><symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></g></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></g></symbol><symbol id="i-arrow-up-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></g></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M11 5l-7 7 7 7"/></g></symbol><symbol id="i-close" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></g></symbol><symbol id="i-menu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></g></symbol><symbol id="i-zoom" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21M8 11h6M11 8v6"/></g></symbol><symbol id="i-chevron" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></g></symbol><symbol id="i-chevron-left" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></g></symbol><symbol id="i-chevron-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></g></symbol><symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></g></symbol><symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></symbol><symbol id="i-quote" viewBox="0 0 24 24"><path fill="currentColor" d="M6.5 5C4 5 2 7.2 2 10.2c0 2.6 1.8 4.6 4.3 4.6.3 0 .6 0 .9-.1-.6 1.9-2 3.4-4 4.1l.9 1.7C8.3 19 11 15.3 11 10.7 11 7.4 9.1 5 6.5 5zm11 0C15 5 13 7.2 13 10.2c0 2.6 1.8 4.6 4.3 4.6.3 0 .6 0 .9-.1-.6 1.9-2 3.4-4 4.1l.9 1.7C19.3 19 22 15.3 22 10.7 22 7.4 20.1 5 17.5 5z"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></g></symbol><symbol id="i-minus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></g></symbol><symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></g></symbol><symbol id="i-external" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></g></symbol><symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></g></symbol><symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></g></symbol><symbol id="i-hazard" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17v.5"/></g></symbol><symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol><symbol id="i-ruble" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20V4h5.5a4 4 0 0 1 0 8H6"/><path d="M6 16h7"/></g></symbol><symbol id="i-vk" viewBox="0 0 24 24"><path fill="currentColor" d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.67 2 15.07 2zm3.08 14.27h-1.46c-.55 0-.72-.44-1.71-1.43-.87-.83-1.24-.94-1.46-.94-.3 0-.38.08-.38.49v1.31c0 .35-.11.56-1.04.56-1.53 0-3.23-.93-4.42-2.65-1.8-2.52-2.29-4.42-2.29-4.81 0-.21.08-.41.49-.41h1.46c.37 0 .51.17.65.56.72 2.09 1.93 3.92 2.42 3.92.19 0 .27-.08.27-.55V9.87c-.06-1-.58-1.08-.58-1.43 0-.17.14-.34.36-.34h2.29c.31 0 .42.17.42.53v2.94c0 .31.14.42.23.42.19 0 .34-.11.68-.45 1.05-1.18 1.8-2.99 1.8-2.99.1-.21.27-.41.63-.41h1.46c.44 0 .53.23.44.53-.18.85-1.97 3.37-1.97 3.37-.15.25-.21.36 0 .64.15.21.65.64.98 1.03.61.69 1.07 1.27 1.2 1.67.13.4-.08.6-.48.6z"/></symbol><symbol id="i-facebook" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.3H7.4V14h2.8v8z"/></symbol><symbol id="i-instagram" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></g></symbol><symbol id="i-logo-mark" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9l-10 6L2 15V6a2 2 0 0 1 2-2z"/></symbol></svg>
+<a class="sr-only" href="#main">Перейти к содержимому</a>
+<div class="topline">
+  <div class="wrap topline__in">
+    <span class="topline__item"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Н. Новгород, ул. Красная слобода, 9</span>
+    <a class="topline__item oc" href="/garage_team/v/knizhka/contacts/#hours" data-oc="{&quot;week&quot;:[[540,1140],[540,1140],[540,1140],[540,1140],[540,1140],[540,1020],null]}" data-oc-brief><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><i class="oc__dot" aria-hidden="true"></i><span class="oc__text">Пн–Пт 9:00–19:00 · Сб 9:00–17:00</span><span class="sr-only">, часы работы</span></a>
+    <a class="topline__item topline__item--mail" href="mailto:info@garage.team"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg> info@garage.team</a>
+    <span class="topline__spacer"></span>
+    <a class="topline__item" href="https://vk.com/garagebest" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg> Подпишитесь на нас</a>
+    <button class="topline__item" type="button" data-modal="login"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-user"/></svg> Вход в личный кабинет</button>
+    <a class="topline__item" href="/garage_team/v/knizhka/avtozapchasti/" id="cart-link" data-count="0" title="Корзина запчастей"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-cart"/></svg> Корзина</a>
+  </div>
+</div>
+<header class="site-header" data-header>
+  <div class="wrap site-header__in">
+    <a class="logo" href="/garage_team/v/knizhka/" aria-label="Гараж — на главную"><img src="/garage_team/v/knizhka/assets/logo/logo.svg" width="133" height="48" alt="Garage Team — автосервис «Гараж» в Нижнем Новгороде"></a>
+    <nav class="nav" aria-label="Основное меню"><a class="nav__link" href="/garage_team/v/knizhka/services.html">Услуги</a><a class="nav__link" href="/garage_team/v/knizhka/avtozapchasti/">Автозапчасти</a><a class="nav__link" href="/garage_team/v/knizhka/oplata.html">Оплата</a><a class="nav__link" href="/garage_team/v/knizhka/about/">О компании</a><a class="nav__link" href="/garage_team/v/knizhka/contacts/">Контакты</a></nav>
+    <div class="site-header__actions">
+      <a class="site-header__phone" href="tel:+78314161677"><span class="mono">(831)</span> 416-16-77</a>
+      <button class="btn btn--ghost btn--sm is-on-dark" type="button" data-modal="call"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Заказать звонок</button>
+      <a class="btn btn--primary btn--sm" href="/garage_team/v/knizhka/call/request/"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Оставить заявку</a>
+      <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu"><svg class="ic ic--menu" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg><svg class="ic ic--close" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+  <nav class="mobile-menu__nav" aria-label="Мобильное меню"><a class="mobile-menu__link" href="/garage_team/v/knizhka/services.html">Услуги <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/knizhka/avtozapchasti/">Автозапчасти <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/knizhka/oplata.html">Оплата <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/knizhka/about/">О компании <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a><a class="mobile-menu__link" href="/garage_team/v/knizhka/contacts/">Контакты <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a></nav>
+  <div class="mobile-menu__meta">
+    <a class="mobile-menu__phone" href="tel:+78314161677">(831) 416-16-77</a>
+    <div class="oc oc-menu" data-oc="{&quot;week&quot;:[[540,1140],[540,1140],[540,1140],[540,1140],[540,1140],[540,1020],null]}"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><i class="oc__dot" aria-hidden="true"></i><p><b class="oc__text" hidden></b><span>Понедельник – пятница: 9:00 – 19:00<br>Суббота: 9:00 – 17:00</span></p></div>
+    <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg> Н. Новгород, ул. Красная слобода, 9</span>
+    <a href="mailto:info@garage.team"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg> info@garage.team</a>
+    <a href="https://vk.com/garagebest" target="_blank" rel="noopener"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg> Мы ВКонтакте</a>
+    <button type="button" data-modal="login"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-user"/></svg> Вход в личный кабинет</button>
+    <a href="/garage_team/v/knizhka/avtozapchasti/"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-cart"/></svg> Корзина</a>
+  </div>
+  <div class="mobile-menu__cta">
+    <a class="btn btn--primary" href="/garage_team/v/knizhka/call/request/"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Оставить заявку</a>
+    <button class="btn btn--ghost is-on-dark" type="button" data-modal="call"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Заказать звонок</button>
+  </div>
+</div>
+<main id="main">
+<section class="page-hero">
+  <div class="page-hero__mark" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-inspection"/></svg></div>
+  <div class="wrap page-hero__in">
+    <div>
+      <nav aria-label="Хлебные крошки"><ol class="crumbs"><li><a href="/garage_team/v/knizhka/">Главная</a></li><li><span aria-current="page">Моя машина</span></li></ol></nav>
+      <p class="eyebrow">Без регистрации и приложений</p>
+      <h1 class="h1 page-hero__title">Моя машина <span class="kn-h1-sub">сервисная книжка в браузере</span></h1>
+      <p class="lead page-hero__lead">Записывайте, что и когда делали с машиной, и смотрите, сколько осталось до следующего ТО. Всё хранится только в этом браузере.</p>
+    </div>
+    <div class="page-hero__aside"><button class="btn btn--primary" type="button" data-modal="call"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Заказать звонок</button>
+    <a class="page-hero__phone" href="tel:+78314161677"><b>(831) 416-16-77</b><span>или позвоните нам</span></a></div>
+  </div>
+</section>
+<section class="kn-sec">
+  <svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="kn-i-pencil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5l4 4L9 19H5v-4zM13 7l4 4"/></g></symbol><symbol id="kn-i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4h5v2.5M6.5 6.5l1 13.5h9l1-13.5M10 10v6.5M14 10v6.5"/></g></symbol></svg>
+  <div class="wrap">
+    <p class="kn-privacy"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2.5"/></g></svg><span><b>Данные хранятся только в этом браузере и никуда не отправляются.</b> Мы их не видим. Чтобы не потерять записи, время от времени сохраняйте копию файлом.</span></p>
+    <noscript>
+      <div class="kn-nojs">
+        <p class="kn-nojs__title">Книжке нужен JavaScript</p>
+        <p>Он считает, сколько осталось до ТО, и хранит записи в вашем браузере. Включите JavaScript в настройках браузера — и книжка заработает. А записаться можно и так — позвоните нам:</p>
+        <a class="btn btn--primary" href="tel:+78314161677"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> (831) 416-16-77</a>
+      </div>
+    </noscript>
+    <div class="kn" data-knizhka data-state="start" data-kn-conf="{&quot;texts&quot;:{&quot;storeOff&quot;:&quot;Браузер не даёт сохранять данные — так бывает в режиме инкогнито или когда сайтам запрещено хранить данные. Книжка работает, но записи пропадут, когда вы закроете вкладку. Сохраните копию файлом.&quot;,&quot;storeFull&quot;:&quot;Не получилось сохранить: в браузере кончилось место для данных сайтов. Сохраните копию файлом.&quot;,&quot;storeBroken&quot;:&quot;Сохранённая книжка не читается. Если у вас есть копия файлом — загрузите её.&quot;,&quot;noCar&quot;:&quot;Паспорт не заполнен&quot;,&quot;noCarHint&quot;:&quot;Впишите марку и модель — они попадут в заявку и в напоминание.&quot;,&quot;none&quot;:&quot;не указан&quot;,&quot;kmAt&quot;:&quot;пробег на {date}&quot;,&quot;kmNone&quot;:&quot;пробег не указан&quot;,&quot;kmSr&quot;:&quot;Пробег {km} км на {date}&quot;,&quot;kmHintNew&quot;:&quot;Дата запишется сама — сегодняшняя.&quot;,&quot;kmHintAt&quot;:&quot;Записан {date}. Если впишете новый, дата станет сегодняшней.&quot;,&quot;errBrand&quot;:&quot;Укажите марку&quot;,&quot;errModel&quot;:&quot;Укажите модель&quot;,&quot;errYear&quot;:&quot;Год — четыре цифры, от 1900 до {max}&quot;,&quot;errKm&quot;:&quot;Пробег — целое число километров, не больше 2 000 000&quot;,&quot;errKmLess&quot;:&quot;Меньше, чем записано раньше ({km} км). Если тогда ошиблись — поправьте в паспорте.&quot;,&quot;vinLength&quot;:&quot;В VIN 17 знаков, а здесь {n}&quot;,&quot;vinIoq&quot;:&quot;В VIN не бывает букв I, O и Q — возможно, это цифры 1 и 0&quot;,&quot;vinChars&quot;:&quot;В VIN только латинские буквы и цифры&quot;,&quot;vinFixed&quot;:&quot;Русские буквы заменены на такие же латинские&quot;,&quot;carSaved&quot;:&quot;Паспорт сохранён&quot;,&quot;kmSaved&quot;:&quot;Пробег записан&quot;,&quot;errInterval&quot;:&quot;Впишите километры, месяцы или и то и другое&quot;,&quot;errIntervalKm&quot;:&quot;Километры — от 100 до 200 000&quot;,&quot;errIntervalMonths&quot;:&quot;Месяцы — от 1 до 120&quot;,&quot;intervalSaved&quot;:&quot;Интервал сохранён&quot;,&quot;rule&quot;:&quot;каждые {km} км или {months} — что наступит раньше&quot;,&quot;ruleKm&quot;:&quot;каждые {km} км&quot;,&quot;ruleMonths&quot;:&quot;каждые {months}&quot;,&quot;headOk&quot;:&quot;Примерно {date}&quot;,&quot;headSoon&quot;:&quot;Скоро: примерно {date}&quot;,&quot;headOver&quot;:&quot;Пора на ТО&quot;,&quot;headGuess&quot;:&quot;Похоже, пора на ТО&quot;,&quot;headKm&quot;:&quot;Осталось {km} км&quot;,&quot;headNoKm&quot;:&quot;Не хватает пробега&quot;,&quot;subBoth&quot;:&quot;Раньше наступит срок по {by}.&quot;,&quot;subOne&quot;:&quot;Считаем по {by}.&quot;,&quot;byKm&quot;:&quot;пробегу&quot;,&quot;byTime&quot;:&quot;времени&quot;,&quot;subOverKm&quot;:&quot;Пробег больше интервала на {km} км.&quot;,&quot;subKmReached&quot;:&quot;Пробег дошёл до интервала.&quot;,&quot;subOverTime&quot;:&quot;Срок прошёл {days} назад.&quot;,&quot;subToday&quot;:&quot;Срок — сегодня.&quot;,&quot;subNoDate&quot;:&quot;Дату посчитаем, когда станет понятен ваш средний пробег.&quot;,&quot;left&quot;:&quot;Осталось&quot;,&quot;overKm&quot;:&quot;Больше интервала на&quot;,&quot;overTime&quot;:&quot;Просрочено на&quot;,&quot;today&quot;:&quot;Сегодня&quot;,&quot;meterKm&quot;:&quot;Пройдено {used} из {all} км&quot;,&quot;meterTime&quot;:&quot;Прошло {used} из {all}&quot;,&quot;noKmInterval&quot;:&quot;Интервал по пробегу не задан.&quot;,&quot;noTimeInterval&quot;:&quot;Интервал по времени не задан.&quot;,&quot;noBaseKm&quot;:&quot;В записи о последнем ТО нет пробега — впишите его, чтобы считать по километрам.&quot;,&quot;noteRate&quot;:&quot;Дату по пробегу считаем по вашему среднему: около {km} км в день.&quot;,&quot;noteNoRate&quot;:&quot;Чтобы оценить дату по пробегу, обновляйте пробег: нужно хотя бы две недели поездок после ТО.&quot;,&quot;noteGuess&quot;:&quot;По вашему среднему пробегу срок по километрам уже подошёл. Обновите пробег — пересчитаем.&quot;,&quot;icsNoDate&quot;:&quot;Напоминание в календарь можно будет добавить, когда станет понятна дата.&quot;,&quot;icsSummary&quot;:&quot;ТО: {car}&quot;,&quot;icsSummaryNoCar&quot;:&quot;ТО по сервисной книжке&quot;,&quot;icsDesc&quot;:&quot;Примерная дата из «Моей машины» на сайте автосервиса «Гараж». Интервал: {rule}. Последнее ТО: {last}. Записаться: {phone}.&quot;,&quot;icsAlarm&quot;:&quot;Завтра ТО: {car}&quot;,&quot;icsFile&quot;:&quot;napominanie-to.ics&quot;,&quot;icsDone&quot;:&quot;Откройте файл {file}, чтобы добавить напоминание в календарь&quot;,&quot;entryNew&quot;:&quot;Новая запись&quot;,&quot;entryEdit&quot;:&quot;Изменить запись&quot;,&quot;errDate&quot;:&quot;Укажите дату&quot;,&quot;errFuture&quot;:&quot;Дата не может быть позже сегодняшней&quot;,&quot;errWhat&quot;:&quot;Отметьте работу или опишите, что сделано&quot;,&quot;errFull&quot;:&quot;В журнале уже 2000 записей — больше не поместится&quot;,&quot;added&quot;:&quot;Запись добавлена&quot;,&quot;addedKm&quot;:&quot;Запись добавлена, пробег в паспорте обновлён&quot;,&quot;saved&quot;:&quot;Запись сохранена&quot;,&quot;deleted&quot;:&quot;Запись удалена&quot;,&quot;edit&quot;:&quot;Изменить&quot;,&quot;remove&quot;:&quot;Удалить&quot;,&quot;editAria&quot;:&quot;Изменить запись от {date}&quot;,&quot;removeAria&quot;:&quot;Удалить запись от {date}&quot;,&quot;stamp&quot;:&quot;ТО&quot;,&quot;tagsAria&quot;:&quot;Что сделано&quot;,&quot;entryKmNone&quot;:&quot;пробег не указан&quot;,&quot;delTitle&quot;:&quot;Удалить запись?&quot;,&quot;delText&quot;:&quot;Запись от {date} исчезнет из журнала. Отменить это нельзя.&quot;,&quot;delOk&quot;:&quot;Удалить&quot;,&quot;bookWorks&quot;:&quot;Хочу записаться: {works}.&quot;,&quot;bookNone&quot;:&quot;Хочу записаться в автосервис.&quot;,&quot;bookCar&quot;:&quot;Машина: {car}.&quot;,&quot;bookLast&quot;:&quot;Последнее ТО: {last}.&quot;,&quot;carKm&quot;:&quot;пробег {km} км&quot;,&quot;jsonFile&quot;:&quot;moya-mashina-{date}.json&quot;,&quot;jsonDone&quot;:&quot;Копия сохранена: {file}&quot;,&quot;importTitle&quot;:&quot;Загрузить книжку из файла?&quot;,&quot;importAsk&quot;:&quot;В файле: {what}. Объединить с книжкой в этом браузере или заменить её?&quot;,&quot;importNoCar&quot;:&quot;машина не указана&quot;,&quot;importMerge&quot;:&quot;Объединить&quot;,&quot;importReplace&quot;:&quot;Заменить&quot;,&quot;importDone&quot;:&quot;Книжка загружена: {n}&quot;,&quot;importMerged&quot;:&quot;Готово, добавлено: {n}&quot;,&quot;importNothing&quot;:&quot;Новых записей в файле нет&quot;,&quot;importSkipped&quot;:&quot;Пропущено неполных записей: {n}&quot;,&quot;import_format&quot;:&quot;Это не файл «Моей машины»&quot;,&quot;import_newer&quot;:&quot;Файл сохранён более новой версией книжки — обновите страницу и попробуйте снова&quot;,&quot;import_big&quot;:&quot;В файле слишком много записей&quot;,&quot;importBroken&quot;:&quot;Файл повреждён: это не JSON&quot;,&quot;importLarge&quot;:&quot;Файл слишком большой — это не копия книжки&quot;,&quot;importRead&quot;:&quot;Не получилось прочитать файл&quot;,&quot;wipeTitle&quot;:&quot;Удалить все данные?&quot;,&quot;wipeText&quot;:&quot;Паспорт машины, журнал и интервал ТО удалятся из этого браузера. Вернуть их можно будет только из копии файлом.&quot;,&quot;wipeOk&quot;:&quot;Удалить всё&quot;,&quot;wipeDone&quot;:&quot;Все данные удалены&quot;,&quot;cancel&quot;:&quot;Отмена&quot;,&quot;noDownload&quot;:&quot;Этот браузер не умеет сохранять файлы&quot;,&quot;printTitle&quot;:&quot;Сервисная книжка&quot;,&quot;printRule&quot;:&quot;Интервал ТО: {rule}&quot;,&quot;printNext&quot;:&quot;Следующее ТО: {text}&quot;,&quot;printLeft&quot;:&quot;осталось {what}&quot;,&quot;printLog&quot;:&quot;Журнал работ&quot;,&quot;printEmpty&quot;:&quot;Записей пока нет.&quot;,&quot;printFoot&quot;:&quot;Распечатано {date} · {url} · автосервис «Гараж», {phone}&quot;,&quot;printCols&quot;:[&quot;Дата&quot;,&quot;Пробег, км&quot;,&quot;Что сделано&quot;,&quot;Заметка&quot;,&quot;Отметка сервиса&quot;],&quot;pDays&quot;:[&quot;день&quot;,&quot;дня&quot;,&quot;дней&quot;],&quot;pMonths&quot;:[&quot;месяц&quot;,&quot;месяца&quot;,&quot;месяцев&quot;],&quot;pEntries&quot;:[&quot;запись&quot;,&quot;записи&quot;,&quot;записей&quot;]},&quot;works&quot;:[{&quot;key&quot;:&quot;to&quot;,&quot;label&quot;:&quot;ТО&quot;,&quot;phrase&quot;:&quot;ТО&quot;},{&quot;key&quot;:&quot;oil&quot;,&quot;label&quot;:&quot;Замена масла&quot;,&quot;phrase&quot;:&quot;замена масла&quot;},{&quot;key&quot;:&quot;filters&quot;,&quot;label&quot;:&quot;Фильтры&quot;,&quot;phrase&quot;:&quot;фильтры&quot;},{&quot;key&quot;:&quot;brakes&quot;,&quot;label&quot;:&quot;Тормоза&quot;,&quot;phrase&quot;:&quot;тормоза&quot;},{&quot;key&quot;:&quot;tires&quot;,&quot;label&quot;:&quot;Шины&quot;,&quot;phrase&quot;:&quot;шины&quot;},{&quot;key&quot;:&quot;diag&quot;,&quot;label&quot;:&quot;Диагностика&quot;,&quot;phrase&quot;:&quot;диагностика&quot;}],&quot;phone&quot;:&quot;(831) 416-16-77&quot;}" hidden>
+      <div class="kn-alert" data-kn-alert role="alert" hidden></div>
+      <div class="kn-start" data-kn-start>
+      <div class="kn-bay" aria-hidden="true">
+        <i class="kn-bay__cord"></i><i class="kn-bay__lamp"></i><i class="kn-bay__light"></i>
+        <p class="kn-bay__sign">Моя машина</p>
+        <div class="kn-bay__door">
+          <div class="kn-bay__inside"><svg class="kn-bay__car" viewBox="0 0 240 100" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 76 14 64Q14 55 24 52L60 47Q72 33 86 29L136 27Q150 27 160 36L172 46 206 51Q224 54 226 64V72Q226 76 220 76H200A18 18 0 0 0 164 76H76A18 18 0 0 0 40 76Z"/><path d="M68 46Q77 36 88 33L110 32V46ZM116 32 136 31Q146 31 154 38L161 46H116ZM113 49V70M60 49H172M210 57 221 59M16 59 22 58"/><circle cx="58" cy="76" r="13"/><circle cx="58" cy="76" r="5"/><circle cx="182" cy="76" r="13"/><circle cx="182" cy="76" r="5"/><path d="M4 90H236" stroke-dasharray="2 6" stroke-width="1.2"/></g></svg></div>
+          <div class="kn-bay__shutter"><span class="kn-bay__no">Бокс 01</span></div>
+        </div>
+      </div>
+      <div class="kn-start__panel">
+        <p class="eyebrow">// Бортовой журнал</p>
+        <h2 class="kn-start__title" id="kn-start-title">Заведите книжку своей машины</h2>
+        <div class="kn-start__intro" data-kn-intro>
+          <p class="kn-start__lead">Как бумажная сервисная книжка, только всегда под рукой и сама считает, когда следующее ТО.</p>
+          <ol class="kn-start__list"><li><span class="kn-start__n">01</span><span><b>Паспорт</b> — марка, модель, год, VIN и пробег</span></li><li><span class="kn-start__n">02</span><span><b>Журнал</b> — что и когда делали, с пробегом и заметками</span></li><li><span class="kn-start__n">03</span><span><b>Следующее ТО</b> — сколько осталось по интервалу из вашей книжки — и напоминание в календарь</span></li><li><span class="kn-start__n">04</span><span><b>Копия и печать</b> — чтобы не потерять записи и показать их мастеру</span></li></ol>
+          <div class="kn-start__actions">
+            <button class="btn btn--primary btn--lg" type="button" data-kn-go><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg> Завести книжку</button>
+            <button class="btn btn--ghost" type="button" data-kn-import><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 16.5v3h15v-3"/></g></svg> Загрузить из файла</button>
+          </div>
+        </div>
+        <div class="kn-slot" data-kn-slot="start"><form class="kn-form kn-carform" data-kn-car-form novalidate hidden aria-labelledby="kn-c-title">
+          <p class="kn-form__title" id="kn-c-title" tabindex="-1">Данные машины</p>
+          <div class="form-grid form-grid--2">
+            <div class="field"><label class="field__label" for="kn-c-brand">Марка <span class="req">*</span></label><input class="input" id="kn-c-brand" name="brand" type="text" maxlength="40" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="Как в СТС" required aria-describedby="kn-c-brand-err"><span class="field__error" id="kn-c-brand-err">Укажите марку</span></div>
+            <div class="field"><label class="field__label" for="kn-c-model">Модель <span class="req">*</span></label><input class="input" id="kn-c-model" name="model" type="text" maxlength="40" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="Как в СТС" required aria-describedby="kn-c-model-err"><span class="field__error" id="kn-c-model-err">Укажите модель</span></div>
+            <div class="field"><label class="field__label" for="kn-c-year">Год выпуска</label><input class="input" id="kn-c-year" name="year" type="text" inputmode="numeric" maxlength="4" autocomplete="off" enterkeyhint="next" aria-describedby="kn-c-year-err"><span class="field__error" id="kn-c-year-err"></span></div>
+            <div class="field"><label class="field__label" for="kn-c-engine">Объём двигателя, л</label><input class="input" id="kn-c-engine" name="engine" type="text" inputmode="decimal" maxlength="24" autocomplete="off" enterkeyhint="next" placeholder="Например, 1,6"></div>
+            <div class="field span-2"><label class="field__label" for="kn-c-vin">VIN</label><input class="input kn-mono" id="kn-c-vin" name="vin" type="text" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="next" aria-describedby="kn-c-vin-hint kn-c-vin-err"><span class="field__hint" id="kn-c-vin-hint">Необязательно. 17 знаков из СТС или с таблички на кузове. <span class="kn-vin-note" data-kn-vin-note hidden>Русские буквы заменены на такие же латинские</span></span><span class="field__error" id="kn-c-vin-err"></span></div>
+            <div class="field span-2"><label class="field__label" for="kn-c-km">Пробег сейчас, км</label><input class="input" id="kn-c-km" name="km" type="text" inputmode="numeric" maxlength="9" autocomplete="off" enterkeyhint="done" aria-describedby="kn-c-km-hint kn-c-km-err"><span class="field__hint" id="kn-c-km-hint" data-kn-km-hint>Дата запишется сама — сегодняшняя.</span><span class="field__error" id="kn-c-km-err"></span></div>
+          </div>
+          <div class="kn-form__actions"><button class="btn btn--ghost" type="button" data-kn-car-cancel>Отмена</button><button class="btn btn--primary" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Сохранить</button></div>
+        </form></div>
+      </div>
+    </div>
+      <div class="kn-desk" data-kn-desk hidden>
+      <section class="kn-car" aria-labelledby="kn-car-title">
+        <div class="kn-plate" data-kn-plate tabindex="-1">
+          <div class="kn-plate__top">
+            <h2 class="kn-plate__label" id="kn-car-title">Паспорт машины</h2>
+            <button class="kn-link" type="button" data-kn-car-edit><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5l4 4L9 19H5v-4zM13 7l4 4"/></g></svg><span>Изменить</span></button>
+          </div>
+          <p class="kn-plate__name" data-kn-name></p>
+          <p class="kn-plate__hint" data-kn-name-hint hidden>Впишите марку и модель — они попадут в заявку и в напоминание.</p>
+          <dl class="kn-plate__specs">
+            <div><dt>Год</dt><dd data-kn-year></dd></div>
+            <div><dt>Двигатель</dt><dd data-kn-engine></dd></div>
+            <div class="kn-plate__vin"><dt>VIN</dt><dd data-kn-vin></dd></div>
+          </dl>
+          <div class="kn-plate__odo">
+            <div class="kn-odo" data-kn-odo aria-hidden="true"><span class="kn-odo__drums" data-kn-drums></span><span class="kn-odo__u">км</span></div>
+            <p class="sr-only" data-kn-odo-sr></p>
+            <p class="kn-odo__cap"><span data-kn-odo-cap></span> <button class="kn-link" type="button" data-kn-odo-open><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l3.5-4.5M6.8 12.8l1 .5M12 9v1.2M17.2 12.8l-1 .5"/></g></svg><span>Обновить пробег</span></button></p>
+          </div>
+          <form class="kn-odoform" data-kn-odo-form novalidate hidden>
+            <div class="field">
+              <label class="field__label" for="kn-o-km">Пробег сейчас, км</label>
+              <div class="kn-odoform__row"><input class="input" id="kn-o-km" name="km" type="text" inputmode="numeric" maxlength="9" autocomplete="off" enterkeyhint="done" aria-describedby="kn-o-km-err"><button class="btn btn--primary" type="submit">Записать</button><button class="btn btn--ghost kn-odoform__x" type="button" data-kn-odo-cancel aria-label="Не обновлять пробег"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button></div>
+              <span class="field__error" id="kn-o-km-err"></span>
+            </div>
+          </form>
+        </div>
+        <div class="kn-slot" data-kn-slot="book"></div>
+      </section>
+      <section class="kn-next" data-kn-next data-state="setup" aria-labelledby="kn-next-title">
+        <div class="kn-next__top">
+          <h2 class="kn-next__label" id="kn-next-title">Следующее ТО</h2>
+          <p class="kn-next__rule" data-kn-rule hidden><span data-kn-rule-text></span> <button class="kn-link" type="button" data-kn-interval-edit><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5l4 4L9 19H5v-4zM13 7l4 4"/></g></svg><span>Изменить</span></button></p>
+        </div>
+        <div class="kn-next__main" data-kn-main hidden>
+          <p class="kn-next__head" data-kn-head tabindex="-1"></p>
+          <p class="kn-next__sub" data-kn-sub></p>
+          <div class="kn-meters">
+            <div class="kn-meter" data-kn-meter="km">
+            <p class="kn-meter__label">По пробегу</p>
+            <div class="kn-meter__body" data-body>
+              <p class="kn-meter__value"><span class="kn-meter__pre" data-pre></span> <b data-val></b></p>
+              <div class="kn-meter__track" role="meter" aria-label="По пробегу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-track><i class="kn-meter__fill"></i><i class="kn-meter__mark"></i></div>
+              <p class="kn-meter__ends"><span data-a></span><span data-b></span></p>
+            </div>
+            <p class="kn-meter__none" data-none hidden></p>
+          </div>
+            <div class="kn-meter" data-kn-meter="time">
+            <p class="kn-meter__label">По времени</p>
+            <div class="kn-meter__body" data-body>
+              <p class="kn-meter__value"><span class="kn-meter__pre" data-pre></span> <b data-val></b></p>
+              <div class="kn-meter__track" role="meter" aria-label="По времени" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-track><i class="kn-meter__fill"></i><i class="kn-meter__mark"></i></div>
+              <p class="kn-meter__ends"><span data-a></span><span data-b></span></p>
+            </div>
+            <p class="kn-meter__none" data-none hidden></p>
+          </div>
+          </div>
+          <p class="kn-next__note" data-kn-note></p>
+          <div class="kn-next__actions">
+            <button class="btn btn--ghost kn-ics" type="button" data-kn-ics><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-calendar"/></svg> <span>Добавить напоминание в календарь</span> <small aria-hidden="true">.ics</small></button>
+            <button class="btn btn--primary" type="button" data-kn-book-to><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Записаться на ТО</button>
+          </div>
+          <p class="kn-next__note kn-next__note--ics" data-kn-ics-note hidden></p>
+        </div>
+        <div class="kn-next__need" data-kn-need hidden>
+          <p class="kn-next__head">Отметьте последнее ТО</p>
+          <p class="kn-next__sub">Добавьте в журнал запись с отметкой «ТО» — от её даты и пробега начнётся отсчёт.</p>
+          <button class="btn btn--primary" type="button" data-kn-add-to><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg> Добавить запись о ТО</button>
+        </div>
+        <form class="kn-interval" data-kn-interval novalidate>
+          <p class="kn-next__head kn-interval__head" data-kn-interval-head>Когда следующее ТО?</p>
+          <p class="kn-interval__lead">Впишите интервал из сервисной книжки или инструкции к машине — у разных машин он разный. Посчитаем, что наступит раньше.</p>
+          <div class="kn-interval__row">
+            <span class="kn-interval__w">Каждые</span>
+            <span class="kn-interval__f"><label class="sr-only" for="kn-i-km">Интервал ТО, километров</label><input class="input" id="kn-i-km" name="km" type="text" inputmode="numeric" maxlength="7" autocomplete="off" enterkeyhint="next" aria-describedby="kn-i-err"><span class="kn-interval__u" aria-hidden="true">км</span></span>
+            <span class="kn-interval__w">или каждые</span>
+            <span class="kn-interval__f kn-interval__f--m"><label class="sr-only" for="kn-i-months">Интервал ТО, месяцев</label><input class="input" id="kn-i-months" name="months" type="text" inputmode="numeric" maxlength="3" autocomplete="off" enterkeyhint="done" aria-describedby="kn-i-err"><span class="kn-interval__u" aria-hidden="true">мес.</span></span>
+          </div>
+          <p class="kn-interval__hint">Можно заполнить что-то одно.</p>
+          <p class="kn-interval__err" id="kn-i-err" data-kn-interval-err hidden></p>
+          <div class="kn-form__actions"><button class="btn btn--ghost btn--sm" type="button" data-kn-interval-cancel hidden>Отмена</button><button class="btn btn--primary btn--sm" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Сохранить интервал</button></div>
+        </form>
+      </section>
+      <section class="kn-log" aria-labelledby="kn-log-title">
+        <div class="kn-log__head">
+          <h2 class="kn-log__title" id="kn-log-title">Журнал работ</h2>
+          <span class="kn-log__count" data-kn-count></span>
+          <button class="btn btn--primary btn--sm" type="button" data-kn-add aria-expanded="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg> Добавить запись</button>
+        </div>
+        <form class="kn-form kn-entryform" data-kn-entry-form novalidate hidden aria-labelledby="kn-e-title">
+          <p class="kn-form__title" id="kn-e-title" data-kn-entry-title tabindex="-1">Новая запись</p>
+          <div class="form-grid form-grid--2">
+            <div class="field"><label class="field__label" for="kn-e-date">Дата <span class="req">*</span></label><input class="input" id="kn-e-date" name="date" type="date" required aria-describedby="kn-e-date-err"><span class="field__error" id="kn-e-date-err"></span></div>
+            <div class="field"><label class="field__label" for="kn-e-km">Пробег, км</label><input class="input" id="kn-e-km" name="km" type="text" inputmode="numeric" maxlength="9" autocomplete="off" aria-describedby="kn-e-km-err"><span class="field__error" id="kn-e-km-err"></span></div>
+            <div class="field span-2"><fieldset class="kn-chips" aria-describedby="kn-e-works-err"><legend class="field__label kn-chips__legend">Что сделано</legend><div class="kn-chips__row"><label class="kn-chip"><input type="checkbox" name="works" value="to" autocomplete="off"><span>ТО</span></label><label class="kn-chip"><input type="checkbox" name="works" value="oil" autocomplete="off"><span>Замена масла</span></label><label class="kn-chip"><input type="checkbox" name="works" value="filters" autocomplete="off"><span>Фильтры</span></label><label class="kn-chip"><input type="checkbox" name="works" value="brakes" autocomplete="off"><span>Тормоза</span></label><label class="kn-chip"><input type="checkbox" name="works" value="tires" autocomplete="off"><span>Шины</span></label><label class="kn-chip"><input type="checkbox" name="works" value="diag" autocomplete="off"><span>Диагностика</span></label></div></fieldset><span class="field__error" id="kn-e-works-err">Отметьте работу или опишите, что сделано</span></div>
+            <div class="field span-2"><label class="field__label" for="kn-e-text">Подробности</label><textarea class="textarea" id="kn-e-text" name="text" rows="3" maxlength="600" placeholder="Например: масло и масляный фильтр, воздушный фильтр салона"></textarea></div>
+            <div class="field span-2"><label class="field__label" for="kn-e-note">Заметка</label><input class="input" id="kn-e-note" name="note" type="text" maxlength="300" autocomplete="off" placeholder="Например: где делали, номера запчастей"></div>
+          </div>
+          <div class="kn-form__actions"><button class="btn btn--ghost" type="button" data-kn-entry-cancel>Отмена</button><button class="btn btn--primary" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Сохранить запись</button></div>
+        </form>
+        <div class="kn-log__list" data-kn-list></div>
+        <div class="kn-log__empty" data-kn-empty>
+          <p class="kn-log__empty-t">Записей пока нет</p>
+          <p>Начните с последнего ТО: дата, пробег и отметка «ТО» — от этой записи посчитаем следующее.</p>
+          <button class="btn btn--ghost" type="button" data-kn-add-to><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg> Добавить запись о ТО</button>
+        </div>
+      </section>
+      <div class="kn-side">
+        <section class="kn-card kn-booking" aria-labelledby="kn-booking-title">
+          <h2 class="kn-card__title" id="kn-booking-title">Записаться в «Гараж»</h2>
+          <p class="kn-card__text">Отметьте работы — машина из паспорта сама подставится в заявку на звонок.</p>
+          <fieldset class="kn-chips"><legend class="sr-only">Работы для записи</legend><div class="kn-chips__row"><label class="kn-chip"><input type="checkbox" name="book-works" value="to" autocomplete="off"><span>ТО</span></label><label class="kn-chip"><input type="checkbox" name="book-works" value="oil" autocomplete="off"><span>Замена масла</span></label><label class="kn-chip"><input type="checkbox" name="book-works" value="filters" autocomplete="off"><span>Фильтры</span></label><label class="kn-chip"><input type="checkbox" name="book-works" value="brakes" autocomplete="off"><span>Тормоза</span></label><label class="kn-chip"><input type="checkbox" name="book-works" value="tires" autocomplete="off"><span>Шины</span></label><label class="kn-chip"><input type="checkbox" name="book-works" value="diag" autocomplete="off"><span>Диагностика</span></label></div></fieldset>
+          <button class="btn btn--primary btn--block" type="button" data-kn-book><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Записаться</button>
+          <a class="kn-card__more" href="/garage_team/v/knizhka/services/planovoe-to.html">Что входит в плановое ТО <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up-right"/></svg></a>
+        </section>
+        <section class="kn-card kn-backup" aria-labelledby="kn-backup-title">
+          <h2 class="kn-card__title" id="kn-backup-title">Копия и печать</h2>
+          <p class="kn-card__text">Книжка живёт только в этом браузере: если очистить его или сменить телефон, записи пропадут, а Safari на iPhone сам стирает данные сайтов, на которые давно не заходили. Сохраните копию файлом — её можно загрузить здесь же или на другом устройстве.</p>
+          <div class="kn-tools">
+            <button class="kn-tool" type="button" data-kn-export><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M4.5 16.5v3h15v-3"/></g></svg><span>Сохранить копию</span><small>.json</small></button>
+            <button class="kn-tool" type="button" data-kn-import><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4.5 16.5v3h15v-3"/></g></svg><span>Загрузить из файла</span><small>.json</small></button>
+            <button class="kn-tool" type="button" data-kn-print><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="8" rx="1.5"/><path d="M7 14h10v6.5H7zM17 11.5h.5"/></g></svg><span>Распечатать</span><small>или в PDF</small></button>
+            <button class="kn-tool kn-tool--danger" type="button" data-kn-wipe><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4h5v2.5M6.5 6.5l1 13.5h9l1-13.5M10 10v6.5M14 10v6.5"/></g></svg><span>Удалить все данные</span><small>из этого браузера</small></button>
+          </div>
+        </section>
+      </div>
+      </div>
+      <div class="kn-print" data-kn-sheet></div>
+      <input type="file" accept=".json,application/json" data-kn-file hidden tabindex="-1" aria-hidden="true">
+    </div>
+  </div>
+</section>
+<section class="section section--tight kn-about" aria-labelledby="kn-about-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><p class="eyebrow">// Как это устроено</p><h2 class="h2 sec-head__title" id="kn-about-title">Книжка, которая<br>считает сама</h2></div>
+      <p class="sec-head__aside">Как бумажная сервисная книжка: паспорт машины и журнал работ. Только ещё подсказывает, когда следующее ТО, и не теряется в бардачке.</p>
+    </div>
+    <ol class="kn-how"><li class="kn-how__item"><span class="kn-how__n">01</span><h3 class="kn-how__t">Паспорт машины</h3><p>Марка, модель, год, объём двигателя, VIN и пробег с датой. VIN проверяем на опечатки: 17 знаков, латинские буквы и цифры, без I, O и Q; русские буквы, похожие на латинские, заменяем сами.</p></li><li class="kn-how__item"><span class="kn-how__n">02</span><h3 class="kn-how__t">Журнал работ</h3><p>Дата, пробег и что сделано: быстрые отметки «ТО», «Замена масла», «Фильтры», «Тормоза», «Шины», «Диагностика», свои подробности и заметки. Записи можно исправить и удалить.</p></li><li class="kn-how__item"><span class="kn-how__n">03</span><h3 class="kn-how__t">Следующее ТО</h3><p>Вы вписываете интервал из своей сервисной книжки: «каждые … км или … месяцев». От последней записи с отметкой «ТО» считаем, что наступит раньше, и показываем, сколько осталось. Дату можно добавить в календарь телефона — с напоминанием накануне.</p></li><li class="kn-how__item"><span class="kn-how__n">04</span><h3 class="kn-how__t">Где хранятся данные</h3><p>Только в этом браузере на этом устройстве. На сервер ничего не отправляется, мы эти данные не видим. Поэтому книжка сама не переедет на другой телефон — для этого есть копия файлом. Данные машины попадают в заявку, только когда вы сами нажмёте «Записаться» и отправите форму.</p></li></ol>
+  </div>
+</section>
+<dialog class="modal kn-dialog" id="kn-dialog" aria-labelledby="kn-dialog-title" aria-describedby="kn-dialog-text">
+  <div class="modal__panel">
+    <button class="modal__close" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+    <h2 class="modal__title" id="kn-dialog-title"></h2>
+    <p class="modal__lead" id="kn-dialog-text"></p>
+    <div class="kn-dialog__actions" data-kn-dialog-actions></div>
+  </div>
+</dialog>
+<section class="section request" id="request" aria-labelledby="request-title">
+  <div class="wrap request__in">
+    <div class="request__side reveal">
+      <p class="eyebrow">// Заявка онлайн</p>
+      <h2 class="h2 sec-head__title" id="request-title">Оставить заявку</h2>
+      <p class="lead">Подберём запчасти и запишем на ремонт. Три коротких шага — и менеджер свяжется с вами в рабочие часы.</p>
+      <p class="muted" style="margin-top:1.2rem;max-width:44ch">Если вы не можете оставить заявку, то свяжитесь с нами по телефону. Наш менеджер быстро и качественно поможет решить проблему или найти ответ на вопрос. Вы не останетесь без поддержки!</p>
+      <a class="request__phone" href="tel:+78314161677"><small>звоните</small>(831) 416-16-77</a>
+      <div class="request__social"><span>Подпишитесь на нас</span><a href="https://vk.com/garagebest" target="_blank" rel="noopener" aria-label="ВКонтакте"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg></a><a href="https://www.facebook.com/%D0%90%D0%B2%D1%82%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81-%D0%B3%D0%B0%D1%80%D0%B0%D0%B6-wwwgarageteam-1811807572418855/?ref=bookmarks" target="_blank" rel="noopener" aria-label="Facebook"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-facebook"/></svg></a></div>
+    </div>
+    <form class="rq reveal" id="request-form" action="/garage_team/v/knizhka/call/request" method="post" novalidate data-rq>
+      <input type="hidden" name="request_part[select_car_type]" value="1">
+      <div class="steps" role="list"><div class="step is-active" data-step="1"><span class="step__n">1</span><span>Выбор автомобиля</span></div><div class="step" data-step="2"><span class="step__n">2</span><span>Ввод запроса</span></div><div class="step" data-step="3"><span class="step__n">3</span><span>Контактная информация</span></div></div>
+
+      <div class="rq__panel is-active" data-panel="1">
+        <div class="rq__title"><span>Ваш автомобиль</span><button class="rq__switch" type="button" data-mode-toggle>Не нашли свой автомобиль?</button></div>
+        <button class="kn-fill" type="button" data-kn-fill="Машина подставлена из «Моей машины»" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5H17a1.5 1.5 0 0 1 1.5 1.5v15.5H7.5a2 2 0 0 1-2-2z"/><path d="M5.5 18.5a2 2 0 0 1 2-2h11"/><path d="M9 7.5h6M9 10.5h4"/></g></svg><span class="kn-fill__t">Заполнить из «Моей машины»</span><span class="kn-fill__car" data-kn-fill-car></span></button>
+        <div data-mode="select">
+          <div class="form-grid form-grid--2">
+            <div class="field"><label class="field__label" for="tecdoc_car_brand">Марка автомобиля <span class="req">*</span></label><select class="select" id="tecdoc_car_brand" name="request_part[tecdoc_car_brand]"><option value="-1">Выберите марку</option><option value="1">Abarth</option><option value="2">AC</option><option value="3">Acura</option><option value="4">Aito</option><option value="5">Alfa Romeo</option><option value="6">Alpina</option><option value="7">AMC</option><option value="8">Asia Motors</option><option value="9">Aston Martin</option><option value="10">Audi</option><option value="11">Avatr</option><option value="12">Baic</option><option value="13">BAW</option><option value="14">Belgee</option><option value="15">Bentley</option><option value="16">Bertone</option><option value="17">BMW</option><option value="18">Brilliance</option><option value="19">Bugatti</option><option value="20">Buick</option><option value="21">BYD</option><option value="22">Cadillac</option><option value="23">Changan</option><option value="24">Changfeng</option><option value="25">Chery</option><option value="26">Chevrolet</option><option value="27">Chrysler</option><option value="28">Ciimo</option><option value="29">Citroen</option><option value="30">Cupra</option><option value="31">Dacia</option><option value="32">Dadi</option><option value="33">Daewoo</option><option value="34">DAF</option><option value="35">Daihatsu</option><option value="36">Datsun</option><option value="37">De Lorean</option><option value="38">Derways</option><option value="39">DFSK</option><option value="40">Dodge</option><option value="41">Dongfeng</option><option value="42">Doninvest</option><option value="43">DS</option><option value="44">Eagle</option><option value="45">Evolute</option><option value="46">Exeed</option><option value="47">Exlantix</option><option value="48">FAW</option><option value="49">Ferrari</option><option value="50">Fiat</option><option value="51">Ford</option><option value="52">Ford Asia</option><option value="53">Ford USA</option><option value="54">Forthing</option><option value="55">Foton</option><option value="56">Freightliner</option><option value="57">FSO</option><option value="58">GAC</option><option value="59">Geely</option><option value="60">Genesis</option><option value="61">Geo</option><option value="62">GMC</option><option value="63">Great Wall</option><option value="64">GWM</option><option value="65">Hafei</option><option value="66">Haima</option><option value="67">Haval</option><option value="68">Hawtai</option><option value="69">Honda</option><option value="70">Hongqi</option><option value="71">Hummer</option><option value="72">Hyundai</option><option value="73">Infiniti</option><option value="74">Iran Khodro</option><option value="75">Isuzu</option><option value="76">JAC</option><option value="77">Jaecoo</option><option value="78">Jaguar</option><option value="79">Jeep</option><option value="80">Jetour</option><option value="81">Jetta</option><option value="82">JMC</option><option value="83">Kaiyi</option><option value="84">Kia</option><option value="85">Knewstar</option><option value="86">KTM</option><option value="87">Lamborghini</option><option value="88">Lancia</option><option value="89">Land Rover</option><option value="90">LDV</option><option value="91">Leapmotor</option><option value="92">Lexus</option><option value="93">Lifan</option><option value="94">Lincoln</option><option value="95">Livan</option><option value="96">Lixiang</option><option value="97">Lotus</option><option value="98">Luxgen</option><option value="99">Lynk &amp; Co</option><option value="100">Mahindra</option><option value="101">Maruti</option><option value="102">Maruti Suzuki</option><option value="103">Maserati</option><option value="104">Maxus</option><option value="105">Maybach</option><option value="106">Mazda</option><option value="107">Mercedes</option><option value="108">Mercury</option><option value="109">Merkur</option><option value="110">MG</option><option value="111">MINI</option><option value="112">Mitsubishi</option><option value="113">Nissan</option><option value="114">Oldsmobile</option><option value="115">Oltcit</option><option value="116">Omoda</option><option value="117">Opel</option><option value="118">ORA</option><option value="119">Oting</option><option value="120">Peugeot</option><option value="121">Piaggio</option><option value="122">Plymouth</option><option value="123">Polaris</option><option value="124">PoleStar</option><option value="125">Pontiac</option><option value="126">Porsche</option><option value="127">Proton</option><option value="128">Ravon</option><option value="129">Renault</option><option value="130">Renault Samsung</option><option value="131">Rolls-Royce</option><option value="132">Rover</option><option value="133">Saab</option><option value="134">SAIC MG</option><option value="135">SAIC Roewe</option><option value="136">Saturn</option><option value="137">Scion</option><option value="138">Seat</option><option value="139">Seres</option><option value="140">ShuangHuan</option><option value="141">Sinotruk</option><option value="142">Skoda</option><option value="143">Skywell</option><option value="144">SMA</option><option value="145">Smart</option><option value="146">Solaris</option><option value="147">Sollers</option><option value="148">Soueast</option><option value="149">Ssangyong</option><option value="150">Subaru</option><option value="151">Suzuki</option><option value="152">SWM</option><option value="153">Tank</option><option value="154">Tata</option><option value="155">Tesla</option><option value="156">Toyota</option><option value="157">Triumph</option><option value="158">Vauxhall</option><option value="159">Volkswagen</option><option value="160">Volvo</option><option value="161">Vortex</option><option value="162">Voyah</option><option value="163">Wartburg</option><option value="164">WEY</option><option value="165">Wuling</option><option value="166">Xcite</option><option value="167">Yema Auto</option><option value="168">Yuejin</option><option value="169">Zeekr</option><option value="170">ZhongXing</option><option value="171">Zotye</option><option value="172">Богдан</option><option value="173">ВАЗ</option><option value="174">ГАЗ</option><option value="175">ЗАЗ</option><option value="176">Иж</option><option value="177">ЛуАЗ</option><option value="178">Москвич</option><option value="179">ТагАЗ</option><option value="180">УАЗ</option></select><span class="field__error">Укажите марку автомобиля</span></div>
+            <div class="field"><label class="field__label" for="tecdoc_car_model">Модель <span class="req">*</span></label><select class="select" id="tecdoc_car_model" name="request_part[tecdoc_car_model]" disabled><option value="-1">Выберите модель</option></select><span class="field__error">Укажите модель автомобиля</span></div>
+            <div class="field"><label class="field__label" for="tecdoc_car_year">Год выпуска <span class="req">*</span></label><select class="select" id="tecdoc_car_year" name="request_part[tecdoc_car_year]" disabled><option value="-1">Выберите год</option></select><span class="field__error">Укажите год выпуска</span></div>
+            <div class="field"><label class="field__label" for="tecdoc_car_type">Модификация</label><select class="select" id="tecdoc_car_type" name="request_part[tecdoc_car_type]" disabled><option value="-1">Выберите модификацию</option></select><span class="field__error">Укажите модификацию автомобиля</span></div>
+          </div>
+        </div>
+        <div data-mode="text" hidden>
+          <div class="form-grid form-grid--2">
+            <div class="field"><label class="field__label" for="text_car_brand">Марка автомобиля <span class="req">*</span></label><input class="input" id="text_car_brand" name="request_part[text_car_brand]" type="text" placeholder="Введите марку"><span class="field__error">Укажите марку автомобиля</span></div>
+            <div class="field"><label class="field__label" for="text_car_model">Модель <span class="req">*</span></label><input class="input" id="text_car_model" name="request_part[text_car_model]" type="text" placeholder="Введите модель"><span class="field__error">Укажите модель автомобиля</span></div>
+            <div class="field"><label class="field__label" for="text_car_year">Год выпуска <span class="req">*</span></label><input class="input" id="text_car_year" name="request_part[text_car_year]" type="text" inputmode="numeric" maxlength="4" placeholder="Введите год выпуска"><span class="field__error">Укажите год выпуска</span></div>
+            <div class="field"><label class="field__label" for="text_car_type">Объём двигателя <span class="req">*</span></label><input class="input" id="text_car_type" name="request_part[text_car_type]" type="text" placeholder="Введите объём двигателя"><span class="field__error">Укажите объём двигателя автомобиля</span></div>
+          </div>
+        </div>
+        <div class="form-grid" style="margin-top:1.1rem">
+          <div class="field"><label class="field__label" for="car_vin">VIN-код</label><input class="input" id="car_vin" name="request_part[car_vin]" type="text" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697" autocapitalize="characters"><span class="field__hint">17 символов с таблички в проёме двери или в СТС. <button class="btn btn--text" type="button" data-vin-help style="font-size:.8rem">Я не знаю, что такое VIN-код</button></span>
+          <p class="form-note" data-vin-help-text hidden>VIN — уникальный идентификационный номер автомобиля из 17 знаков. По нему мы подбираем запчасти точно под вашу комплектацию. Найти его можно в свидетельстве о регистрации (СТС), ПТС или на табличке под лобовым стеклом. Если VIN под рукой нет — просто пропустите это поле.</p></div>
+        </div>
+        <div class="rq__actions"><button class="btn btn--primary" type="button" data-next>Вперёд <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button></div>
+      </div>
+
+      <div class="rq__panel" data-panel="2">
+        <div class="rq__title"><span>Что нужно сделать?</span></div>
+        <div data-parts>
+          <div class="part">
+            <div class="field"><label class="field__label" for="part_name_1">Запчасть №1</label><input class="input" id="part_name_1" name="request_part[parts][1][name]" type="text" placeholder="Например: противотуманные фары"><span class="field__error">Введите запрос</span></div>
+            <div class="field"><label class="field__label" for="part_count_1">Кол-во, шт.</label><input class="input" id="part_count_1" name="request_part[parts][1][count]" type="number" inputmode="numeric" min="1" value="1"></div>
+            <button type="button" class="part__remove" aria-label="Удалить запчасть" disabled><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm" type="button" data-add-part><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg> Добавить запчасть</button>
+        <div class="field" style="margin-top:1.1rem"><label class="field__label" for="request_what">Или опишите задачу для автосервиса</label><textarea class="textarea" id="request_what" name="request_part[what]" rows="3" placeholder="Например: стук в передней подвеске, нужна диагностика и замена"></textarea></div>
+        <div class="rq__actions"><button class="btn btn--ghost" type="button" data-prev><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-left"/></svg> Назад</button><button class="btn btn--primary" type="button" data-next>Вперёд <svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button></div>
+      </div>
+
+      <div class="rq__panel" data-panel="3">
+        <div class="rq__title"><span>Контактная информация</span></div>
+        <div class="form-grid form-grid--2">
+          <div class="field"><label class="field__label" for="contact_name">Ваше имя <span class="req">*</span></label><input class="input" id="contact_name" name="request_part[contact_name]" type="text" autocomplete="name" autocapitalize="words"><span class="field__error">Укажите, как к вам следует обращаться</span></div>
+          <div class="field"><label class="field__label" for="contact_city">Ваш город <span class="req">*</span></label><input class="input" id="contact_city" name="request_part[city]" type="text" value="Нижний Новгород" autocomplete="address-level2"><span class="field__error">Выберите город, в котором вы находитесь</span></div>
+          <div class="field"><label class="field__label" for="contact_phone">Контактный телефон <span class="req">*</span></label><input class="input" id="contact_phone" name="request_part[contact_phone]" type="tel" autocomplete="tel" data-phone><span class="field__error">Укажите контактный телефон для связи с вами</span></div>
+          <div class="field"><label class="field__label" for="contact_comment">Комментарий</label><input class="input" id="contact_comment" name="request_part[comment]" type="text" placeholder="Удобное время звонка, пожелания"></div>
+          <div class="field span-2"><label class="check"><input type="checkbox" name="agree" value="1"><span class="check__box"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span>Соглашаюсь с <a href="/garage_team/v/knizhka/page/soglashenie/" target="_blank">пользовательским соглашением</a> и обработкой персональных данных</span></label><span class="field__error">Необходимо согласие</span></div>
+        </div>
+        <div class="form-alert" data-alert role="alert"></div>
+        <div class="rq__actions"><button class="btn btn--ghost" type="button" data-prev><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-left"/></svg> Назад</button><button class="btn btn--primary" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-send"/></svg> Отправить заявку</button></div>
+      </div>
+
+      <div class="form-success" data-success>
+        <div class="form-success__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></div>
+        <h3 class="h3">Ваша заявка отправлена!</h3>
+        <p class="muted">Наши менеджеры рассмотрят её в рабочие часы и свяжутся с вами.</p>
+        <a class="btn btn--ghost btn--sm" href="/garage_team/v/knizhka/">На главную</a>
+      </div>
+    </form>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="footer__watermark" aria-hidden="true">ГАРАЖ</div>
+  <div class="wrap site-footer__in">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a class="logo logo--footer" href="/garage_team/v/knizhka/"><img src="/garage_team/v/knizhka/assets/logo/logo.svg" width="221" height="80" alt="Garage Team — автосервис «Гараж»" loading="lazy"></a>
+        <p class="footer__slogan mono" lang="en">Complete car care since 2011</p>
+        <p>ООО «Гараж»<br>Сеть магазинов запчастей «Гараж»<br>Автосервис и магазин запчастей в Нижнем Новгороде с 2011 года.</p>
+        <div class="footer__social">
+          <a href="https://vk.com/garagebest" target="_blank" rel="noopener" aria-label="ВКонтакте"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-vk"/></svg></a>
+          <a href="https://www.facebook.com/%D0%90%D0%B2%D1%82%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81-%D0%B3%D0%B0%D1%80%D0%B0%D0%B6-wwwgarageteam-1811807572418855/?ref=bookmarks" target="_blank" rel="noopener" aria-label="Facebook"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-facebook"/></svg></a>
+        </div>
+        <a class="kn-foot" href="/garage_team/v/knizhka/moya-mashina/"><span class="kn-foot__ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.5H17a1.5 1.5 0 0 1 1.5 1.5v15.5H7.5a2 2 0 0 1-2-2z"/><path d="M5.5 18.5a2 2 0 0 1 2-2h11"/><path d="M9 7.5h6M9 10.5h4"/></g></svg></span><span class="kn-foot__t"><b>Моя машина</b><small>сервисная книжка в браузере</small></span></a>
+      </div>
+      <div>
+        <div class="footer__title">Разделы</div>
+        <div class="footer__links"><a href="/garage_team/v/knizhka/services.html">Все услуги</a><a href="/garage_team/v/knizhka/avtozapchasti/">Автозапчасти</a><a href="/garage_team/v/knizhka/cats/">Каталоги запчастей</a><a href="/garage_team/v/knizhka/search/">Поиск по номеру</a><a href="/garage_team/v/knizhka/delivery.html">Доставка</a><a href="/garage_team/v/knizhka/oplata.html">Оплата</a><a href="/garage_team/v/knizhka/about/">О компании</a><a href="/garage_team/v/knizhka/otzyvy.html">Отзывы</a><a href="/garage_team/v/knizhka/contacts/">Контакты</a><a href="/garage_team/v/knizhka/call/request/">Оставить заявку</a><a href="/garage_team/v/knizhka/call/manager/">Звонок менеджеру</a><a href="/garage_team/v/knizhka/registration/">Регистрация</a><a href="/garage_team/v/knizhka/page/soglashenie/">Пользовательское соглашение</a></div>
+      </div>
+      <div>
+        <div class="footer__title">Услуги</div>
+        <div class="footer__links"><a href="/garage_team/v/knizhka/services/diagnostika.html">Диагностика автомобиля</a><a href="/garage_team/v/knizhka/services/remont-dvigatela.html">Ремонт двигателя</a><a href="/garage_team/v/knizhka/services/remont-hodovoj.html">Ремонт подвески и ходовой</a><a href="/garage_team/v/knizhka/services/cip-tuning.html">Чип-тюнинг</a><a href="/garage_team/v/knizhka/services/remont-zamena-regulirovka-prokacka-tormozov.html">Ремонт и прокачка тормозов</a><a href="/garage_team/v/knizhka/services/remont-i-promyvka-sistem-ohlazdenia.html">Ремонт и промывка системы охлаждения</a><a href="/garage_team/v/knizhka/services/remont-elektrooborudovania-avtomobila.html">Автоэлектрика</a><a href="/garage_team/v/knizhka/services/zapravka-i-remont-avtokondicionerov.html">Ремонт автокондиционеров</a><a href="/garage_team/v/knizhka/services/remont-promyvka-inzektorov-i-monovpryskov.html">Ремонт инжектора</a><a href="/garage_team/v/knizhka/services/remont-dizela.html">Ремонт дизеля</a><a href="/garage_team/v/knizhka/services.html"><b>Все 28 направлений →</b></a></div>
+      </div>
+      <div>
+        <div class="footer__title">Звоните по телефонам горячей линии</div>
+        <div class="footer__contact">
+          <a class="footer__phone" href="tel:+78314161677">(831) 416-16-77</a>
+          <a href="mailto:info@garage.team"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg><span>info@garage.team</span></a>
+          <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg><span>603155, г. Нижний Новгород, ул. Красная слобода, 9</span></span>
+          <span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><span>Понедельник – пятница: 9:00 – 19:00</span></span><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-clock"/></svg><span>Суббота: 9:00 – 17:00</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2011–<span data-year>2026</span> ООО «Гараж». Все права защищены.</span>
+      <span><a href="/garage_team/v/knizhka/page/soglashenie/">Пользовательское соглашение</a> · <a href="/garage_team/v/knizhka/contacts/">Схема проезда</a></span>
+    </div>
+  </div>
+</footer>
+<div class="mobile-bar">
+  <a class="btn btn--ghost is-on-dark" href="tel:+78314161677"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Позвонить</a>
+  <a class="btn btn--primary" href="/garage_team/v/knizhka/call/request/"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Заявка</a>
+</div>
+<dialog class="modal" id="modal-call" aria-labelledby="modal-call-title">
+  <div class="modal__panel">
+    <button class="modal__close" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+    <form data-simple-form action="/garage_team/v/knizhka/call" method="post" novalidate data-error-text="Не удалось отправить. Позвоните: (831) 416-16-77">
+      <div data-body>
+        <h2 class="modal__title" id="modal-call-title">Заказать звонок / консультацию</h2>
+        <p class="modal__lead">Заполните, пожалуйста, поля ниже, чтобы мы могли связаться с вами.</p>
+        <div class="form-grid form-grid--2">
+          <div class="field"><label class="field__label" for="call-name">Имя <span class="req">*</span></label><input class="input" id="call-name" name="contact_name" type="text" autocomplete="name" autocapitalize="words" enterkeyhint="next" required><span class="field__error">Укажите, как к вам обращаться</span></div>
+          <div class="field"><label class="field__label" for="call-phone">Телефон <span class="req">*</span></label><input class="input" id="call-phone" name="contact_phone" type="tel" autocomplete="tel" enterkeyhint="next" data-phone required><span class="field__error">Укажите корректный телефон</span></div>
+          <div class="field"><label class="field__label" for="call-car">Для автомобиля</label><input class="input" id="call-car" name="car" type="text" placeholder="Марка, модель, год"></div>
+          <div class="field"><label class="field__label" for="call-vin">VIN</label><input class="input" id="call-vin" name="vin_code" type="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697"></div>
+          <div class="field span-2"><label class="field__label" for="call-msg">Комментарий</label><textarea class="textarea" id="call-msg" name="message" rows="3"></textarea></div>
+          <div class="field span-2"><label class="check"><input type="checkbox" name="agree" value="1" required><span class="check__box"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span>Соглашаюсь с <a href="/garage_team/v/knizhka/page/soglashenie/" target="_blank">пользовательским соглашением</a> и обработкой персональных данных</span></label></div>
+        </div>
+        <input type="hidden" name="send" value="1">
+        <div class="rq__actions"><button class="btn btn--ghost" type="button" data-close>Отмена</button><button class="btn btn--primary" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-phone"/></svg> Позвоните мне</button></div>
+      </div>
+      <div class="form-success" data-success>
+        <div class="form-success__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></div>
+        <h3 class="h4">Ваше сообщение отправлено! Наши менеджеры рассмотрят его в рабочие часы и свяжутся с вами.</h3>
+        <button class="btn btn--primary btn--sm" type="button" data-close>OK</button>
+      </div>
+    </form>
+  </div>
+</dialog><dialog class="modal" id="modal-login" aria-labelledby="modal-login-title">
+  <div class="modal__panel">
+    <button class="modal__close" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+    <form data-simple-form data-redirect="1" action="/garage_team/v/knizhka/login/popup" method="post" novalidate data-success-text="Вы вошли в личный кабинет" data-error-text="Не удалось войти. Проверьте телефон и пароль">
+      <div data-body>
+        <h2 class="modal__title" id="modal-login-title">Вход в личный кабинет</h2>
+        <p class="modal__lead">Для входа введите мобильный и пароль. Или <a href="/garage_team/v/knizhka/registration/">зарегистрируйтесь</a>, если у вас ещё нет учётной записи.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label class="field__label" for="login-phone">Мобильный телефон <span class="req">*</span></label>
+            <div class="input--prefix"><span>+7</span><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="login-code" name="UserLoginForm[areaCode]" type="text" inputmode="numeric" autocomplete="tel-area-code" maxlength="3" placeholder="903" style="width:90px" required aria-label="Код оператора"><input class="input" id="login-phone" name="UserLoginForm[number]" type="text" inputmode="numeric" autocomplete="tel-local" maxlength="7" placeholder="1234567" required></div></div>
+            <span class="field__error">Введите номер телефона</span>
+          </div>
+          <div class="field"><label class="field__label" for="login-pass">Пароль <span class="req">*</span></label><input class="input" id="login-pass" name="UserLoginForm[password]" type="password" autocomplete="current-password" required><span class="field__error">Введите пароль</span></div>
+          <div class="row between" style="--gap:.75rem">
+            <button class="btn btn--text" type="button" data-lost-toggle>Забыли пароль?</button>
+            <button class="btn btn--text" type="button" data-sms>Получить пароль по СМС</button>
+          </div>
+          <div data-lost hidden>
+            <div class="field"><label class="field__label" for="lost-email">Эл. почта <span class="req">*</span></label><div class="row" style="--gap:.5rem;flex-wrap:nowrap"><input class="input" id="lost-email" name="lost-email" type="email" autocomplete="email" placeholder="you@mail.ru"><button class="btn btn--ghost btn--sm" type="button" data-email-lost>Отправить</button></div><span class="field__hint">Пришлём пароль на указанный e-mail.</span></div>
+          </div>
+          <label class="check"><input type="checkbox" name="agree" value="1" required checked><span class="check__box"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span>Подтверждаю, что с <a href="/garage_team/v/knizhka/page/soglashenie/" target="_blank">Пользовательским соглашением</a> ознакомлен и согласен</span></label>
+        </div>
+        <input type="hidden" name="send" value="1">
+        <div class="rq__actions"><a class="btn btn--ghost" href="/garage_team/v/knizhka/registration/">Регистрация</a><button class="btn btn--primary" type="submit"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-user"/></svg> Войти</button></div>
+      </div>
+      <div class="form-success" data-success>
+        <div class="form-success__icon"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-check"/></svg></div>
+        <h3 class="h4">Ваше сообщение отправлено! Наши менеджеры рассмотрят его в рабочие часы и свяжутся с вами.</h3>
+        <button class="btn btn--primary btn--sm" type="button" data-close>OK</button>
+      </div>
+    </form>
+  </div>
+</dialog><dialog class="lightbox" id="lightbox" aria-label="Просмотр фото">
+  <div class="lightbox__stage"><img class="lightbox__img" alt=""></div>
+  <span class="lightbox__count">01 / 01</span>
+  <button class="lightbox__btn lightbox__btn--prev" type="button" data-prev aria-label="Предыдущее фото"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chevron-left"/></svg></button>
+  <button class="lightbox__btn lightbox__btn--next" type="button" data-next aria-label="Следующее фото"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg></button>
+  <button class="lightbox__close" type="button" data-close aria-label="Закрыть"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-close"/></svg></button>
+</dialog>
+<script src="/garage_team/v/knizhka/assets/js/site.js?v=9cf7c2b4f0" defer></script>
+<a class="vbadge" href="/garage_team/v/">← <span class="vbadge__all">все варианты · </span><b>Моя машина</b></a></body>
+</html>
