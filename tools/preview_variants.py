@@ -18,7 +18,8 @@ Manifest:
   "title": "…", "lead": "…", "notes": ["…"], "foot": ["…"],
   "groups": [{"id": "plushki", "eyebrow": "// 01 — …", "title": "…", "lead": "…",
               "cards": [{"key": "pogoda", "ref": "perk/pogoda", "num": "// Н1", "title": "…", "text": "…",
-                         "try": "…", "open": "#pogoda", "open_label": "К блоку", "base_card": false}]}]
+                         "try": "…", "open": "#pogoda", "open_label": "К блоку", "base_card": false,
+                         "tag": "в сайте", "tag_on": true}]}]
 }
 "open" is the page and anchor inside the copy ("" = its home page, "services/sinomontaz.html#shiny").
 """
@@ -137,10 +138,13 @@ def card_html(card, base, thumbs):
     tryit = f'<p class="try"><b>Что попробовать</b>{esc(card["try"])}</p>' if card.get("try") else ""
     more = f'<a class="btn" href="{esc(key)}/">С начала</a>' if card.get("open") else ""
     cls = "card card--base" if card.get("base_card") else "card"
+    # «в сайте» / «не выбрано»: what became of a card shown earlier (tag_on: true = it is in the site now)
+    tag = (f'<span class="tag{" tag--on" if card.get("tag_on") else ""}">{esc(card["tag"])}</span>'
+           if card.get("tag") else "")
     return f"""  <article class="{cls}" id="card-{esc(key)}">
     {thumb}
     <div class="body">
-      <span class="num">{esc(card.get("num", ""))}</span>
+      <span class="num">{esc(card.get("num", ""))}{tag}</span>
       <h2>{esc(card["title"])}</h2>
       <p>{esc(card["text"])}</p>
       {tryit}
@@ -201,6 +205,8 @@ h1 span {{ color: var(--brick); }}
 .shot img {{ display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }}
 .body {{ padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1; }}
 .num {{ font: 500 12px/1 "JetBrains Mono", ui-monospace, Menlo, monospace; color: var(--green-bright); letter-spacing: .1em; }}
+.tag {{ display: inline-block; margin-left: 12px; padding: 4px 7px; font: 500 11px/1 "JetBrains Mono", ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); border: 1px solid var(--line-2); vertical-align: 1px; }}
+.tag--on {{ color: var(--green-bright); border-color: rgba(31, 196, 99, .45); }}
 h2 {{ font: 800 22px/1.15 "Unbounded", "Manrope", sans-serif; margin: 0; text-transform: uppercase; }}
 .body p {{ margin: 0; color: var(--text-2); font-size: 15px; }}
 .try {{ color: var(--text); font-size: 14px; border-left: 2px solid var(--lamp); padding-left: 12px; }}

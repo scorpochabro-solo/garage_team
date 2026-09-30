@@ -97,6 +97,9 @@ cp <проект>/tools/features_check.cjs . && node features_check.cjs      # �
 # превью веток для владельца: манифест с карточками → _preview/v/ (сервер garage-2027-preview, порт 5182)
 python3 tools/preview_variants.py _preview/manifest.json && node preview_thumbs.cjs <проект>/_preview/manifest.json \
   && python3 tools/preview_variants.py _preview/manifest.json --index-only
+# те же превью на GitHub Pages (https://scorpochabro-solo.github.io/garage_team/v/): карточки — tools/pages_previews.json,
+# собирать в docs/ отдельной копии ветки main (git worktree), картинки карточек — в docs/v/thumbs/<ключ>.webp
+python3 tools/preview_variants.py tools/pages_previews.json --out <копия main>/docs --only base,pogoda
 ```
 
 ## Фото услуг (kie.ai, GPT Image 2.5)
