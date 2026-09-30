@@ -24,6 +24,7 @@ from build.home import render_home  # noqa: E402
 from build.images import make_logo_assets, process_images  # noqa: E402
 from build.services import render_service, render_services_index  # noqa: E402
 from build.static_pages import PAGES  # noqa: E402
+from build.stuk import DATA_PATH as STUK_DATA, data_json as stuk_data  # noqa: E402
 
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
@@ -40,8 +41,8 @@ def _arg(name, default):
 BASE = _arg("--base", "").rstrip("/")
 DIST = ROOT / _arg("--out", "dist")
 D.set_base(BASE)
-CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "car.css", "pribory.css", "pages.css", "service.css", "shiny.css", "footer.css"]
-JS_ORDER = ["core.js", "car.js", "pribory.js", "gallery.js", "form.js", "pages.js", "shiny.js"]
+CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "car.css", "pribory.css", "stuk.css", "pages.css", "service.css", "shiny.css", "footer.css"]
+JS_ORDER = ["core.js", "car.js", "pribory.js", "gallery.js", "form.js", "stuk.js", "pages.js", "shiny.js"]
 UNICODE = {
     "latin": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
     "cyrillic": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116",
@@ -97,6 +98,7 @@ def main(verbose=False):
     (DIST / "assets" / "js" / "site.js").write_text(js, encoding="utf-8")
     D.ASSET_VERSION.update(css=hashlib.sha1(css.encode("utf-8")).hexdigest()[:10],
                            js=hashlib.sha1(js.encode("utf-8")).hexdigest()[:10])
+    (DIST / STUK_DATA.lstrip("/")).write_text(stuk_data(), encoding="utf-8")  # «Что стучит?»: loaded when the section is near
 
     # pages
     urls = []

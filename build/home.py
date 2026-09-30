@@ -7,6 +7,7 @@ from . import schema
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 from .pribory import pribory_section
+from .stuk import stuk_section
 
 esc = D.esc
 S = D.SITE
@@ -267,6 +268,7 @@ def render_home():
         gallery(),
         team(),
         reviews_section(paper=True),
+        stuk_section(),
         request_section("Оставить запрос"),
         green_note_wrap(),
         contacts_strip(),
