@@ -6,11 +6,14 @@ dome pendants that light it, and between them the «GARAGE TEAM» neon sign from
              the headline readable, the night / hand-lamp layers of the dark room and the glow of the neon
     room()   the lamps (real toggle buttons) and the neon sign
     mini()   the same pendant, small, over the «Приезжайте в Гараж» heading: it lights up when the heading scrolls in
+    neon_tubes()  public: the tube outlines of the neon sign (the footer sign of «Неон», build/neon.py, uses them too)
 
 Behaviour is in src/assets/js/svet.js, styles in src/assets/css/svet.css. Without JavaScript the room is simply lit.
 """
 import re
+from functools import lru_cache
 from pathlib import Path
+from typing import NamedTuple
 
 from . import data as D
 
@@ -48,9 +51,20 @@ def _lamp_symbol():
 # The logo is a PDF export: the letters exist only as clip paths. These are the inner letter shapes the tubes trace:
 # G A R A G E, T E A M, the bar over GARAGE and the bar under it.
 _LETTER_CLIPS = (30, 32, 50, 34, 36, 38, 48, 40, 42, 44, 28, 46)
+# the part of the logo's coordinate system the sign occupies (min-x min-y width height)
+NEON_VIEWBOX = "92 358 396 138"
 
 
-def _neon_paths():
+class NeonTubes(NamedTuple):
+    letters: tuple   # path data of the white letter tubes: G A R A G E, T E A M and the two bars
+    frame: str       # path data of the mint tube around the sign
+    script: str      # path data of «CAR SERVICE»: a filled mint shape, not a tube
+
+
+@lru_cache(maxsize=1)
+def neon_tubes() -> NeonTubes:
+    """The tubes of the GARAGE TEAM sign, traced from the logo. Read once per build: the footer sign of «Неон»
+    (build/neon.py) asks for them on every page."""
     svg = (ROOT / "src" / "assets" / "logo" / "logo.svg").read_text(encoding="utf-8")
     clips = dict(re.findall(r'<clipPath id="clip-(\d+)"><path[^>]* d="([^"]+)"', svg))
     body = svg.split("</defs>", 1)[-1]
@@ -66,14 +80,14 @@ def _neon_paths():
         script = next(d_of(a) for a in drawn if "39.61%" in a and float(re.search(r' d="M ([\d.]+)', a).group(1)) < 400)
     except (KeyError, StopIteration, AttributeError) as exc:
         raise SystemExit(f"svet: в logo.svg не нашлись контуры для неоновой вывески ({exc})")
-    return letters, frame, script
+    return NeonTubes(tuple(letters), frame, script)
 
 
 def _neon():
-    letters, frame, script = _neon_paths()
+    letters, frame, script = neon_tubes()
     tubes = "".join(f'<path d="{d}"/>' for d in letters)
     # every tube is drawn three times — a wide faint halo, a glow and the bright core — instead of a blur filter
-    return f"""<svg class="svet-neon" viewBox="92 358 396 138" aria-hidden="true" focusable="false">
+    return f"""<svg class="svet-neon" viewBox="{NEON_VIEWBOX}" aria-hidden="true" focusable="false">
   <defs>
     <g id="svet-neon-white" fill="none" stroke-linejoin="round">{tubes}</g>
     <g id="svet-neon-mint" fill="none" stroke-linejoin="round"><path d="{frame}"/></g>

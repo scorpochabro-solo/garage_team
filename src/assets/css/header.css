@@ -23,9 +23,8 @@
 
 .nav { display: flex; align-items: center; gap: 0.25rem; margin-left: 0.5rem; }
 .nav__link { position: relative; display: inline-flex; align-items: center; height: 40px; padding: 0 0.85rem; font-weight: 600; font-size: 0.93rem; color: var(--gray-300); transition: color var(--dur) var(--ease); }
-.nav__link::after { content: ""; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 6px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform var(--dur) var(--ease); }
 .nav__link:hover, .nav__link.is-active { color: #fff; }
-.nav__link:hover::after, .nav__link.is-active::after { transform: scaleX(1); }
+/* the underline of the hovered, focused and current item is a neon tube: .nav__label in neon.css */
 
 .site-header__actions { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
 .site-header__phone { display: inline-flex; align-items: baseline; gap: 0.35em; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; color: #fff; margin-right: 0.6rem; white-space: nowrap; }

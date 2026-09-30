@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from build import data as D  # noqa: E402
+from build import neon  # noqa: E402
 from build.css_tools import guard_hover  # noqa: E402
 from build.home import render_home  # noqa: E402
 from build.images import make_logo_assets, process_images  # noqa: E402
@@ -41,8 +42,8 @@ def _arg(name, default):
 BASE = _arg("--base", "").rstrip("/")
 DIST = ROOT / _arg("--out", "dist")
 D.set_base(BASE)
-CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "zima.css", "car.css", "pribory.css", "stuk.css", "pages.css", "service.css", "shiny.css", "footer.css", "otkryto.css", "arki.css", "svet.css", "vorota.css"]
-JS_ORDER = ["core.js", "car.js", "pribory.js", "gallery.js", "form.js", "zima.js", "stuk.js", "pages.js", "shiny.js", "otkryto.js", "arki.js", "svet.js", "vorota.js"]
+CSS_ORDER = ["tokens.css", "base.css", "components.css", "header.css", "home.css", "zima.css", "car.css", "pribory.css", "stuk.css", "pages.css", "service.css", "shiny.css", "footer.css", "otkryto.css", "arki.css", "svet.css", "vorota.css", "neon.css"]
+JS_ORDER = ["core.js", "car.js", "pribory.js", "gallery.js", "form.js", "zima.js", "stuk.js", "pages.js", "shiny.js", "otkryto.js", "arki.js", "svet.js", "vorota.js", "neon.js"]
 UNICODE = {
     "latin": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
     "cyrillic": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116",
@@ -89,8 +90,9 @@ def main(verbose=False):
     make_logo_assets(SRC / "assets" / "logo" / "mark.png", DIST)
     n_img, img_bytes = process_images(SRC / "assets" / "img", DIST / "assets" / "img", verbose=verbose)
 
-    # hover styles only where a pointer can hover: on a phone a tapped element stays in :hover (build/css_tools.py)
-    css = fonts_css() + D.rebase(guard_hover("\n".join((SRC / "assets" / "css" / n).read_text(encoding="utf-8") for n in CSS_ORDER)))
+    # hover styles only where a pointer can hover: on a phone a tapped element stays in :hover (build/css_tools.py);
+    # the brick wall of «Неон» is generated (build/neon.py) and goes first, as custom properties for neon.css
+    css = fonts_css() + neon.material_css() + D.rebase(guard_hover("\n".join((SRC / "assets" / "css" / n).read_text(encoding="utf-8") for n in CSS_ORDER)))
     (DIST / "assets" / "css").mkdir(parents=True)
     (DIST / "assets" / "css" / "site.css").write_text(css, encoding="utf-8")
     js = D.rebase("\n".join((SRC / "assets" / "js" / n).read_text(encoding="utf-8") for n in JS_ORDER))

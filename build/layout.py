@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
-from . import otkryto
+from . import neon, otkryto
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -86,7 +86,8 @@ def topline():
 
 
 def header():
-    nav = "".join(f'<a class="nav__link" href="{h}">{esc(n)}</a>' for n, h in D.NAV)
+    # the label is its own box: the neon tube under it (neon.css) follows the text when a label wraps
+    nav = "".join(f'<a class="nav__link" href="{h}"><span class="nav__label">{esc(n)}</span></a>' for n, h in D.NAV)
     return f"""<header class="site-header" data-header>
   <div class="wrap site-header__in">
     <a class="logo" href="/" aria-label="Гараж — на главную"><img src="/assets/logo/logo.svg" width="133" height="48" alt="Garage Team — автосервис «Гараж» в Нижнем Новгороде"></a>
@@ -134,6 +135,7 @@ def footer():
     cats = "".join(f'<a href="{c["href"]}">{esc(c["name"])}</a>' for c in D.CATEGORIES[:10])
     hours = "".join(f"<span>{icon('clock')}<span>{esc(d)}: {esc(h)}</span></span>" for d, h in D.HOURS)
     return f"""<footer class="site-footer">
+  {neon.footer_sign()}
   <div class="footer__watermark" aria-hidden="true">ГАРАЖ</div>
   <div class="wrap site-footer__in">
     <div class="footer__grid">

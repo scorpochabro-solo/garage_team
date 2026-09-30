@@ -206,9 +206,8 @@
 .reg-section__title::before { content: ""; width: 10px; height: 10px; background: var(--green); }
 .reg-section[hidden] { display: none; }
 
-/* 404 */
+/* 404 (the neon «404» on the brick wall: neon.css) */
 .notfound { text-align: center; padding-block: clamp(5rem, 4rem + 6vw, 10rem); }
-.notfound__code { font-family: var(--font-display); font-weight: 900; font-size: clamp(6rem, 4rem + 12vw, 16rem); line-height: 0.9; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 2px rgba(var(--green-bright-rgb), 0.7); }
 .notfound__actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
 
 /* reviews page grid */

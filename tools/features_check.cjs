@@ -167,6 +167,25 @@ async function contacts(page) {
   line(c.sw <= c.vw, '/contacts/: no sideways scroll', `${c.sw} / ${c.vw}`);
 }
 
+async function neon(page) {
+  // «Неон»: the 404 is the neon wall and its broken tube catches; the footer sign is dark below the fold, lit in view
+  await page.goto(BASE + '/404.html', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(6000);   // the start-up of the broken tube (neon.css): 5 s after a 0.35 s delay
+  const nf = await page.evaluate(() => {
+    const s = document.querySelector('[data-neon-404]');
+    return s ? { steady: s.classList.contains('is-steady'), layers: s.querySelectorAll('.neon-404__sign svg').length } : null;
+  });
+  line(!!nf && nf.layers === 3 && nf.steady, '«Неон»: the 404 sign burns, the broken tube has caught', nf ? `${nf.layers} layers` : 'no sign');
+  await page.goto(BASE + '/oplata.html', { waitUntil: 'networkidle' });
+  const before = await page.evaluate(() => { const s = document.querySelector('[data-neon-sign]'); return s ? s.className : ''; });
+  await show(page, '.neon-strip', 1600);
+  const after = await page.evaluate(() => {
+    const s = document.querySelector('[data-neon-sign]');
+    return s ? `${s.className} ${getComputedStyle(s.querySelector('.neon-sign__lit')).opacity}` : '';
+  });
+  line(before === 'neon-strip is-off' && after === 'neon-strip is-on 1', '«Неон»: the footer sign strikes on in view', `${before} -> ${after}`);
+}
+
 async function shiny(page) {
   await page.goto(BASE + '/services/sinomontaz.html', { waitUntil: 'networkidle' });
   const text = page.locator('[data-shiny] [data-size="b"] [data-text]');
@@ -194,7 +213,7 @@ async function shiny(page) {
     page.on('console', (m) => { if (m.type() === 'error' && (m.location().url || BASE).startsWith(BASE)) errors.push('console: ' + m.text() + ' ' + (m.location().url || '')); });
     page.on('requestfailed', (r) => { if (r.url().startsWith(BASE)) errors.push('failed: ' + r.url()); });
     const phone = !!run.ctx.isMobile;
-    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page)]) {
+    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page), () => neon(page)]) {
       try { await step(); } catch (e) { line(false, 'step crashed', e.message.split('\n')[0]); }
     }
     line(errors.length === 0, 'no errors in the console', errors.slice(0, 5).join(' | '));
