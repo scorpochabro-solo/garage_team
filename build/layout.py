@@ -2,6 +2,7 @@
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
 from . import otkryto
+from . import shtorka
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -49,6 +50,7 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 <link rel="apple-touch-icon" href="/assets/logo/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+{shtorka.head()}
 <link rel="stylesheet" href="/assets/css/site.css{_version('css')}">
 {ld}
 </head>
@@ -58,6 +60,7 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 {topline()}
 {header()}
 {mobile_menu()}
+{shtorka.markup()}
 <main id="main">
 {body}
 </main>
