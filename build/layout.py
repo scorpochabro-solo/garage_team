@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
-from . import otkryto
+from . import otkryto, vremya
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -191,6 +191,7 @@ def call_modal():
           <div class="field"><label class="field__label" for="call-car">Для автомобиля</label><input class="input" id="call-car" name="car" type="text" placeholder="Марка, модель, год"></div>
           <div class="field"><label class="field__label" for="call-vin">VIN</label><input class="input" id="call-vin" name="vin_code" type="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697"></div>
           <div class="field span-2"><label class="field__label" for="call-msg">Комментарий</label><textarea class="textarea" id="call-msg" name="message" rows="3"></textarea></div>
+          {vremya.in_modal()}
           <div class="field span-2"><label class="check"><input type="checkbox" name="agree" value="1" required><span class="check__box">{icon('check')}</span><span>Соглашаюсь с <a href="/page/soglashenie/" target="_blank">пользовательским соглашением</a> и обработкой персональных данных</span></label></div>
         </div>
         <input type="hidden" name="send" value="1">
@@ -406,6 +407,7 @@ def request_section(title="Оставить запрос", section_id="request",
         </div>
         <button class="btn btn--ghost btn--sm" type="button" data-add-part>{icon('plus')} Добавить запчасть</button>
         <div class="field" style="margin-top:1.1rem"><label class="field__label" for="request_what">Или опишите задачу для автосервиса</label><textarea class="textarea" id="request_what" name="request_part[what]" rows="3" placeholder="Например: стук в передней подвеске, нужна диагностика и замена"></textarea></div>
+        {vremya.in_form()}
         <div class="rq__actions"><button class="btn btn--ghost" type="button" data-prev>{icon('arrow-left')} Назад</button><button class="btn btn--primary" type="button" data-next>Вперёд {icon('arrow')}</button></div>
       </div>
 

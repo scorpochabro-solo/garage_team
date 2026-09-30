@@ -1,0 +1,124 @@
+/* ============================================================
+   vremya: «Когда удобно приехать?» under the request text and the modal's comment (build/vremya.py, js/vremya.js).
+   A split-flap board of 14 days: 7 × 2 when the form is wide, one strip that scrolls and snaps on a phone.
+   The chosen day lights its number like a lamp on the board; closed days are hatched, their number struck through.
+   ============================================================ */
+.vr[hidden], .vr [hidden] { display: none !important; }   /* the parts below set their own display */
+.vr { --vr-board: var(--black); --vr-amber: #f2a93b; --vr-amber-rgb: 242, 169, 59; container: vr / inline-size; margin-top: 1.5rem; }
+.form-grid > .vr { margin-top: 0.15rem; }   /* the modal: the grid's gap is the distance */
+
+/* ---------- head: the question over «необязательно» ---------- */
+.vr__head { display: flex; margin-bottom: 0.55rem; }
+.vr__title { display: flex; align-items: center; gap: 0.65rem; min-width: 0; min-height: 44px; text-align: left; }
+.vr__title > .ic { width: 1.35rem; height: 1.35rem; color: var(--accent); }
+.vr__tt { display: grid; gap: 0.08rem; }
+.vr__q { font-weight: 700; font-size: 0.95rem; line-height: 1.3; color: var(--text); }
+.vr__opt { font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+/* the modal: the question is a bar like the fields above it, and it opens the days; the note waits until they are
+   open or something is chosen */
+.vr__toggle { flex: 1 1 auto; min-height: 56px; padding: 0.5rem 0.9rem; color: var(--text); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+.vr__toggle .vr__chev { width: 1.15rem; height: 1.15rem; margin-left: auto; color: var(--text-3); transition: transform var(--dur) var(--ease), color var(--dur) var(--ease); }
+.vr__toggle:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.vr__toggle:hover .vr__chev { color: var(--accent); }
+.vr.is-open .vr__toggle { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-2); }
+.vr.is-open .vr__chev { transform: rotate(180deg); }
+.vr--fold:not(.is-open):not(.is-set) .vr__note { display: none; }
+.vr--fold:not(.is-open) .vr__status { margin-top: 0.2rem; }
+
+/* ---------- the board: 1px seams are the board's background showing between the cells ---------- */
+.vr__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; max-width: 46rem; background: var(--line); box-shadow: 0 0 0 1px var(--line-2); }
+.vr-day {
+  position: relative; display: grid; justify-items: center; align-content: center; gap: 0.32rem;
+  min-width: 0; min-height: 5rem; padding: 0.65rem 0.15rem 0.6rem;
+  color: var(--text-2); background: var(--vr-board);
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.vr-day__wd { font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+/* the number on its flap: a dark tile split across the middle */
+.vr-day__d {
+  position: relative; padding: 0.3rem 0.34rem 0.26rem; border-radius: 2px;
+  font-family: var(--font-mono); font-weight: 600; font-size: 1.28rem; line-height: 1; letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+  color: var(--text); background: var(--ink-600);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.vr-day__d::after { content: ""; position: absolute; left: 0; right: 0; top: calc(50% - 0.5px); height: 1px; background: var(--vr-board); }
+.vr-day__tag { font-size: 0.6875rem; font-weight: 600; line-height: 1.1; white-space: nowrap; color: var(--text-3); }
+/* today: a bar on top, as the week of «Открыто сейчас» marks it */
+.vr-day.is-today::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--accent); }
+.vr-day.is-today .vr-day__tag { color: var(--accent); }
+
+.vr-day:not(:disabled):hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
+.vr-day:not(:disabled):hover .vr-day__d { background: var(--ink-500); }
+.vr-day:not(:disabled):active .vr-day__d { transform: translateY(1px); }
+
+/* chosen: the number lights up, the cell is framed in the signal green */
+.vr-day[aria-checked="true"] { color: var(--text); background: rgba(var(--green-bright-rgb), 0.12); box-shadow: inset 0 0 0 2px var(--green-bright); }
+.vr-day[aria-checked="true"] .vr-day__wd, .vr-day[aria-checked="true"] .vr-day__tag { color: var(--text); }
+.vr-day[aria-checked="true"] .vr-day__d { color: #06120a; background: var(--green-bright); box-shadow: 0 0 18px -3px rgba(var(--green-bright-rgb), 0.65); animation: vr-flip 0.42s var(--ease) both; }
+.vr-day[aria-checked="true"] .vr-day__d::after { background: rgba(6, 18, 10, 0.4); }
+.vr-day.is-today[aria-checked="true"]::before { background: var(--green-bright); }
+@keyframes vr-flip { from { transform: perspective(140px) rotateX(-80deg); } }
+
+/* closed (Sunday) and today once every part of it is over: hatched, the flap struck through */
+.vr-day:disabled { cursor: default; color: var(--text-3); background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 0 6px, transparent 6px 12px); }
+.vr-day:disabled .vr-day__d { color: var(--text-3); background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+.vr-day:disabled .vr-day__d::after { left: -0.2rem; right: -0.2rem; background: var(--text-3); }
+.vr-day.is-today:disabled::before { background: var(--text-3); }
+.vr-day.is-today:disabled .vr-day__tag { color: var(--text-3); }
+
+/* focus: a ring inside the cell (the cells stand edge to edge) */
+.vr-day:focus-visible, .vr-part:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; border-radius: 0; }
+.vr-day[aria-checked="true"]:focus-visible, .vr-part[aria-checked="true"]:focus-visible { outline-color: #fff; }
+
+/* ---------- parts of the day ---------- */
+.vr__parts { display: flex; flex-wrap: wrap; gap: 0.4rem; max-width: 46rem; margin-top: 0.55rem; }
+.vr-part {
+  flex: 1 1 6.5rem; display: grid; align-content: center; justify-items: start; gap: 0.22rem;
+  min-height: 3.5rem; padding: 0.55rem 0.85rem; text-align: left; color: var(--text); background: var(--vr-board);
+  box-shadow: inset 0 0 0 1px var(--line-2); animation: vr-in 0.35s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms);
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.vr-part__t { font-weight: 700; font-size: 0.92rem; line-height: 1.2; }
+.vr-part__h { padding: 0.12rem 0.34rem; margin-left: -0.34rem; border-radius: 2px; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.2; letter-spacing: 0.04em; color: var(--text-2); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.vr-part:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.vr-part:active { transform: translateY(1px); }
+.vr-part[aria-checked="true"] { background: rgba(var(--green-bright-rgb), 0.12); box-shadow: inset 0 0 0 2px var(--green-bright); }
+.vr-part[aria-checked="true"] .vr-part__h { color: #06120a; background: var(--green-bright); }
+@keyframes vr-in { from { opacity: 0; transform: translateY(5px); } }
+
+/* ---------- what went into the text (with «Сбросить» that takes it out), and the honest note ---------- */
+.vr__status { display: flex; align-items: flex-start; gap: 0.6rem; max-width: 46rem; margin-top: 0.75rem; padding: 0.7rem 0.9rem; font-size: 0.9rem; line-height: 1.45; color: var(--text); background: rgba(var(--green-bright-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--green-bright-rgb), 0.35); }
+.vr__status > .ic { flex: none; width: 1.15em; height: 1.15em; margin-top: 0.15em; color: var(--accent); }
+.vr__sbody { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+/* the caption never breaks; on the narrowest phones «Сбросить» goes under it, to the right */
+.vr__srow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.2rem 0.75rem; }
+.vr__where { white-space: nowrap; font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+/* 44px to tap, without making the row taller (the negative margin eats the padding) */
+.vr__clear { display: inline-flex; align-items: center; gap: 0.35em; flex: none; min-height: 44px; margin: -12px -0.45rem -12px auto; padding: 0 0.45rem; font-size: 0.85rem; font-weight: 600; color: var(--text-2); transition: color var(--dur) var(--ease); }
+.vr__clear .ic { width: 1.05em; height: 1.05em; color: var(--accent); }
+.vr__clear:hover { color: var(--text); }
+.vr__line { margin-top: 0.1rem; }
+.vr__status .vr__warn { display: none; }
+.vr__status.is-warn { background: rgba(var(--vr-amber-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--vr-amber-rgb), 0.45); }
+.vr__status.is-warn .vr__ok, .vr__status.is-warn .vr__srow { display: none; }
+.vr__status.is-warn .vr__warn { display: block; color: var(--vr-amber); }
+.vr__status.is-warn .vr__line { margin-top: 0; }
+.vr__note { max-width: 60ch; margin-top: 0.6rem; font-size: 0.82rem; line-height: 1.45; color: var(--text-3); text-wrap: pretty; }
+
+/* ---------- narrow (a phone, the modal on a phone): one strip of days that scrolls and snaps ---------- */
+@container vr (max-width: 459.98px) {
+  .vr__days { display: flex; max-width: none; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .vr__days::-webkit-scrollbar { display: none; }
+  .vr-day { flex: 0 0 4.25rem; scroll-snap-align: start; }
+}
+
+/* reduced motion: base.css shortens the animations, the chips must not wait for their stagger delay either */
+@media (prefers-reduced-motion: reduce) {
+  .vr-part, .vr-day[aria-checked="true"] .vr-day__d { animation: none; }
+}
+
+/* Windows high contrast: colours are replaced, the choice keeps a frame */
+@media (forced-colors: active) {
+  .vr-day[aria-checked="true"], .vr-part[aria-checked="true"] { outline: 3px solid Highlight; outline-offset: -3px; }
+  .vr-day:disabled { color: GrayText; }
+}

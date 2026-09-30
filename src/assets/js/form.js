@@ -171,7 +171,9 @@
         const first = $('.part input[type=text]', form);
         const filled = $$('.part input[type=text]', form).some((i) => i.value.trim());
         const comment = $('[name="request_part[what]"]', form);
-        const ok = filled || (comment && comment.value.trim());
+        // «Когда удобно приехать?» (vremya.js) writes its line into this text: the line alone does not describe the task
+        const text = comment ? (G.vremya ? G.vremya.ownText(comment) : comment.value) : '';
+        const ok = filled || text.trim();
         if (first) G.setError(first, !ok);
         return !!ok;
       }
