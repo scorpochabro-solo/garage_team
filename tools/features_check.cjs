@@ -51,13 +51,14 @@ async function home(page, phone) {
     insideLamp: !!document.querySelector('#inside .svet-lit .svet-mini'),
     director: !!document.querySelector('.director__photo--arch'),
     stuk: !!document.querySelector('#stuk[data-stuk]'),
+    pogoda: !!document.querySelector('#pogoda [data-pogoda]'),
     zima: document.querySelectorAll('#zima .zima-item').length,
     gate: !!document.querySelector('#contacts .gate'),
     order: Array.from(document.querySelectorAll('main section[id], body > section[id], section[id]')).map((s) => s.id).join(' '),
   }));
-  line(has.svet && has.lamps === 16 && has.arches === 4 && has.insideLamp && has.director && has.stuk && has.zima >= 10 && has.gate,
+  line(has.svet && has.lamps === 16 && has.arches === 4 && has.insideLamp && has.director && has.stuk && has.pogoda && has.zima >= 10 && has.gate,
     'home: every block is on the page', `lamps ${has.lamps}, arches ${has.arches}, zima ${has.zima}`);
-  line(/pribory advantages inside gallery team reviews stuk zima request contacts/.test(has.order), 'home: section order', has.order);
+  line(/pribory advantages inside gallery team reviews stuk pogoda zima request contacts/.test(has.order), 'home: section order', has.order);
 
   // «Свет ламп»: every lamp off -> the dark room with the neon; any lamp brings the light back
   const lampBtns = page.locator('[data-svet-lamp] button:visible');
@@ -105,6 +106,25 @@ async function home(page, phone) {
     return { shown: r && !r.hidden, links };
   });
   line(res.shown && res.links.length > 0 && !res.links.some((h) => /udalen/.test(h)), '«Что стучит?»: causes with service links', `${res.links.length} links`);
+
+  // «Пора переобуваться?»: the forecast (or, without the network, the rule of thumb) and the booking with its message
+  await show(page, '#pogoda', 600);
+  await page.waitForFunction(() => /^(ready|stale|error)$/.test(document.querySelector('[data-pogoda]').dataset.state), null, { timeout: 15000 }).catch(() => {});
+  const pg = await page.evaluate(() => {
+    const r = document.querySelector('[data-pogoda]');
+    const shown = (s) => { const el = r.querySelector(s); return !!el && !el.closest('[hidden]'); };
+    return { state: r.dataset.state, title: r.querySelector('[data-pg-title]').textContent, days: r.querySelectorAll('.pogoda-day').length,
+             rule: shown('[data-pg-rule]'), error: r.dataset.pgError || '' };
+  });
+  line(/^(ready|stale)$/.test(pg.state) ? !!pg.title && pg.days >= 10 : pg.state === 'error' && pg.rule,
+    '«Пора переобуваться?»: a verdict and the days, or the rule without the network', `${pg.state}: ${pg.title || pg.error}, ${pg.days} days`);
+  const book = page.locator('#pogoda [data-pg-book]');
+  if (phone) await book.tap(); else await book.click();
+  await page.waitForTimeout(600);
+  const msg = await page.evaluate(() => { const d = document.getElementById('modal-call'); return d.open ? d.querySelector('[name="message"]').value : ''; });
+  line(/^Шиномонтаж: /.test(msg), '«Пора переобуваться?»: the booking opens the call modal with a message', msg);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
 
   // «Готова ли машина к зиме?»: two ticks move the dial (the ticks are real checkboxes)
   await show(page, '#zima', 1500);

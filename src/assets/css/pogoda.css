@@ -1,0 +1,217 @@
+/* ============================================================
+   «Пора переобуваться?» (#pogoda, build/pogoda.py + js/pogoda.js): the verdict card under a warm lamp and the chart
+   of the days — min–max bars coloured by temperature (lamp amber above the threshold, the mint of the workshop's neon
+   below it, ice under 0 °C), the daily mean as a ringed dot, the +7 °C guide as a dashed neon line, 0 °C in ice.
+   Motion: the bars grow in once (transform), the labels fade in (opacity); nothing loops but the status dot while
+   the forecast loads.
+   ============================================================ */
+.pogoda-sec {
+  --pg-warm: var(--arch-lamp-rgb, 255, 207, 138);   /* the lamps of the office (arki.css); a fallback of its own */
+  --pg-cool: 64, 240, 192;                          /* the mint tubes of the neon sign */
+  --pg-ice: 205, 236, 255;
+  border-top: 1px solid var(--line);
+}
+/* evening light in the workshop: warm where the board hangs, a cool breath where the cold days are */
+.pogoda-sec::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 48% at 16% 40%, rgba(var(--pg-warm), 0.075), transparent 72%),
+    radial-gradient(ellipse 44% 50% at 86% 80%, rgba(var(--pg-cool), 0.045), transparent 72%); }
+.pogoda-sec .wrap { position: relative; }
+.pogoda [hidden] { display: none !important; }   /* the parts below set their own display */
+
+.pogoda { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(1rem, 0.4rem + 1.6vw, 2rem); align-items: stretch; }
+
+/* ---------- the verdict card: a board under a lamp ---------- */
+.pogoda-card { position: relative; display: flex; flex-direction: column; min-width: 0; padding: clamp(1.4rem, 1rem + 1.2vw, 2.1rem);
+  background: radial-gradient(130% 58% at 24% -10%, rgba(var(--pg-warm), 0.15), rgba(var(--pg-warm), 0.035) 52%, transparent 74%), var(--ink-800);
+  box-shadow: inset 0 0 0 1px var(--line-2); }
+/* the lamp itself: a warm strip on the top edge */
+.pogoda-card::before { content: ""; position: absolute; left: 24%; top: 0; width: 56px; height: 3px; margin-left: -28px; background: rgb(var(--pg-warm)); box-shadow: 0 0 18px 3px rgba(var(--pg-warm), 0.42); }
+
+.pogoda-card__status { display: flex; align-items: center; gap: 0.65rem; font-family: var(--font-mono); font-size: var(--fs-mono); line-height: 1.4; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+.pogoda-card__part { white-space: nowrap; }
+.pogoda-card__dot { width: 8px; height: 8px; flex: none; background: var(--text-3); transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.pogoda[data-tone="winter"] .pogoda-card__dot { background: rgb(var(--pg-cool)); box-shadow: 0 0 10px rgba(var(--pg-cool), 0.7); }
+.pogoda[data-tone="summer"] .pogoda-card__dot { background: rgb(var(--pg-warm)); box-shadow: 0 0 10px rgba(var(--pg-warm), 0.6); }
+.pogoda[data-state="loading"] .pogoda-card__dot { animation: pogoda-wait 0.9s var(--ease-io) infinite alternate; }
+.pogoda[data-state="error"] .pogoda-card__dot { background: var(--danger); }
+@keyframes pogoda-wait { from { opacity: 0.2; } }
+
+/* the two faces share one place: the rule of thumb (no forecast yet, no JS, an error) and the verdict */
+.pogoda-card__faces { margin-top: clamp(1.1rem, 0.8rem + 1vw, 1.7rem); }
+.pogoda-card__big { display: flex; align-items: flex-start; font-family: var(--font-display); font-weight: 800; font-size: clamp(3.2rem, 2.4rem + 3vw, 5.2rem); line-height: 0.92; letter-spacing: -0.05em; }
+.pogoda-card__big b:first-child { color: rgb(var(--pg-cool)); }
+.pogoda-card__big b:last-of-type { color: rgb(var(--pg-warm)); }
+/* Unbounded draws «…» as three heavy dots: the text face, light and small, sits on the baseline instead */
+.pogoda-card__big span { align-self: flex-end; margin: 0 0.06em 0.04em; font-family: var(--font-text); font-weight: 400; font-size: 0.6em; line-height: 1; letter-spacing: 0; color: var(--text-3); }
+.pogoda-card__big small { margin: 0.1em 0 0 0.1em; font-size: 0.34em; letter-spacing: 0; color: var(--text-2); }
+.pogoda-card__cap { margin-top: 0.9rem; max-width: 32ch; font-size: 1rem; line-height: 1.45; color: var(--text-2); text-wrap: pretty; }
+
+.pogoda-card__face--live { animation: pogoda-in 0.55s var(--ease) both; }
+@keyframes pogoda-in { from { opacity: 0; transform: translateY(8px); } }
+.pogoda-card__verdict { outline: none; }
+.pogoda-card__verdict:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+.pogoda-card__title { display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.1rem, 1.55rem + 2.1vw, 3.3rem); line-height: 1; letter-spacing: -0.035em; color: var(--text); text-wrap: balance; }
+.pogoda[data-tone="winter"] .pogoda-card__title { color: rgb(var(--pg-cool)); text-shadow: 0 0 30px rgba(var(--pg-cool), 0.26); }
+.pogoda[data-tone="summer"] .pogoda-card__title { color: rgb(var(--pg-warm)); text-shadow: 0 0 30px rgba(var(--pg-warm), 0.2); }
+.pogoda-card__kick { display: block; margin-top: 0.6rem; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.22rem); line-height: 1.3; letter-spacing: -0.01em; color: var(--text); text-wrap: balance; }
+.pogoda-card__chip { display: inline-flex; align-items: center; gap: 0.55em; margin-top: 0.95rem; padding: 0.5em 0.85em; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(var(--pg-cool)); background: rgba(var(--pg-cool), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--pg-cool), 0.32); }
+.pogoda-card__chip .ic { width: 1.15em; height: 1.15em; }
+.pogoda[data-tone="summer"] .pogoda-card__chip { color: rgb(var(--pg-warm)); background: rgba(var(--pg-warm), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--pg-warm), 0.32); }
+.pogoda-card__why { margin-top: 1rem; max-width: 50ch; font-size: 0.98rem; line-height: 1.55; color: var(--text-2); text-wrap: pretty; }
+.pogoda-card__note { margin-top: 0.75rem; max-width: 50ch; padding-left: 0.9rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-2); box-shadow: inset 2px 0 0 rgba(var(--pg-warm), 0.75); text-wrap: pretty; }
+
+/* the rule of thumb: the answer itself without a forecast, a footnote under the verdict */
+.pogoda-card__rule { display: flex; gap: 0.65rem; margin-top: 1.3rem; padding-top: 1.1rem; border-top: 1px solid var(--line); font-size: 0.95rem; line-height: 1.55; color: var(--text-2); text-wrap: pretty; }
+.pogoda-card__rule .ic { flex: none; width: 1.15rem; height: 1.15rem; margin-top: 0.15rem; color: rgb(var(--pg-warm)); }
+.pogoda-card__cta { display: grid; gap: 0.7rem; margin-top: auto; padding-top: clamp(1.3rem, 1rem + 1vw, 1.9rem); }
+/* with a verdict the booking comes right after it and the rule becomes the footnote at the bottom of the card
+   (the order of the markup — rule, then booking — is the one for the rule alone; nothing in the rule takes focus) */
+.pogoda:is([data-state="ready"], [data-state="stale"]) .pogoda-card__cta { order: 1; margin-top: 0; padding-bottom: 1.4rem; }
+.pogoda:is([data-state="ready"], [data-state="stale"]) .pogoda-card__rule { order: 2; margin-top: auto; font-size: 0.84rem; line-height: 1.5; color: var(--text-3); }
+.pogoda:is([data-state="ready"], [data-state="stale"]) .pogoda-card__rule .ic { color: var(--text-3); }
+/* in summer and in deep winter the verdict's own sentence already is the rule for the next season */
+.pogoda:is([data-verdict="summer-summer"], [data-verdict="winter-winter"]) .pogoda-card__rule { display: none; }
+.pogoda-card__book { --h: 56px; width: 100%; height: auto; min-height: var(--h); padding-block: 0.7em; white-space: normal; text-align: center; line-height: 1.2; text-wrap: balance; }
+/* side by side while both names fit on one line, one under the other on phones */
+.pogoda-card__links { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.75rem), 1fr)); gap: 0.5rem; }
+.pogoda-card__link { display: flex; align-items: center; gap: 0.6rem; min-height: 50px; padding: 0.5rem 0.85rem; font-size: 0.9rem; font-weight: 700; line-height: 1.25; color: var(--text); background: rgba(255, 255, 255, 0.025); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+.pogoda-card__link > .ic:first-child { width: 20px; height: 20px; color: var(--accent); }
+.pogoda-card__go { width: 1em; height: 1em; margin-left: auto; color: var(--text-3); transition: transform var(--dur) var(--ease), color var(--dur) var(--ease); }
+.pogoda-card__link:hover { box-shadow: inset 0 0 0 1px var(--accent); background: rgba(var(--green-bright-rgb), 0.05); }
+.pogoda-card__link:hover .pogoda-card__go { color: var(--accent); transform: translate(2px, -2px); }
+.pogoda-card__link:active { background: rgba(var(--green-bright-rgb), 0.08); }
+
+/* ---------- the chart ---------- */
+.pogoda-chart { position: relative; display: flex; flex-direction: column; min-width: 0; margin: 0; padding: clamp(1.1rem, 0.8rem + 1vw, 1.7rem); background: var(--ink-900); box-shadow: inset 0 0 0 1px var(--line); container: pogoda-chart / inline-size; }
+.pogoda-chart__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1.5rem; }
+.pogoda-chart__title { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-2); }
+.pogoda-chart__legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 1.1rem; font-size: 0.78rem; line-height: 1.3; color: var(--text-3); }
+.pogoda-key { display: inline-flex; align-items: center; gap: 0.45em; white-space: nowrap; }
+.pogoda-key--range i { width: 6px; height: 15px; border-radius: 3px; background: linear-gradient(180deg, rgb(var(--pg-warm)) 20%, rgb(var(--pg-cool)) 62%, rgb(var(--pg-ice)) 92%); }
+.pogoda-key--mean i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-900); box-shadow: 0 0 0 2px #fff; }
+.pogoda-snow { color: rgb(var(--pg-ice)); }
+.pogoda-key .pogoda-snow { width: 15px; height: 15px; }
+
+/* the plot takes the height the card gives it (at least the minimum); everything in it is placed in % of the
+   plot area — the band between the labels on top and the dates below — so no container units are needed */
+.pogoda-plot {
+  --pad-t: 36px; --pad-b: 24px; --date-h: 46px; --bar-w: 10px; --gut: 2.8rem; --plot-min: 200px;
+  /* the colour of a temperature: one gradient over the whole scale; each bar shows its own slice of it */
+  --pg-grad: linear-gradient(180deg, rgb(var(--pg-warm)) 0, rgb(var(--pg-warm)) calc((1 - var(--pt)) * 100% - 5%),
+    rgb(var(--pg-cool)) calc((1 - var(--pb)) * 100%), rgb(var(--pg-cool)) calc((1 - var(--p0)) * 100% - 2.5%),
+    rgb(var(--pg-ice)) calc((1 - var(--p0)) * 100% + 0.5%), rgb(var(--pg-ice)) 100%);
+  position: relative; flex: 1 0 auto; margin-top: 1rem;
+  min-height: calc(var(--pad-t) + var(--plot-min) + var(--pad-b) + var(--date-h));
+}
+/* the plot area of the whole chart (guides, messages) and of each day */
+.pogoda-plot__guides, .pogoda-plot__msg, .pogoda-day__plot, .pogoda-day.is-run::before { position: absolute; top: var(--pad-t); bottom: calc(var(--pad-b) + var(--date-h)); }
+
+/* guide lines: the band of «+5…+7 °C», the threshold as a neon tube, 0 °C as a line of ice; labels in the right margin */
+.pogoda-plot__guides { left: 0; right: 0; pointer-events: none; }
+.pogoda-plot__band { position: absolute; left: 0; right: var(--gut); bottom: calc(var(--pb) * 100%); height: calc((var(--pt) - var(--pb)) * 100%);
+  background: repeating-linear-gradient(-45deg, rgba(var(--pg-cool), 0.1) 0 1px, transparent 1px 7px); }
+.pogoda-plot__line { position: absolute; left: 0; right: 0; height: 0; }
+.pogoda-plot__line--thr { bottom: calc(var(--pt) * 100%); border-top: 2px dashed rgba(var(--pg-cool), 0.78); filter: drop-shadow(0 0 4px rgba(var(--pg-cool), 0.55)); }
+.pogoda-plot__line--zero { bottom: calc(var(--p0) * 100%); border-top: 1px solid rgba(var(--pg-ice), 0.55); }
+.pogoda-plot__line b { position: absolute; right: 0; bottom: 4px; font-family: var(--font-mono); font-size: 0.75rem; font-style: normal; font-weight: 700; line-height: 1; }
+.pogoda-plot__line--thr b { bottom: 5px; color: rgb(var(--pg-cool)); }
+.pogoda-plot__line--zero b { color: rgb(var(--pg-ice)); }
+
+.pogoda-days { position: absolute; top: 0; bottom: 0; left: 0; right: var(--gut); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.pogoda-day { position: relative; min-width: 0; }
+.pogoda-day.is-past { opacity: 0.38; }
+.pogoda-day__plot { left: 0; right: 0; }
+/* the days the verdict is about: a cool (in spring a warm) wash behind their bars */
+.pogoda-day.is-run::before { content: ""; left: 0; right: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(var(--pg-cool), 0.015), rgba(var(--pg-cool), 0.085)); }
+.pogoda[data-tone="summer"] .pogoda-day.is-run::before { background: linear-gradient(180deg, rgba(var(--pg-warm), 0.07), rgba(var(--pg-warm), 0.01)); }
+/* today stands under the lamp: a pool of warm light from the top edge; the ellipse fades out inside the box, no edges */
+.pogoda-day.is-today::after { content: ""; position: absolute; left: -30%; right: -30%; top: 0; bottom: var(--date-h); pointer-events: none;
+  background: radial-gradient(50% 62% at 50% 0%, rgba(var(--pg-warm), 0.15), rgba(var(--pg-warm), 0.05) 55%, transparent 100%); }
+
+/* the bar: a column as tall as the plot area painted with the whole gradient, cut down to the day's min–max by an inset
+   clip (--blo/--bhi: the range, at least a short capsule) — so its colours are the temperatures of the scale */
+.pogoda-day__bar { position: absolute; top: 0; bottom: 0; left: 50%; z-index: 1; width: var(--bar-w); margin-left: calc(var(--bar-w) / -2);
+  background: var(--pg-grad);
+  clip-path: inset(calc((1 - var(--bhi)) * 100%) 0 calc(var(--blo) * 100%) 0 round calc(var(--bar-w) / 2));
+  transform: scaleY(0); transform-origin: 50% 100%; transition: transform 0.8s var(--ease) calc(var(--i) * 45ms); }
+.pogoda-day__dot { position: absolute; left: 50%; top: calc((1 - var(--mean)) * 100%); z-index: 2; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
+  background: var(--ink-900); box-shadow: 0 0 0 2px #fff; }
+.pogoda-day__max, .pogoda-day__min { position: absolute; left: -3px; right: -3px; z-index: 2; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; font-variant-numeric: tabular-nums; text-shadow: 0 0 3px var(--ink-900), 0 0 6px var(--ink-900); }
+.pogoda-day__max { top: calc((1 - var(--bhi)) * 100% - 17px); color: var(--text); }
+.pogoda-day__min { top: calc((1 - var(--blo)) * 100% + 7px); color: var(--text-2); }
+.pogoda-day.is-frost .pogoda-day__min { color: rgb(var(--pg-ice)); }
+.pogoda-day__snow { position: absolute; left: 50%; top: calc((1 - var(--bhi)) * 100% - 36px); z-index: 2; width: 15px; height: 15px; margin-left: -7.5px; }
+.pogoda-day__dot, .pogoda-day__max, .pogoda-day__min, .pogoda-day__snow { opacity: 0; transition: opacity 0.45s var(--ease) calc(var(--i) * 45ms + 0.4s); }
+.pogoda-plot.is-drawn .pogoda-day__bar { transform: none; }
+.pogoda-plot.is-drawn :is(.pogoda-day__dot, .pogoda-day__max, .pogoda-day__min, .pogoda-day__snow) { opacity: 1; }
+
+/* the date row: weekday and day; «сегодня» where a column has room for it */
+.pogoda-day__date { position: absolute; left: 0; right: 0; bottom: 0; height: var(--date-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-top: 1px solid var(--line); font-family: var(--font-mono); line-height: 1; text-align: center; }
+.pogoda-day__wd, .pogoda-day__now { font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.pogoda-day__dn { font-size: 0.8rem; font-weight: 600; color: var(--text-2); }
+.pogoda-day__now { display: none; }
+.pogoda-day.is-today :is(.pogoda-day__wd, .pogoda-day__dn, .pogoda-day__now) { color: rgb(var(--pg-warm)); }
+/* the day the verdict names: a neon tick over its date */
+.pogoda-day.is-from .pogoda-day__date::before { content: ""; position: absolute; left: 50%; top: -2px; width: 24px; height: 3px; margin-left: -12px; background: rgb(var(--pg-cool)); box-shadow: 0 0 10px rgba(var(--pg-cool), 0.8); }
+.pogoda-day.is-from :is(.pogoda-day__wd, .pogoda-day__dn) { color: rgb(var(--pg-cool)); }
+.pogoda[data-tone="summer"] .pogoda-day.is-from .pogoda-day__date::before { background: rgb(var(--pg-warm)); box-shadow: 0 0 10px rgba(var(--pg-warm), 0.7); }
+.pogoda[data-tone="summer"] .pogoda-day.is-from :is(.pogoda-day__wd, .pogoda-day__dn) { color: rgb(var(--pg-warm)); }
+
+/* loading and failure: a message over the empty plot, the guide lines stay */
+.pogoda-plot__msg { left: 0; right: var(--gut); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.85rem; padding: 0.75rem; text-align: center; }
+.pogoda-plot__text { max-width: 36ch; padding: 0.55rem 0.85rem; font-size: 0.92rem; line-height: 1.5; color: var(--text-2); background: rgba(12, 13, 12, 0.88); outline: none; text-wrap: pretty; }
+.pogoda-plot__text:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }   /* holds the focus while a retry loads */
+.pogoda-plot__retry { --btn-bg: var(--ink-900); }
+
+.pogoda-chart__src { margin-top: 0.95rem; font-size: 0.78rem; line-height: 1.5; color: var(--text-3); }
+.pogoda-chart__src a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; transition: color var(--dur) var(--ease); }
+.pogoda-chart__src a:hover { color: var(--accent); text-decoration-color: currentColor; }
+/* touch: the source links get a taller hit area without moving the line */
+@media (pointer: coarse) { .pogoda-chart__src a { display: inline-block; padding-block: 12px; margin-block: -12px; } }
+
+/* ---------- narrow charts: the ten days only, slimmer bars ---------- */
+@container pogoda-chart (max-width: 560px) {
+  .pogoda-day.is-past { display: none; }
+  .pogoda-plot { --bar-w: 8px; --gut: 2.3rem; --pad-t: 34px; --date-h: 42px; --plot-min: 176px; }
+  .pogoda-day__deg { display: none; }
+  .pogoda-day__max, .pogoda-day__min { font-size: 0.6875rem; letter-spacing: -0.05em; }
+  .pogoda-day__dot { width: 8px; height: 8px; margin: -4px 0 0 -4px; }
+  .pogoda-day__snow { width: 13px; height: 13px; margin-left: -6.5px; top: calc((1 - var(--bhi)) * 100% - 33px); }
+  .pogoda-chart__legend { gap: 0.3rem 0.85rem; }
+}
+@container pogoda-chart (min-width: 780px) {
+  .pogoda-day.is-today .pogoda-day__wd { display: none; }
+  .pogoda-day.is-today .pogoda-day__now { display: block; }
+}
+
+/* ---------- layout ---------- */
+@media (max-width: 1239px) { .pogoda { grid-template-columns: minmax(0, 1fr); } }
+/* tablets: the card lies on its side — the verdict (or the rule's big numbers) on the left, the booking on the right,
+   the rule across the bottom */
+@media (min-width: 721px) and (max-width: 1239px) {
+  .pogoda-card { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(15rem, 1fr); column-gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  .pogoda-card__status { grid-column: 1 / -1; grid-row: 1; }
+  .pogoda-card__faces { grid-column: 1; grid-row: 2; }
+  /* as specific as the verdict-state rules above, and later: these win on tablets */
+  .pogoda-sec .pogoda .pogoda-card__cta { grid-column: 2; grid-row: 2; align-self: end; margin-top: 0; padding: 0; }
+  .pogoda-card__links { grid-template-columns: minmax(0, 1fr); }
+  .pogoda-sec .pogoda .pogoda-card__rule { grid-column: 1 / -1; grid-row: 3; margin-top: 1.5rem; }
+}
+/* the chart under the card on a wide tablet: taller, so the bars keep their proportion to the width */
+@media (min-width: 900px) and (max-width: 1239px) { .pogoda-plot { --plot-min: 250px; } }
+
+/* without JavaScript: the rule of thumb and a phone link instead of the modal button; no chart */
+@media (scripting: none) {
+  .pogoda-sec .reveal { opacity: 1; transform: none; }
+  .pogoda { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+  .pogoda-chart, .pogoda-card [data-pg-book] { display: none; }
+}
+
+/* reduced motion: everything in place at once, the delays go too */
+@media (prefers-reduced-motion: reduce) {
+  .pogoda-day__bar { transform: none; }
+  .pogoda-day__bar, .pogoda-day__dot, .pogoda-day__max, .pogoda-day__min, .pogoda-day__snow { transition: none; }
+  .pogoda-card__face--live { animation: none; }
+}

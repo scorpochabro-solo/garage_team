@@ -6,6 +6,7 @@ from . import arki, otkryto, schema, svet
 from . import data as D
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
+from .pogoda import pogoda_section
 from .pribory import pribory_section
 from .stuk import stuk_section
 from .vorota import gate_scene
@@ -272,6 +273,7 @@ def render_home():
         team(),
         reviews_section(paper=True),
         stuk_section(),
+        pogoda_section(),
         zima_section(),
         request_section("Оставить запрос"),
         green_note_wrap(),
