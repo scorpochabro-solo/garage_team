@@ -84,18 +84,25 @@
     const run = (el) => {
       const end = Number(el.dataset.countup);
       if (G.reducedMotion || !Number.isFinite(end)) { el.textContent = el.dataset.countup; return; }
+      // the markup holds the final number: its width is kept while counting, otherwise a narrow fact card re-wrapped
+      // «360 дн.» on every other frame and the whole first screen jumped (layout shift 0.2–0.6 at 1180–1300 px)
+      el.style.display = 'inline-block';
+      el.style.minWidth = `${el.getBoundingClientRect().width}px`;
       const dur = 1400; const t0 = performance.now();
       const step = (t) => {
         const p = Math.min(1, (t - t0) / dur); const e = 1 - Math.pow(1 - p, 3);
         el.textContent = String(Math.round(end * e));
         if (p < 1) requestAnimationFrame(step);
+        else el.style.minWidth = '';   // the final number has that width anyway; a later resize must not keep it
       };
       requestAnimationFrame(step);
     };
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
     }, { threshold: 0.5 });
-    counters.forEach((el) => io.observe(el));
+    // the width is measured in the real font: start once the web fonts are in (a failed font does not block it)
+    const fontsIn = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    fontsIn.catch(() => {}).then(() => counters.forEach((el) => io.observe(el)));
   }
 
   /* ---------- hero parallax ---------- */

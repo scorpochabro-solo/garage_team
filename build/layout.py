@@ -49,6 +49,8 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 <link rel="apple-touch-icon" href="/assets/logo/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/unbounded-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css{_version('css')}">
 {ld}
 </head>
