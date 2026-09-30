@@ -2,7 +2,7 @@
 """Static pages: about, contacts, payment, delivery, parts, catalogs, search, call/*, registration, agreement, reviews, 404."""
 import re
 
-from . import arki, otkryto, schema
+from . import arki, otkryto, schema, slovar
 from . import data as D
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
@@ -343,5 +343,6 @@ PAGES = {
     "/registration/": render_registration,
     "/page/soglashenie/": render_soglashenie,
     "/otzyvy.html": render_otzyvy,
+    "/slovar/": slovar.render,
     "/404.html": render_404,
 }

@@ -1,0 +1,272 @@
+/* ============================================================
+   «Что сказал мастер?» — the glossary page /slovar/ (build/slovar.py, js/slovar.js)
+   An editorial dictionary on the workshop wall: a brick hero with a mint neon sign, a rail with the search and
+   the filters (sticky beside the list on wide screens, a sticky search bar on phones), the systems as numbered
+   chapters and the terms with hanging heads. Motion: opacity and transform only — the neon switching on once,
+   the lamp over a term opened by a link.
+   ============================================================ */
+.page-slovar { --gl-lamp: 255, 207, 138; --gl-neon: 64, 240, 192; --gl-pad: clamp(0.75rem, 0.4rem + 1.2vw, 1.5rem); }
+
+/* ---------- hero: the brick wall of the office, dark, with the neon sign on it ---------- */
+.page-slovar .page-hero {
+  --gl-brick: url('/assets/img/real/brick-wall-800.webp');
+  background:
+    radial-gradient(ellipse 34% 62% at 84% 46%, rgba(var(--gl-neon), 0.09), transparent 72%),
+    radial-gradient(ellipse 40% 70% at 12% 0%, rgba(var(--gl-lamp), 0.12), transparent 70%),
+    linear-gradient(90deg, rgba(7, 8, 7, 0.95) 0%, rgba(7, 8, 7, 0.86) 40%, rgba(7, 8, 7, 0.62) 72%, rgba(7, 8, 7, 0.78) 100%),
+    linear-gradient(180deg, rgba(7, 8, 7, 0.3) 0%, rgba(7, 8, 7, 0.9) 100%),
+    var(--gl-brick) 50% 28% / cover no-repeat, #0a0807;
+}
+@media (min-width: 1000px) { .page-slovar .page-hero { --gl-brick: url('/assets/img/real/brick-wall.webp'); } }
+.page-slovar .page-hero::before { opacity: 0.45; }
+.page-slovar .page-hero__aside { align-self: center; }
+
+.gl-sign { position: relative; width: clamp(150px, 15vw, 224px); aspect-ratio: 220 / 190; margin-right: clamp(0rem, 3vw, 3.5rem); pointer-events: none; }
+.gl-sign__svg { position: relative; display: block; width: 100%; height: auto; overflow: visible; }
+.gl-sign__spill { position: absolute; inset: -55% -70%; background: radial-gradient(closest-side, rgba(var(--gl-neon), 0.16), rgba(var(--gl-neon), 0.05) 55%, transparent); }
+.gl-sign__clip { fill: none; stroke: #343836; stroke-width: 3.5; stroke-linecap: round; }
+/* a neon tube starting up: a few stutters, then steady (once, like the «GARAGE TEAM» sign of «Свет ламп») */
+.gl-sign__lit, .gl-sign__spill { animation: gl-neon 1.6s 0.35s linear backwards; }
+@keyframes gl-neon { 0% { opacity: 0; } 8% { opacity: 0.7; } 11% { opacity: 0; } 24% { opacity: 0; } 27% { opacity: 0.9; } 31% { opacity: 0.2; } 36% { opacity: 1; } 52% { opacity: 0.55; } 56%, 100% { opacity: 1; } }
+@media (max-width: 900px) {
+  /* one column: the sign hangs in the top right corner; the breadcrumbs and the eyebrow keep clear of it */
+  .page-slovar .page-hero { --gl-sign-w: clamp(76px, 20vw, 128px); }
+  .page-slovar .page-hero__aside { position: absolute; top: 0; right: 0; }
+  .gl-sign { width: var(--gl-sign-w); margin: 0; }
+  .page-slovar .page-hero .crumbs, .page-slovar .page-hero .eyebrow { padding-right: calc(var(--gl-sign-w) + 0.75rem); }
+  .page-slovar .page-hero__title { max-width: 11ch; margin-top: 1.25rem; }
+}
+
+/* ---------- layout: the rail and the list ---------- */
+.gl-sec { --gl-sec-top: clamp(1.75rem, 1rem + 2.5vw, 3.5rem); position: relative; padding-block: var(--gl-sec-top) calc(var(--section-y) * 0.7); background: var(--bg); }
+.gl { position: relative; }
+.gl__list { position: relative; min-width: 0; }
+@media (min-width: 1100px) {
+  .gl { display: grid; grid-template-columns: 17.5rem minmax(0, 1fr); column-gap: clamp(2.5rem, 0.5rem + 3.6vw, 5rem); align-items: start; }
+  .gl__rail { position: sticky; top: calc(var(--header-h) + 1.25rem); max-height: calc(100dvh - var(--header-h) - 2.5rem); overflow-y: auto; overscroll-behavior: contain;
+    padding: 0.25rem 0.5rem 1rem 0.25rem; margin: -0.25rem -0.5rem 0 -0.25rem; scrollbar-width: thin; scrollbar-color: var(--ink-400) transparent; }
+}
+/* phones and tablets: the search bar sticks under the header, the filters scroll away above the list */
+@media (max-width: 1099px) {
+  .gl__rail { display: contents; }
+  .gl-bar { position: sticky; top: var(--header-h); z-index: 20; margin: calc(-1 * var(--gl-sec-top)) calc(-1 * var(--gutter-safe)) 0;
+    padding: 0.8rem var(--gutter-safe) 0.55rem; background: var(--bg); border-bottom: 1px solid var(--line); }
+}
+/* a phone on its side (~400px high): the header already takes 60px, a sticky bar would cover half of what is left */
+@media (max-width: 1099px) and (max-height: 500px) { .gl-bar { position: relative; } }
+/* without JavaScript the search and the filters cannot work: the page is the full glossary and its index */
+@media (scripting: none) { .gl__rail { display: none; } .gl { display: block; } }
+
+/* ---------- search ---------- */
+.gl-search { position: relative; }
+.gl-search__ic { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); display: flex; color: var(--text-3); pointer-events: none; transition: color var(--dur) var(--ease); }
+.gl-search:focus-within .gl-search__ic { color: var(--accent); }
+.gl-search__input { height: 52px; padding: 0 3rem 0 2.9rem; font-size: 1rem; }
+.gl-search__input::-webkit-search-cancel-button, .gl-search__input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
+.gl-search__clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-2); transition: color var(--dur) var(--ease); }
+.gl-search__clear[hidden] { display: none; }
+.gl-search__clear:hover { color: var(--text); }
+.gl-status { margin-top: 0.55rem; min-height: 1.4em; font-family: var(--font-mono); font-size: var(--fs-mono); line-height: 1.4; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); overflow-wrap: anywhere; }
+
+/* ---------- filters: systems and letters ---------- */
+.gl-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+.gl-group { min-width: 0; }   /* a swipe row inside must not widen the grid (and the page) to its full length */
+.gl-group__label { margin-bottom: 0.55rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+.gl-group__label::before { content: "// "; }
+
+/* wide screens: a table of contents with dot leaders; the count follows the search */
+.gl-chips { display: grid; }
+.gl-chip { position: relative; display: flex; align-items: baseline; gap: 0.55rem; width: 100%; min-height: 35px; padding: 0.42rem 0.3rem 0.38rem 0; text-align: left;
+  font-size: 0.94rem; font-weight: 600; line-height: 1.25; color: var(--text-2); border-bottom: 1px solid var(--line); transition: color var(--dur) var(--ease); }
+.gl-chip__i { flex: none; width: 1.6rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--text-3); transition: color var(--dur) var(--ease); }
+.gl-chip__i--all::before { content: ""; display: inline-block; width: 7px; height: 7px; background: currentColor; transform: translateY(-1px); }
+.gl-chip__t { order: 1; }
+.gl-chip::after { content: ""; order: 2; flex: 1 1 1rem; min-width: 0.75rem; margin-bottom: 0.3em; border-bottom: 1px dotted var(--line-2); }
+.gl-chip__n { order: 3; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.gl-chip:hover { color: var(--text); }
+.gl-chip[aria-pressed="true"] { color: #fff; }
+.gl-chip[aria-pressed="true"] .gl-chip__i, .gl-chip[aria-pressed="true"] .gl-chip__n { color: var(--accent); }
+.gl-chip[aria-pressed="true"]::before { content: ""; position: absolute; left: -0.9rem; top: 0.55rem; bottom: 0.55rem; width: 3px; background: var(--green); }
+.gl-chip.is-empty:not([aria-pressed="true"]) { color: var(--text-3); }   /* nothing in this system: dimmer, still AA */
+
+.gl-abc { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 0.25rem; }
+.gl-abc__b { display: grid; place-items: center; height: 2rem; font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500; color: var(--text-2); background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line); transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease); }
+.gl-abc__b[data-letter="latin"] { grid-column: span 2; letter-spacing: 0.04em; }
+.gl-abc__b:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
+.gl-abc__b[aria-pressed="true"] { color: #fff; background: var(--green); box-shadow: none; }
+.gl-abc__b:disabled { opacity: 0.28; cursor: default; box-shadow: inset 0 0 0 1px var(--line); color: var(--text-3); }
+.gl-chip:active, .gl-abc__b:active:not(:disabled) { transform: translateY(1px); }
+
+/* the rail's own call to action: the lamp-lit card under the filters */
+.gl-mini { position: relative; padding: 1rem 1.1rem 1.1rem; background: radial-gradient(ellipse 90% 80% at 0% 0%, rgba(var(--gl-lamp), 0.1), transparent 70%), var(--ink-800);
+  box-shadow: inset 0 0 0 1px var(--line-2); }
+.gl-mini::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: repeating-linear-gradient(-45deg, var(--green) 0 8px, transparent 8px 16px); }
+.gl-mini__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: rgb(var(--gl-lamp)); }
+.gl-mini__label::before { content: "// "; }
+.gl-mini__btn { width: 100%; margin-top: 0.7rem; --px: 0.9em; }
+.gl.is-empty .gl-mini { display: none; }   /* «Нашли?» over «ничего не нашлось» would read wrong; the empty state has its own button */
+.gl-cta-note { margin-top: 0.7rem; font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5; letter-spacing: 0.04em; color: rgb(var(--gl-lamp)); overflow-wrap: anywhere; }
+.gl-cta-note[hidden] { display: none; }
+/* a short laptop screen: the filters first, the card would only be reachable by scrolling the rail */
+@media (min-width: 1100px) and (max-height: 860px) { .gl-mini { display: none; } }
+
+/* phones and tablets: the systems and the letters are rows to swipe through, edge to edge */
+@media (max-width: 1099px) {
+  .gl-side { gap: 0.9rem; margin: 1.1rem 0 1.3rem; }
+  .gl-group__label { margin-bottom: 0.45rem; }
+  .gl-chips, .gl-abc { display: flex; gap: 0.45rem; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; scroll-padding-inline: var(--gutter-safe);
+    margin-inline: calc(-1 * var(--gutter-safe)); padding-inline: var(--gutter-safe);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent); }
+  .gl-chips::-webkit-scrollbar, .gl-abc::-webkit-scrollbar { display: none; }
+  .gl-chips::after, .gl-abc::after { content: ""; flex: 0 0 1.5rem; }   /* the last chip clears the fade */
+  .gl-chip { flex: none; width: auto; min-height: 44px; align-items: center; gap: 0.45rem; padding: 0 0.95rem; border: 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
+  .gl-chip::after, .gl-chip__i { display: none; }
+  .gl-chip[aria-pressed="true"] { color: #fff; background: var(--green); box-shadow: none; }
+  .gl-chip[aria-pressed="true"]::before { content: none; }
+  .gl-chip[aria-pressed="true"] .gl-chip__n { color: rgba(255, 255, 255, 0.8); }
+  .gl-abc__b { flex: none; width: 44px; height: 44px; }
+  .gl-abc__b[data-letter="latin"] { width: auto; padding: 0 0.85rem; }
+  .gl-mini { display: none; }
+  .gl.is-query .gl-group--abc { display: none; }
+}
+
+/* ---------- a system: a numbered chapter ---------- */
+.gl-cat { scroll-margin-top: calc(var(--gl-bar-h, 0px) + 0.5rem); }
+.gl-cat[hidden] { display: none; }
+.gl-cat:not([hidden]) ~ .gl-cat { padding-top: clamp(2.75rem, 2rem + 2.5vw, 4.5rem); }
+.gl-cat__head { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "num title" "num lead"; column-gap: clamp(0.9rem, 0.5rem + 1.2vw, 1.6rem); align-items: end;
+  padding-bottom: 1.15rem; border-bottom: 1px solid var(--line-2); }
+.gl-cat__num { grid-area: num; font-family: var(--font-display); font-weight: 900; font-size: clamp(3.2rem, 2.2rem + 3.4vw, 5.6rem); line-height: 0.78; letter-spacing: -0.06em;
+  color: transparent; -webkit-text-stroke: 1px rgba(var(--gl-neon), 0.55); }
+.gl-cat__title { grid-area: title; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; min-width: 0; }
+.gl-cat__ic { width: 34px; height: 34px; display: grid; place-items: center; flex: none; color: var(--accent); background: rgba(var(--green-bright-rgb), 0.1); }
+.gl-cat__ic .ic { width: 20px; height: 20px; }
+.gl-cat__h { font-size: clamp(1.3rem, 1rem + 1.2vw, 2rem); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; }
+.gl-cat__count { margin-left: auto; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+.gl-cat__lead { grid-area: lead; margin-top: 0.55rem; max-width: 62ch; font-size: 0.97rem; line-height: 1.55; color: var(--text-2); text-wrap: pretty; }
+/* phones: the number and the title on one row, the lead under them across the width */
+@media (max-width: 760px) {
+  .gl-cat__head { grid-template-areas: "num title" "lead lead"; align-items: center; }
+  .gl-cat__lead { margin-top: 0.7rem; }
+}
+/* while a search or a letter is on, the chapters are just headings over the answers */
+.gl.is-searching .gl-cat__lead { display: none; }
+.gl.is-searching .gl-cat__num { font-size: clamp(2.2rem, 1.8rem + 1.6vw, 3.2rem); }
+.gl.is-searching .gl-cat__head { align-items: center; }
+/* phones: the number alone marks the chapter, so «ТРАНСМИССИЯ» keeps one line at 320px */
+@media (max-width: 480px) {
+  .gl-cat__ic { display: none; }
+  .gl-cat__num { font-size: 2.7rem; }
+  .gl-cat__h { font-size: 1.15rem; }
+}
+
+/* ---------- a term: the head hangs beside the definition ---------- */
+.gl-list { margin: 0; }
+.gl-term { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 0.6rem; padding: 1.4rem 0 1.45rem; border-bottom: 1px solid var(--line);
+  scroll-margin-top: calc(var(--gl-bar-h, 0px) + 1rem); outline: none; }
+.gl-term[hidden] { display: none; }
+@media (min-width: 760px) {
+  .gl-term { grid-template-columns: minmax(10rem, 16.5rem) minmax(0, 1fr); column-gap: clamp(1.5rem, 0.5rem + 2.2vw, 3rem); }
+  .gl-term > dt { grid-row: 1 / span 4; }
+  .gl-term > dd { grid-column: 2; }
+}
+.gl-term > dd { margin: 0; }
+.gl-term__head { display: grid; align-content: start; gap: 0.35rem; }
+.gl-term__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; color: var(--text-3); transition: color var(--dur) var(--ease); }
+.gl-term__name { font-style: normal; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.1rem, 0.98rem + 0.45vw, 1.3rem); line-height: 1.2; letter-spacing: -0.015em;
+  color: #fff; overflow-wrap: break-word; text-wrap: balance; }
+.gl-term__aka { font-size: 0.86rem; line-height: 1.45; color: var(--text-2); }
+.gl-term__label { margin-right: 0.35rem; font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.gl-term__aka .gl-term__label { display: block; margin: 0.15rem 0 0.1rem; }
+.gl-term__def p { max-width: 64ch; font-size: 1.02rem; line-height: 1.62; color: var(--text); text-wrap: pretty; }
+.gl-term__wear { max-width: 64ch; padding-left: 0.9rem; font-size: 0.95rem; line-height: 1.6; color: var(--text-2); box-shadow: inset 2px 0 0 rgba(var(--gl-lamp), 0.5); text-wrap: pretty; }
+.gl-term__wear .gl-term__label { display: block; margin-bottom: 0.15rem; color: rgba(var(--gl-lamp), 0.95); }
+.gl-term__go, .gl-term__see { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 1rem; }
+.gl-term__go .gl-term__label, .gl-term__see .gl-term__label { margin-right: 0; }
+.gl-go { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.9rem; font-weight: 700; line-height: 1.3; color: var(--accent); }
+.gl-go .ic { width: 1em; height: 1em; flex: none; transition: transform var(--dur) var(--ease); }
+.gl-go:hover { text-decoration: underline; text-underline-offset: 3px; }
+.gl-go:hover .ic { transform: translate(2px, -2px); }
+.gl-see { font-size: 0.9rem; font-weight: 600; line-height: 1.3; color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 4px;
+  transition: color var(--dur) var(--ease), text-decoration-color var(--dur) var(--ease); }
+.gl-see:hover { color: var(--text); text-decoration-color: rgb(var(--gl-neon)); }
+@media (pointer: coarse) { .gl-go, .gl-see { min-height: 44px; min-width: 44px; } .gl-see { display: inline-flex; align-items: center; } }
+
+/* what the search found: a mint underline, the colour of the sign */
+.gl-term mark { padding: 0 0.04em; color: #fff; background: rgba(var(--gl-neon), 0.16); box-shadow: inset 0 -2px 0 rgba(var(--gl-neon), 0.85); border-radius: 2px; }
+
+/* a term opened by a link (/slovar/#grm, the index, «См. также»): the lamp over it flickers on, then stays dim */
+.gl-term::before { content: ""; position: absolute; z-index: -1; inset: -1px calc(-1 * var(--gl-pad)); pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse 70% 130% at 18% 0%, rgba(var(--gl-lamp), 0.15), rgba(var(--gl-lamp), 0.04) 55%, transparent 80%); }
+.gl-term::after { content: ""; position: absolute; left: calc(-1 * var(--gl-pad)); top: 1.3rem; bottom: 1.3rem; width: 3px; background: rgb(var(--gl-lamp)); transform: scaleY(0); transform-origin: top;
+  transition: transform 0.6s var(--ease); pointer-events: none; }
+.gl-term:target::before { opacity: 0.6; }
+.gl-term:target::after, .gl-term.is-lit::after { transform: scaleY(1); }
+.gl-term.is-lit::before { animation: gl-lamp 2.6s linear forwards; }
+.gl-term:target .gl-term__n, .gl-term.is-lit .gl-term__n { color: rgb(var(--gl-lamp)); }
+@keyframes gl-lamp { 0% { opacity: 0; } 9% { opacity: 0.9; } 13% { opacity: 0.3; } 19% { opacity: 1; } 65% { opacity: 1; } 100% { opacity: 0.55; } }
+
+/* ---------- the answers named otherwise: «ещё 13 терминов, где упоминается «ремень»» ---------- */
+.gl-more { display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 56px; margin-top: 1.75rem; padding: 0.8rem 1.1rem; text-align: left;
+  font-weight: 600; font-size: 0.95rem; line-height: 1.35; color: var(--text-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2);
+  transition: color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.gl-more[hidden] { display: none; }
+.gl-more .ic { flex: none; color: var(--accent); }
+.gl-more:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
+.gl-more:active { transform: translateY(1px); }
+
+/* ---------- nothing found ---------- */
+.gl-empty { display: grid; justify-items: start; gap: 0.8rem; padding: 1rem 0 2.5rem; }
+.gl-empty[hidden] { display: none; }
+.gl-empty__mark { font-family: var(--font-display); font-weight: 900; font-size: 5.5rem; line-height: 0.9; color: transparent; -webkit-text-stroke: 1.5px rgba(var(--gl-neon), 0.8); }
+.gl-empty__title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 1rem + 0.8vw, 1.55rem); line-height: 1.25; letter-spacing: -0.015em; }
+.gl-empty__text { max-width: 58ch; color: var(--text-2); text-wrap: pretty; }
+.gl-empty__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
+.gl-empty__actions .btn--ghost { --btn-bg: var(--bg); }
+
+/* ---------- the index from А to Я ---------- */
+.gl-idx { padding-block: calc(var(--section-y) * 0.7); background: var(--ink-900); border-top: 1px solid var(--line); }
+.gl-idx__head { max-width: 50rem; margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.25rem); }
+.gl-idx__title { margin-top: 0.85rem; }
+.gl-idx__lead { margin-top: 1rem; max-width: 56ch; color: var(--text-2); text-wrap: pretty; }
+.gl-idx__cols { columns: 4 13.5rem; column-gap: clamp(1.5rem, 1rem + 2vw, 3rem); }
+.gl-idx__group { break-inside: avoid; padding: 0 0 1.5rem; }
+.gl-idx__letter { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; line-height: 1; color: rgb(var(--gl-neon)); }
+.gl-idx__letter::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.gl-idx li a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.35em; padding: 0.2rem 0; font-size: 0.95rem; line-height: 1.35; color: var(--text-2); transition: color var(--dur) var(--ease); }
+.gl-idx__term a { font-weight: 700; color: var(--text); }
+.gl-idx__to, .gl-idx__name { color: var(--text-3); }
+.gl-idx li a:hover { color: var(--accent); }
+.gl-idx li a:hover .gl-idx__name { color: var(--text); }
+/* touch: short words («ГРМ», «VIN») still get a 44px target */
+@media (pointer: coarse) { .gl-idx li a { min-height: 44px; min-width: 44px; align-items: center; padding: 0; } }
+@media (max-width: 640px) { .gl-idx__cols { columns: 2 9rem; } }
+
+/* ---------- call to action: the brick again, under the lamp ---------- */
+.gl-cta { position: relative; overflow: hidden; padding-block: clamp(3rem, 2rem + 4vw, 6rem); border-top: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse 45% 90% at 20% 0%, rgba(var(--gl-lamp), 0.16), transparent 70%),
+    linear-gradient(90deg, rgba(7, 8, 7, 0.9) 0%, rgba(7, 8, 7, 0.8) 55%, rgba(7, 8, 7, 0.92) 100%),
+    url('/assets/img/real/brick-wall-800.webp') 50% 60% / cover no-repeat, #0a0807; }
+.gl-cta__in { position: relative; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 1rem + 4vw, 5rem); align-items: center; }
+.gl-cta__title { margin-top: 0.85rem; }
+.gl-cta__text { margin-top: 1rem; max-width: 46ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); text-wrap: pretty; }
+.gl-cta__actions { display: grid; justify-items: start; gap: 1.1rem; }
+.gl-cta__phone { display: inline-flex; flex-direction: column; justify-content: center; min-height: 44px; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+  letter-spacing: -0.02em; line-height: 1.1; color: #fff; transition: color var(--dur) var(--ease); }
+.gl-cta__phone small { margin-bottom: 0.3rem; font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.gl-cta__phone:hover { color: var(--accent); }
+.gl-cta .gl-cta-note { margin-top: -0.3rem; }
+@media (max-width: 800px) { .gl-cta__in { grid-template-columns: minmax(0, 1fr); } }
+/* the narrowest phones: the long button label wraps instead of pushing past the screen */
+@media (max-width: 440px) {
+  .gl-cta .btn, .gl-empty .btn { width: 100%; height: auto; min-height: var(--h); padding-block: 0.7em; white-space: normal; line-height: 1.25; text-align: center; }
+}
+
+/* ---------- the way in from the home page: under the answer of «Что стучит?» (one line in build/stuk.py) ---------- */
+.stuk__more { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+.stuk__more .link-arrow { font-size: 0.95rem; color: var(--text-2); transition: color var(--dur) var(--ease); }
+.stuk__more .link-arrow:hover { color: var(--text); }
+/* one column: the line wraps on a phone, so the arrow leads it instead of drifting to the far edge */
+@media (max-width: 1099px) { .stuk__more { justify-content: flex-start; } .stuk__more .link-arrow .ic { order: -1; } }
