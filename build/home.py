@@ -10,6 +10,7 @@ from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 from .pribory import pribory_section
 from .stuk import stuk_section
+from .vorota import gate_scene
 from .zima import zima_section
 
 esc = D.esc
@@ -232,12 +233,11 @@ def team():
 def contacts_strip():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
-    return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
-  <div class="wrap contacts contacts--door">
-    <div class="reveal svet-lit">
-      {svet.mini()}
-      <p class="eyebrow">// 06 — Контакты</p>
-      <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
+    # the section heading lives in the «Ворота» scene (build/vorota.py): the facade, the gate, the way in
+    return f"""<section class="section section--black section--gate" id="contacts" aria-labelledby="contacts-title">
+  {gate_scene(esc(otkryto.ROUTE_URL))}
+  <div class="wrap contacts">
+    <div class="reveal">
       <ul class="contacts__list">
         <li class="contacts__item">{icon('pin')}<div><b>{esc(D.ADDRESS_FULL)}</b><span>Автосервис и магазин запчастей</span></div></li>
         <li class="contacts__item">{icon('phone')}<div><a class="big" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a><span>Звоните по телефонам горячей линии</span></div></li>
@@ -247,7 +247,6 @@ def contacts_strip():
       {otkryto.actions()}
       <a class="link-arrow link-arrow--inline oc-go__more" href="/contacts/">Страница контактов {icon('arrow')}</a>
     </div>
-    {arki.door()}
     <div class="map reveal">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
       <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>

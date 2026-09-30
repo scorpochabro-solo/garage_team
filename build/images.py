@@ -13,6 +13,9 @@ FOLDER_MAX_SIDE = {"review": 168, "team": 640}
 # Folders whose JPEGs also get a narrow variant "<name>-<width>.webp" for srcset (large cover photos on service pages,
 # the real photos of the building on the home page).
 RESPONSIVE_WIDTHS = {"photo": 800, "gallerymain": 800, "real": 800}
+# Folders encoded at a lower WebP quality: the photos of the building (real/) are full-bleed scenes full of brickwork,
+# which costs a lot of bytes at 82 and shows no visible difference at 75 (−22 % for the facade).
+FOLDER_QUALITY = {"real": 75}
 
 
 def scaled_size(src: Path, max_side: int = MAX_SIDE) -> tuple[int, int]:
@@ -52,15 +55,16 @@ def process_images(src_root: Path, dist_root: Path, verbose=False):
                 im = Image.open(src)
                 im = im.convert("RGB")
                 side = FOLDER_MAX_SIDE.get(rel.parts[0], MAX_SIDE) if len(rel.parts) > 1 else MAX_SIDE
+                quality = FOLDER_QUALITY.get(rel.parts[0], WEBP_QUALITY) if len(rel.parts) > 1 else WEBP_QUALITY
                 if max(im.size) > side:
                     im.thumbnail((side, side), Image.LANCZOS)
-                im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
+                im.save(dest, "WEBP", quality=quality, method=6)
                 narrow = RESPONSIVE_WIDTHS.get(rel.parts[0]) if len(rel.parts) > 1 else None
                 if narrow and im.width > narrow:
                     small = im.copy()
                     small.thumbnail((narrow, narrow * 4), Image.LANCZOS)
                     small_dest = dest.with_name(f"{dest.stem}-{narrow}.webp")
-                    small.save(small_dest, "WEBP", quality=WEBP_QUALITY, method=6)
+                    small.save(small_dest, "WEBP", quality=quality, method=6)
                     total += small_dest.stat().st_size
             elif ext == ".png":
                 im = Image.open(src)

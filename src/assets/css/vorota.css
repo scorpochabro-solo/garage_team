@@ -1,0 +1,169 @@
+/* ============================================================
+   vorota: «Ворота» — arriving at the garage
+   the contacts scene (build/vorota.py, js/vorota.js): the real facade at dusk, the sign lights up,
+   the roller shutter rolls up with the scroll, the camera walks into the workshop;
+   the same shutter on the mobile menu and the modals
+   ============================================================ */
+
+/* ---------- roller shutter material: steel slats at dusk ---------- */
+:root {
+  --slat: linear-gradient(180deg, #434744 0%, #363937 14%, #2a2d2b 48%, #202321 80%, #0f110f 90%, #080908 100%);
+  --slat-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 30%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* ---------- section ---------- */
+.section--gate { padding-top: 0; }
+.section--gate .contacts { margin-top: clamp(3rem, 2rem + 4vw, 6rem); }
+.section--gate .contacts__list { margin-top: 0; }
+
+/* ---------- scene ----------
+   Static by default (no JS, reduced motion): the gate is open and the sign is lit. js/vorota.js adds .gate--scroll:
+   the stage is pinned under the header while the page scrolls through --gate-run. */
+.gate { position: relative; background: var(--black); --gate-run: 140svh; }
+.gate__stage {
+  /* the photo box: aspect ratio of the photo, covers the stage, the gate kept near the middle (--fx/--fy) */
+  --ar: 1.3333; --fx: 0.72; --fy: 0.6;
+  position: relative; overflow: hidden; container-type: size;
+  height: clamp(560px, calc(100svh - var(--header-h)), 900px);
+  background: var(--black);
+}
+.gate__world {
+  --ww: max(100cqw, 100cqh * var(--ar));
+  position: absolute; width: var(--ww); height: calc(var(--ww) / var(--ar));
+  left: clamp(100cqw - var(--ww), 50cqw - var(--fx) * var(--ww), 0px);
+  top: clamp(100cqh - var(--ww) / var(--ar), 50cqh - var(--fy) * var(--ww) / var(--ar), 0px);
+}
+.gate__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #1a1412; }
+
+/* everything drawn over the photo is placed in % of the photo box (inline styles from build/vorota.py) */
+.gate__art { position: absolute; inset: 0; pointer-events: none; }
+.gate__art--tall { display: none; }
+.gate__dusk { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gate__sign-dim { opacity: 0; }
+.gate__sign-lit { fill: #ffe7a8; fill-opacity: 0.12; }   /* the lit board: a warm wash over the painted sign */
+.gate__glow { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 215, 140, 0.34), rgba(255, 207, 138, 0.12) 55%, rgba(255, 207, 138, 0) 100%); }
+.gate__spill { position: absolute; clip-path: var(--clip); background: linear-gradient(180deg, rgba(255, 222, 170, 0.24), rgba(255, 207, 138, 0.07) 60%, rgba(255, 207, 138, 0) 100%); }
+.gate__opening { position: absolute; overflow: hidden; clip-path: var(--clip); }
+.gate__shutter {
+  position: absolute; inset: 0; transform: translateY(-100%);
+  background:
+    radial-gradient(60% 28% at 50% 0%, rgba(255, 207, 138, 0.10), rgba(255, 207, 138, 0)),   /* the sign above lights the top slats */
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 3%, rgba(0, 0, 0, 0) 97%, rgba(0, 0, 0, 0.55)),   /* guide rails */
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 30%),
+    linear-gradient(100deg, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.035) 85%, rgba(255, 255, 255, 0) 100%),   /* the lamp on the right jamb */
+    var(--slat) 0 0 / 100% calc(100% / 28) repeat-y;
+}
+/* bottom bar of the shutter: a steel profile with a green hazard stripe */
+.gate__bar { position: absolute; left: 0; right: 0; bottom: 0; height: max(6px, 4.5%); background: repeating-linear-gradient(-45deg, var(--green) 0 7px, #101211 7px 14px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 -3px 6px rgba(0, 0, 0, 0.45); }
+
+.gate__inside { position: absolute; inset: 0; display: none; opacity: 0; pointer-events: none; background: #0d0e0d; }
+.gate__inside img { width: 100%; height: 100%; object-fit: cover; object-position: 48% 55%; }
+
+/* legibility of the copy over the photo (static: no animation, no blur) */
+.gate__veil { position: absolute; inset: 0; pointer-events: none; background:
+  linear-gradient(90deg, rgba(7, 8, 7, 0.86) 0%, rgba(7, 8, 7, 0.55) 30%, rgba(7, 8, 7, 0) 56%),
+  linear-gradient(180deg, var(--black) 0%, rgba(7, 8, 7, 0) 16%, rgba(7, 8, 7, 0) 78%, rgba(7, 8, 7, 0.55) 92%, var(--black) 100%); }
+
+.gate__copy { position: absolute; inset: 0; z-index: 2; pointer-events: none; padding-top: clamp(2.25rem, 8vh, 5rem); }
+.gate__copy .wrap > * { pointer-events: auto; }
+.gate__copy .sec-head__title { color: #fff; }
+.gate__addr { display: grid; gap: 0.45rem; margin-top: clamp(1.1rem, 2.5vh, 1.6rem); }
+.gate__addr b { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem); letter-spacing: -0.01em; color: #fff; }
+.gate__addr .mono { color: var(--gray-300); }
+.gate__route { margin-top: clamp(1.2rem, 3vh, 1.8rem); }
+
+/* the remote beside the gate: a slim wall box — ▲ opens, ▼ closes (scrolls the page to that point of the scene) */
+.gate__remote {
+  --chamfer: 10px;
+  position: absolute; z-index: 3; right: var(--gutter-safe); bottom: clamp(1.25rem, 5vh, 3rem);
+  display: grid; justify-items: center; gap: 0.7rem; width: 56px; padding: 6px 6px 0.8rem;
+  background: rgba(9, 10, 9, 0.9); box-shadow: inset 0 0 0 1px var(--line-2);
+  clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer));
+}
+.gate__remote[hidden] { display: none; }
+.gate__remote-btn { --chamfer: 7px; order: -1; width: 44px; height: 44px; display: grid; place-items: center; background: var(--green); color: #fff; clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer)); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.gate__remote-btn .ic { width: 22px; height: 22px; transform: rotate(180deg); transition: transform 0.45s var(--ease); }
+.gate__remote.is-open .gate__remote-btn .ic { transform: none; }
+.gate__remote-btn:hover { background: var(--green-bright); color: #06120a; }
+.gate__remote-btn:active { background: var(--green-bright); color: #06120a; }
+.gate__remote-btn:focus-visible { outline-offset: -4px; outline-color: #fff; }
+.gate__remote-meter { position: relative; width: 3px; height: clamp(36px, 7vh, 64px); background: var(--line-2); overflow: hidden; }
+.gate__remote-meter i { position: absolute; inset: 0; background: var(--green-bright); transform: scaleY(0); transform-origin: bottom; }
+.gate__remote-value { width: 100%; text-align: center; font-size: 0.66rem; letter-spacing: 0.02em; color: #fff; font-variant-numeric: tabular-nums; contain: layout paint; }
+.gate__remote-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.62rem; letter-spacing: 0.22em; color: var(--text-3); order: 1; }
+
+/* browsers without container units (Safari < 16): the photo simply covers the stage, nothing is drawn over it */
+@supports not (width: 1cqw) {
+  .gate__world { inset: 0; width: auto; height: auto; }
+  .gate__art, .gate__remote { display: none !important; }
+}
+
+/* ---------- scroll mode ---------- */
+.gate--scroll { height: calc(100svh - var(--header-h) + var(--gate-run)); }
+.gate--scroll .gate__stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); }
+.gate--scroll .gate__inside { display: block; }
+.gate--scroll .gate__shutter { transform: none; }
+.gate--scroll .gate__spill { opacity: 0; }
+.gate.is-active .gate__world, .gate.is-active .gate__shutter, .gate.is-active .gate__inside { will-change: transform, opacity; }
+/* the sign: off until the facade is on screen, then it flickers on like a lightbox, once, and stays lit
+   (no idle loop: a running animation, even a rare buzz, costs the main thread a style pass on every frame) */
+.gate--scroll:not(.is-lit) .gate__sign-dim { opacity: 1; }
+.gate--scroll:not(.is-lit) .gate__sign-lit, .gate--scroll:not(.is-lit) .gate__glow { opacity: 0; }
+.gate--scroll.is-lit .gate__sign-dim { animation: gate-dim-on 1.9s steps(1, end) 0.25s both; }
+.gate--scroll.is-lit .gate__sign-lit, .gate--scroll.is-lit .gate__glow { animation: gate-lit-on 1.9s steps(1, end) 0.25s both; }
+@keyframes gate-dim-on { 0% { opacity: 1; } 5% { opacity: 0.2; } 8% { opacity: 1; } 22% { opacity: 0.45; } 25% { opacity: 1; } 29% { opacity: 0.1; } 33% { opacity: 0.7; } 38% { opacity: 0; } 41% { opacity: 0.35; } 44%, 100% { opacity: 0; } }
+@keyframes gate-lit-on { 0% { opacity: 0; } 5% { opacity: 0.8; } 8% { opacity: 0; } 22% { opacity: 0.55; } 25% { opacity: 0; } 29% { opacity: 0.9; } 33% { opacity: 0.3; } 38% { opacity: 1; } 41% { opacity: 0.65; } 44%, 100% { opacity: 1; } }
+
+/* ---------- phones: a shorter run, a smaller remote ---------- */
+@media (max-width: 700px) {
+  .gate { --gate-run: 110svh; }
+  .gate__copy { padding-top: 1.6rem; }
+  .gate__remote { bottom: 1rem; width: 52px; padding: 4px 4px 0.7rem; gap: 0.55rem; }
+  .gate__remote-meter { height: 34px; }
+}
+/* phones held upright: the tall photo, the copy over the sky; the gate fills the right part of the frame,
+   so the remote hangs on the wall to the left of it (in landscape the wide photo stays, as on desktops) */
+@media (max-width: 700px) and (orientation: portrait) {
+  .gate__stage { --ar: 0.75; --fx: 0.66; --fy: 0.5; height: clamp(560px, calc(100svh - var(--header-h)), 820px); }
+  .gate__art--wide { display: none; }
+  .gate__art--tall { display: block; }
+  .gate__veil { background:
+    linear-gradient(180deg, rgba(7, 8, 7, 0.92) 0%, rgba(7, 8, 7, 0.7) 24%, rgba(7, 8, 7, 0.25) 40%, rgba(7, 8, 7, 0) 50%),
+    linear-gradient(0deg, var(--black), rgba(7, 8, 7, 0.4) 5%, rgba(7, 8, 7, 0) 12%); }
+  .gate__remote { right: auto; left: var(--gutter-safe); }
+}
+/* under 640px the fixed call bar covers the bottom 70px: the pinned stage ends above it */
+@media (max-width: 640px) {
+  .gate--scroll .gate__stage { height: calc(100svh - var(--header-h) - 70px - env(safe-area-inset-bottom)); }
+  .gate--scroll { height: calc(100svh - var(--header-h) - 70px - env(safe-area-inset-bottom) + var(--gate-run)); }
+}
+
+/* ---------- mobile menu: rolls down from under the header like a shutter, rolls back up on close ---------- */
+.mobile-menu {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0 1px, rgba(0, 0, 0, 0) 1px 100%) 0 0 / 100% 22px, var(--ink-900);
+  background-attachment: local;
+  transform: translateY(-100%);
+  transition: transform 0.55s var(--ease-io), display 0.55s allow-discrete;
+}
+.mobile-menu.is-open { transform: none; animation: none; }
+@starting-style { .mobile-menu.is-open { transform: translateY(-100%); } }
+/* the bottom bar travels with the leading edge (fixed inside a transformed box = its bottom) and rests on the screen edge */
+.mobile-menu::after { content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 6px; background: repeating-linear-gradient(-45deg, var(--green) 0 8px, #101211 8px 16px); box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.14), 0 10px 24px rgba(0, 0, 0, 0.6); pointer-events: none; }
+/* the header is the shutter box: opaque while the menu is open, so the menu rolling out from under it is not seen through the glass */
+.is-menu-open .site-header { background: var(--ink-900); }
+
+/* ---------- modals: a shutter over the panel rolls up as the dialog opens ---------- */
+.modal .modal__panel { overflow: hidden; }
+.modal[open] .modal__panel::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    repeating-linear-gradient(-45deg, var(--green) 0 8px, #101211 8px 16px) 0 100% / 100% 7px no-repeat,
+    var(--slat-soft) 0 0 / 100% 26px repeat-y, var(--slat) 0 0 / 100% 26px repeat-y;
+  animation: shutter-up 0.5s var(--ease-io) 0.05s both;   /* short: the form is what the visitor came for */
+}
+@keyframes shutter-up { from { transform: none; } to { transform: translateY(-101%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu { transition: none; transform: none; }
+  .modal[open] .modal__panel::after { display: none; }
+}
