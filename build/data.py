@@ -14,7 +14,7 @@ DIST = ROOT / "dist"
 
 SITE = json.loads((DATA / "site.json").read_text(encoding="utf-8"))
 # titles of the pages that are not services: keys of site.json → pages plus the pages whose text lives in the code
-PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy"})
+PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy", "moya_mashina"})
 _SERVICES = json.loads((DATA / "services.json").read_text(encoding="utf-8"))
 DESCR = json.loads((DATA / "descriptions.json").read_text(encoding="utf-8"))
 HOTSPOTS = json.loads((DATA / "hotspots.json").read_text(encoding="utf-8"))["items"]

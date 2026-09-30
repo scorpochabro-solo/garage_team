@@ -1,0 +1,431 @@
+/* ============================================================
+   knizhka: «Моя машина» — the car's service book in the browser (build/knizhka.py, js/knizhka.js).
+   A logbook on the workshop's brick wall under a warm lamp: the passport as a riveted steel plate with a mechanical
+   odometer, the next service as a gauge card with a mint neon tube, the log as a stamped timeline; the first visit
+   is a garage bay whose roller shutter rolls up. Motion: transform and opacity only; the print view is a plain sheet.
+   Also here: the footer link (.kn-foot) and the request form's «Заполнить из «Моей машины»» (.kn-fill) — every page.
+   ============================================================ */
+:root {
+  --kn-neon: 64, 240, 192;         /* the mint tubes of the workshop sign («Свет ламп») */
+  --kn-warm: 255, 212, 158;        /* lamp light */
+  --kn-amber: 242, 169, 59;        /* soon (the «Открыто сейчас» amber) */
+  --kn-red: 255, 92, 92;           /* over */
+  --kn-steel: linear-gradient(155deg, #363a37 0%, #272a28 46%, #1c1e1d 100%);
+  --kn-brick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='44'%3E%3Cpath d='M0 .5h76M0 22.5h76M.5 0v22M38.5 22v22' fill='none' stroke='%23fff' stroke-opacity='.06'/%3E%3C/svg%3E");
+}
+
+/* the script shows and hides parts with the hidden attribute: it wins over every display below */
+.kn[hidden], .kn [hidden], .kn-fill[hidden] { display: none !important; }
+
+/* ---------- the section: brick courses fading down under a warm lamp ---------- */
+.kn-sec { position: relative; padding: clamp(1.75rem, 1rem + 2.5vw, 3.25rem) 0 var(--section-y); background: var(--black); }
+.kn-sec::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(70rem 30rem at 16% -3rem, rgba(var(--kn-warm), 0.08), transparent 70%), var(--kn-brick) 0 0 / 76px 44px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, rgba(0, 0, 0, 0.5) 38rem, transparent 80rem);
+  mask-image: linear-gradient(180deg, #000 0, rgba(0, 0, 0, 0.5) 38rem, transparent 80rem); }
+.kn-sec > .wrap { position: relative; }
+.kn { min-height: 24rem; }
+
+/* the H1: «Моя машина» and, under it, what it is, lit like a neon label */
+.kn-h1-sub { display: block; margin-top: 0.9rem; font-family: var(--font-mono); font-size: clamp(0.8rem, 0.7rem + 0.45vw, 1.05rem); font-weight: 500;
+  letter-spacing: 0.16em; line-height: 1.4; color: rgb(var(--kn-neon)); text-shadow: 0 0 14px rgba(var(--kn-neon), 0.45); }
+
+/* the honest note: always on top, also without JS */
+.kn-privacy { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem); padding: 0.85rem 1.1rem;
+  font-size: 0.92rem; line-height: 1.5; color: var(--text-2);
+  background: linear-gradient(90deg, rgba(var(--kn-neon), 0.07), rgba(var(--kn-neon), 0) 65%); box-shadow: inset 2px 0 0 rgb(var(--kn-neon)), inset 0 0 0 1px var(--line); }
+.kn-privacy .ic { flex: none; width: 20px; height: 20px; margin-top: 0.1rem; color: rgb(var(--kn-neon)); }
+.kn-privacy b { color: var(--text); font-weight: 700; }
+
+.kn-alert { display: block; margin-bottom: 1.25rem; padding: 0.9rem 1.1rem 0.9rem 1.25rem; font-size: 0.92rem; line-height: 1.5; color: var(--text);
+  background: rgba(var(--kn-amber), 0.08); box-shadow: inset 3px 0 0 rgb(var(--kn-amber)), inset 0 0 0 1px rgba(var(--kn-amber), 0.45); }
+
+.kn-nojs { display: grid; justify-items: start; gap: 0.9rem; max-width: 46rem; padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem); background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); }
+.kn-nojs__title { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 1.1rem + 1vw, 1.8rem); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; }
+.kn-nojs p:not(.kn-nojs__title) { color: var(--text-2); max-width: 60ch; }
+
+/* ---------- shared bits ---------- */
+.kn-link { display: inline-flex; align-items: center; gap: 0.4em; min-height: 32px; font-size: 0.86rem; font-weight: 700; color: var(--accent); transition: color var(--dur) var(--ease); }
+.kn-link .ic { width: 1.05em; height: 1.05em; }
+.kn-link:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.kn .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.kn .btn .ic { width: 1.15em; height: 1.15em; }
+.kn-mono { font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.kn-mono::placeholder { text-transform: none; letter-spacing: 0; }
+.kn-vin-note { display: block; margin-top: 0.2rem; color: rgb(var(--kn-neon)); }
+.kn .field__hint { color: var(--text-2); }
+.kn-btn-danger { background: #c9302c; }
+.kn-btn-danger:hover { background: #e5423c; color: #fff; }
+/* iOS draws an empty native date field centred and without height */
+.kn input[type="date"] { min-height: 52px; line-height: 52px; }
+.kn input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.kn input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); cursor: pointer; }
+
+/* forms: a dark sheet with the hazard stripe of the site's modals */
+.kn-form { position: relative; padding: clamp(1.15rem, 0.9rem + 1vw, 1.75rem); background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); }
+.kn-form::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: repeating-linear-gradient(-45deg, var(--green) 0 10px, transparent 10px 20px); }
+.kn-form__title { margin: 0.2rem 0 1.15rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.01em; }
+.kn-form__title:focus { outline: none; }
+.kn-form__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.6rem; margin-top: 1.4rem; }
+
+/* quick marks: real checkboxes in the site's chip look, a small square that lights up mint */
+.kn-chips { min-width: 0; margin: 0; padding: 0; border: 0; }
+.kn-chips__legend { float: left; width: 100%; margin-bottom: 0.55rem; padding: 0; }
+.kn-chips__row { clear: both; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.kn-chip { position: relative; display: inline-flex; }
+.kn-chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.kn-chip span { display: inline-flex; align-items: center; gap: 0.55em; min-height: 40px; padding: 0.45em 0.95em 0.45em 0.8em; font-weight: 600; font-size: 0.9rem; line-height: 1.2;
+  color: var(--text-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.kn-chip span::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--ink-400); transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.kn-chip:hover span { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
+.kn-chip input:checked + span { color: #fff; background: rgba(var(--kn-neon), 0.12); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.8); }
+.kn-chip input:checked + span::before { background: rgb(var(--kn-neon)); box-shadow: 0 0 8px rgba(var(--kn-neon), 0.85); }
+.kn-chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.field.is-error .kn-chip span { box-shadow: inset 0 0 0 1px var(--danger); }
+
+/* ---------- first visit: the garage bay and the invitation ---------- */
+.kn-start { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(1.5rem, 0.8rem + 3vw, 4.5rem); align-items: start; }
+/* the bay: everything above the door is placed in container units (cqw) of the bay's width, so the lamp, the sign and
+   the door keep their places whatever the height of the bay */
+.kn-bay { position: relative; container-type: inline-size; aspect-ratio: 10 / 9; overflow: hidden; isolation: isolate;
+  background: radial-gradient(75% 60% at 50% 0%, rgba(var(--kn-warm), 0.14), transparent 70%),
+    radial-gradient(120% 90% at 50% 10%, rgba(var(--brick-rgb, 181, 85, 58), 0.1), transparent 75%), var(--kn-brick) 0 0 / 60px 35px, #100d0b;
+  box-shadow: inset 0 0 0 1px var(--line), inset 0 -60px 80px -40px #000; }
+.kn-bay__cord { position: absolute; left: 50%; top: 0; width: 2px; height: 5cqw; margin-left: -1px; background: linear-gradient(90deg, #0d0c0c, #3a3530); }
+.kn-bay__lamp { position: absolute; left: 50%; top: 5cqw; width: 16cqw; height: 6.4cqw; transform: translateX(-50%);
+  background: linear-gradient(180deg, #2c2f2d, #0e0f0e 80%); border-radius: 50% 50% 10% 10% / 100% 100% 10% 10%;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2.4cqw 3cqw -1cqw rgba(var(--kn-warm), 0.55); }
+.kn-bay__lamp::after { content: ""; position: absolute; left: 7%; right: 7%; bottom: -0.6cqw; height: 1.4cqw; border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 35%, #fffaf0, #ffd08e); box-shadow: 0 0 2cqw 0.4cqw rgba(var(--kn-warm), 0.7); }
+.kn-bay__light { position: absolute; left: 50%; top: 11cqw; width: 120cqw; height: 80%; transform: translateX(-50%); pointer-events: none;
+  background: conic-gradient(from 148deg at 50% 0%, transparent 0deg, rgba(var(--kn-warm), 0.08) 22deg, rgba(var(--kn-warm), 0.13) 32deg, rgba(var(--kn-warm), 0.08) 42deg, transparent 64deg);
+  -webkit-mask-image: radial-gradient(ellipse 50% 100% at 50% 0%, #000 12%, rgba(0, 0, 0, 0.4) 55%, transparent 90%);
+  mask-image: radial-gradient(ellipse 50% 100% at 50% 0%, #000 12%, rgba(0, 0, 0, 0.4) 55%, transparent 90%); }
+/* the neon sign over the door: flickers on once, then stays lit */
+.kn-bay__sign { position: absolute; left: 0; right: 0; top: 14.5cqw; text-align: center; font-family: var(--font-display); font-weight: 500; font-size: 6.2cqw;
+  line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; color: #eafff8;
+  text-shadow: 0 0 0.12em rgba(var(--kn-neon), 0.95), 0 0 0.4em rgba(var(--kn-neon), 0.7), 0 0 1.1em rgba(var(--kn-neon), 0.45);
+  animation: kn-neon 1.6s 0.4s linear backwards; }
+@keyframes kn-neon { 0% { opacity: 0.12; } 8% { opacity: 0.8; } 11% { opacity: 0.12; } 24% { opacity: 0.12; } 27% { opacity: 0.95; } 31% { opacity: 0.3; } 37% { opacity: 1; } 52% { opacity: 0.6; } 56%, 100% { opacity: 1; } }
+/* the door: a steel frame around the dark workshop; the roller shutter covers it until the book is started */
+.kn-bay__door { position: absolute; left: 13%; right: 13%; top: 25cqw; bottom: 0; overflow: hidden; background: #050605;
+  box-shadow: inset 0 0 0 5px #151615, inset 0 0 0 6px rgba(255, 255, 255, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.kn-bay__inside { position: absolute; inset: 0; background: radial-gradient(90% 70% at 50% 0%, rgba(var(--kn-warm), 0.1), transparent 70%), linear-gradient(180deg, #0b0c0b, #050605); }
+/* a mint pool of light on the floor under the car, once the shutter is up */
+.kn-bay__inside::after { content: ""; position: absolute; left: 10%; right: 10%; bottom: 0; height: 30%; opacity: 0; transition: opacity 1s var(--ease);
+  background: radial-gradient(50% 60% at 50% 100%, rgba(var(--kn-neon), 0.2), transparent 75%); }
+.kn-start.is-open .kn-bay__inside::after { opacity: 1; transition-delay: 0.5s; }
+.kn-bay__car { position: absolute; left: 6%; right: 6%; bottom: 5%; width: 88%; height: auto; color: rgb(var(--kn-neon)); opacity: 0; transform: translateX(-14%);
+  transition: opacity 0.7s var(--ease), transform 1.1s var(--ease); }
+.kn-bay__shutter { position: absolute; inset: 0; z-index: 1; transform: none; transition: transform 1s var(--ease-io);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 4%, rgba(0, 0, 0, 0) 96%, rgba(0, 0, 0, 0.55)),
+    radial-gradient(70% 30% at 50% 0%, rgba(var(--kn-warm), 0.1), transparent),
+    var(--slat, linear-gradient(180deg, #434744 0%, #363937 14%, #2a2d2b 48%, #202321 80%, #0f110f 90%, #080908 100%)) 0 0 / 100% 4.4cqw repeat-y; }
+.kn-bay__shutter::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4.5%; min-height: 6px;
+  background: repeating-linear-gradient(-45deg, var(--green) 0 7px, #101211 7px 14px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22); }
+.kn-bay__no { position: absolute; left: 0; right: 0; top: 36%; text-align: center; font-family: var(--font-mono); font-size: 3.6cqw; font-weight: 600;
+  letter-spacing: 0.32em; text-transform: uppercase; color: rgba(255, 255, 255, 0.38); }
+.kn-start.is-open .kn-bay__shutter { transform: translateY(-101%); }
+.kn-start.is-open .kn-bay__car { opacity: 1; transform: none; transition-delay: 0.45s; }
+
+.kn-start__title { margin-top: 0.9rem; font-size: clamp(1.6rem, 1.1rem + 1.7vw, 2.6rem); line-height: 1.02; text-transform: uppercase; letter-spacing: -0.03em; font-weight: 800; }
+.kn-start__lead { margin-top: 1rem; max-width: 46ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--text-2); }
+.kn-start__list { margin-top: 1.4rem; border-top: 1px solid var(--line); }
+.kn-start__list li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: 0.6rem; padding: 0.75rem 0; border-bottom: 1px solid var(--line); color: var(--text-2); line-height: 1.5; }
+.kn-start__list b { color: var(--text); }
+.kn-start__n { font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.9; color: rgb(var(--kn-neon)); }
+.kn-start__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.6rem; }
+.kn-start .kn-slot .kn-form { margin-top: 1.25rem; }
+
+/* ---------- the book: passport and next service on top, the log and the side column under them ---------- */
+.kn-desk { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 0.7rem + 1vw, 1.5rem); align-items: start; }
+.kn-car { display: grid; gap: 1rem; }
+
+/* the passport: a riveted steel plate lit by the lamp */
+.kn-plate { --cut: 14px; position: relative; padding: clamp(1.25rem, 0.95rem + 1.2vw, 2rem); color: #eef1ee;
+  background: radial-gradient(95% 70% at 10% -12%, rgba(var(--kn-warm), 0.17), transparent 62%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px), var(--kn-steel);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.kn-plate::before { content: ""; position: absolute; inset: 11px; pointer-events: none;
+  --rivet: radial-gradient(circle, #9aa09b 0 1.5px, #474b48 2.2px 3.3px, transparent 3.7px);
+  background: var(--rivet) 0 0 / 8px 8px no-repeat, var(--rivet) 100% 0 / 8px 8px no-repeat, var(--rivet) 0 100% / 8px 8px no-repeat, var(--rivet) 100% 100% / 8px 8px no-repeat; }
+.kn-plate:focus { outline: none; }
+.kn-plate:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.kn-plate__top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.kn-plate__label { display: inline-flex; align-items: center; gap: 0.7em; font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: #cfd4cf; }
+.kn-plate__label::before { content: ""; width: 8px; height: 8px; background: rgb(var(--kn-warm)); box-shadow: 0 0 8px rgba(var(--kn-warm), 0.8); }
+.kn-plate .kn-link { color: #7ff0cf; }
+.kn-plate__name { margin-top: 0.85rem; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.35rem); line-height: 1.04;
+  letter-spacing: -0.02em; text-transform: uppercase; overflow-wrap: anywhere; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 -1px 0 rgba(255, 255, 255, 0.05); }
+.kn-plate__name.is-empty { color: #c3c8c3; }
+.kn-plate__hint { margin-top: 0.4rem; font-size: 0.9rem; color: #c3c8c3; }
+.kn-plate__specs { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.9rem 2rem; margin: 1.1rem 0 0; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.kn-plate__specs dt { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: #b3b9b3; }
+.kn-plate__specs dd { margin: 0.3rem 0 0; font-family: var(--font-mono); font-size: 1rem; color: #fff; overflow-wrap: anywhere; }
+.kn-plate__vin { grid-column: 1 / -1; }
+/* the VIN stamped into a recess: maker · description · serial, gaps that are not copied with the text */
+.kn-plate__vin dd { display: flex; flex-wrap: wrap; gap: 0 0.6em; padding: 0.55rem 0.75rem; font-size: clamp(0.95rem, 0.82rem + 0.45vw, 1.18rem); letter-spacing: 0.13em;
+  background: rgba(0, 0, 0, 0.36); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.07); text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8); }
+.kn-plate__vin dd.is-empty { font-family: var(--font-text); font-size: 0.95rem; letter-spacing: 0; color: #c3c8c3; }
+
+/* the odometer: drums in a bezel, each rolls to its digit */
+.kn-plate__odo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem 1.1rem; margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.kn-odo { --cell: 1.5em; display: inline-flex; align-items: center; gap: 0.45rem; padding: 5px 0.55rem 5px 5px; font-family: var(--font-mono); font-weight: 600;
+  font-size: clamp(1.2rem, 0.95rem + 1vw, 1.65rem); border-radius: 4px; background: linear-gradient(180deg, #4d524e, #1b1e1c);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 3px 10px rgba(0, 0, 0, 0.55); }
+.kn-odo__drums { display: inline-flex; gap: 2px; padding: 2px; border-radius: 2px; background: #050605; }
+.kn-odo__d { position: relative; width: 1em; height: var(--cell); overflow: hidden;
+  background: linear-gradient(180deg, #080908 0%, #202320 24%, #2d312d 50%, #202320 76%, #080908 100%); }
+.kn-odo__d::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), transparent 32%, transparent 68%, rgba(0, 0, 0, 0.6)); }
+.kn-odo__s { display: block; transform: translateY(calc(var(--n, 0) * -10%)); transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 70ms); }
+.kn-odo__s span { display: block; height: var(--cell); line-height: var(--cell); text-align: center; color: #f5f6f4; }
+.kn-odo__d.is-lead .kn-odo__s span { color: #5f645f; }
+.kn-odo__u { font-size: max(0.6875rem, 0.55em); letter-spacing: 0.1em; color: #d6d9d6; }   /* never under 11 px */
+.kn-odo__cap { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem 0.9rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.1em;
+  text-transform: uppercase; color: #c3c8c3; }
+.kn-odo__cap .kn-link { font-family: var(--font-text); font-size: 0.86rem; letter-spacing: 0; text-transform: none; }
+.kn-odoform { margin-top: 1rem; }
+.kn-odoform .field__label { color: #d6d9d6; }
+.kn-odoform__row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.5rem; }
+.kn-odoform__row .input { font-family: var(--font-mono); background: rgba(0, 0, 0, 0.35); }
+.kn-odoform__x { --px: 0; width: 52px; }
+.kn-car .kn-carform::before { background: repeating-linear-gradient(-45deg, rgb(var(--kn-warm)) 0 10px, transparent 10px 20px); opacity: 0.7; }
+
+/* the next service: a gauge card with a neon tube along the top in the state's colour */
+.kn-next { --kn-c: var(--kn-neon); position: relative; display: grid; align-content: start; gap: 0.95rem; overflow: hidden; container-type: inline-size;
+  padding: clamp(1.25rem, 0.95rem + 1.2vw, 2rem); background: radial-gradient(80% 70% at 100% 0%, rgba(var(--kn-c), 0.09), transparent 70%), var(--ink-800);
+  box-shadow: inset 0 0 0 1px var(--line-2); }
+.kn-next::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgb(var(--kn-c)); box-shadow: 0 0 14px 1px rgba(var(--kn-c), 0.75); }
+.kn-next[data-state="soon"] { --kn-c: var(--kn-amber); }
+.kn-next[data-state="over"] { --kn-c: var(--kn-red); }
+.kn-next__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem 1rem; }
+.kn-next__label { display: inline-flex; align-items: center; gap: 0.7em; font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase; color: rgb(var(--kn-c)); }
+.kn-next__label::before { content: ""; width: 8px; height: 8px; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.kn-next__rule { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.8rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-2); }
+.kn-next__main, .kn-next__need { display: grid; align-content: start; justify-items: start; gap: 0.9rem; }
+.kn-next__head { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.4rem, 1rem + 1.35vw, 2.2rem); line-height: 1.08; letter-spacing: -0.025em; text-wrap: balance; }
+.kn-next__head:focus { outline: none; }
+.kn-next[data-state="over"] .kn-next__head { color: rgb(var(--kn-red)); text-shadow: 0 0 22px rgba(var(--kn-red), 0.35); }
+.kn-next__sub { margin-top: -0.4rem; color: var(--text-2); }
+.kn-next__note { display: block; font-size: 0.86rem; line-height: 1.5; color: var(--text-2); max-width: 62ch; }
+.kn-next__note--ics { margin-top: -0.3rem; }
+.kn-next__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.kn-ics small { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--text-2); }
+
+.kn-meters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; width: 100%; }
+@container (max-width: 480px) { .kn-meters { grid-template-columns: minmax(0, 1fr); } }
+.kn-meter { --m: var(--kn-neon); padding: 0.95rem 1rem 0.85rem; background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.kn-meter[data-state="soon"] { --m: var(--kn-amber); }
+.kn-meter[data-state="over"] { --m: var(--kn-red); }
+.kn-meter__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-2); }
+.kn-meter__value { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.45rem; margin-top: 0.35rem; }
+.kn-meter__pre { font-size: 0.86rem; color: var(--text-2); }
+.kn-meter__value b { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.85rem); line-height: 1.1; letter-spacing: -0.02em;
+  color: rgb(var(--m)); font-variant-numeric: tabular-nums; }
+.kn-meter__track { position: relative; height: 14px; margin-top: 0.8rem; overflow: hidden; background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09); }
+.kn-meter__track::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(255, 255, 255, 0.2) calc(10% - 1px) 10%); }
+.kn-meter__fill { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(var(--f, 0)); transition: transform 1s var(--ease);
+  background: linear-gradient(90deg, rgba(var(--m), 0.3), rgb(var(--m))); }
+.kn-meter[data-state="over"] .kn-meter__fill { background: repeating-linear-gradient(-45deg, rgb(var(--m)) 0 6px, rgba(var(--m), 0.55) 6px 12px); }
+.kn-meter__mark { position: absolute; inset: 0; transform: translateX(calc(var(--f, 0) * 100%)); transition: transform 1s var(--ease); pointer-events: none; }
+.kn-meter__mark::before { content: ""; position: absolute; left: -2px; top: 0; bottom: 0; width: 3px; background: #fff; box-shadow: 0 0 8px rgba(var(--m), 0.95); }
+.kn-meter__ends { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 0.45rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-2); }
+.kn-meter__none { margin-top: 0.5rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-2); }
+
+/* the interval, as a sentence: «Каждые [   ] км или каждые [  ] мес.» */
+.kn-interval { display: grid; gap: 0.8rem; }
+.kn-interval__lead { max-width: 56ch; color: var(--text-2); }
+.kn-interval__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem 0.7rem; font-weight: 600; font-size: 1.02rem; }
+.kn-interval__f { position: relative; display: inline-flex; }
+.kn-interval__f .input { width: 9rem; padding-right: 2.8rem; font-family: var(--font-mono); font-size: 1.1rem; background: rgba(0, 0, 0, 0.3); }
+.kn-interval__f--m .input { width: 7.2rem; padding-right: 3.4rem; }
+.kn-interval__f .input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--danger); }
+.kn-interval__u { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-2); pointer-events: none; }
+.kn-interval__hint { font-size: 0.84rem; color: var(--text-2); }
+.kn-interval__err { font-size: 0.86rem; color: var(--danger); }
+.kn-interval .kn-form__actions { margin-top: 0.2rem; justify-content: flex-start; }
+
+/* ---------- the log: a stamped timeline, grouped by year ---------- */
+.kn-log { padding: clamp(1.15rem, 0.9rem + 1vw, 1.75rem); background: rgba(12, 13, 12, 0.94); box-shadow: inset 0 0 0 1px var(--line); }
+.kn-log__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; }
+.kn-log__title { font-size: var(--fs-h3); text-transform: uppercase; letter-spacing: -0.02em; }
+.kn-log__count { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); }
+.kn-log__head .btn { margin-left: auto; }
+.kn-entryform { margin-top: 1.1rem; }
+.kn-log__empty { display: grid; justify-items: start; gap: 0.65rem; margin-top: 1.1rem; padding: clamp(1.2rem, 1rem + 1vw, 1.75rem); color: var(--text-2);
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.018) 0 10px, transparent 10px 20px); box-shadow: inset 0 0 0 1px var(--line); }
+.kn-log__empty-t { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--text); }
+.kn-log__empty p:not(.kn-log__empty-t) { max-width: 52ch; }
+
+.kn-year { margin-top: 1.5rem; }
+.kn-year__y { display: flex; align-items: center; gap: 0.9rem; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.kn-year__y::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.kn-entries { --rail: 1.3rem; position: relative; display: grid; gap: 0.6rem; margin-top: 0.8rem; padding-left: var(--rail); }
+.kn-entries::before { content: ""; position: absolute; left: 4px; top: 0.4rem; bottom: 0.4rem; width: 1px; background: linear-gradient(180deg, var(--line-2), var(--line)); }
+.kn-entry { position: relative; display: grid; grid-template-columns: 8.2rem minmax(0, 1fr) auto; gap: 0.55rem 1.25rem; padding: 1rem 1.1rem;
+  background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.kn-entry::before { content: ""; position: absolute; left: calc(-1 * var(--rail)); top: 1.3rem; width: 9px; height: 9px; background: var(--ink-400); box-shadow: 0 0 0 3px #0c0d0c; }
+.kn-entry.is-to::before { background: rgb(var(--kn-neon)); box-shadow: 0 0 0 3px #0c0d0c, 0 0 10px rgba(var(--kn-neon), 0.8); }
+.kn-entry::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: rgba(var(--kn-neon), 0.06); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.75); }
+.kn-entry.is-editing::after { opacity: 1; }
+.kn-entry.is-new { animation: kn-in 0.5s var(--ease); }
+.kn-entry.is-new::after { animation: kn-flash 1.8s var(--ease); }
+@keyframes kn-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes kn-flash { 0%, 35% { opacity: 1; } 100% { opacity: 0; } }
+.kn-entry:focus { outline: none; }
+.kn-entry:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.kn-entry__when { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+.kn-entry__date { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--text); letter-spacing: 0.02em; }
+.kn-entry__km { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-2); }
+/* a rubber stamp: double rim, a little crooked */
+.kn-stamp { margin-top: 0.55rem; padding: 0.12rem 0.5rem; font-family: var(--font-display); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.14em; line-height: 1.3;
+  color: rgb(var(--kn-neon)); border: 2px solid rgba(var(--kn-neon), 0.75); border-radius: 3px; outline: 1px solid rgba(var(--kn-neon), 0.35); outline-offset: 2px;
+  transform: rotate(-7deg); }
+.kn-entry__body { display: grid; align-content: start; gap: 0.45rem; min-width: 0; }
+.kn-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.kn-tag { padding: 0.28em 0.6em; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em; color: var(--text-2); background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px var(--line-2); }
+.kn-tag--to { color: rgb(var(--kn-neon)); background: rgba(var(--kn-neon), 0.07); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.55); }
+.kn-entry__text { color: var(--text); white-space: pre-line; overflow-wrap: anywhere; }
+.kn-entry__note { font-size: 0.88rem; color: var(--text-2); overflow-wrap: anywhere; }
+.kn-entry__tools { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+.kn-entry__tools .kn-link { color: var(--text-2); }
+.kn-entry__tools .kn-link:hover { color: var(--accent); }
+.kn-entry__tools [data-act="remove"]:hover { color: rgb(var(--kn-red)); }
+
+/* ---------- the side column: «Записаться» and the copy ---------- */
+.kn-side { display: grid; gap: inherit; align-content: start; }
+.kn-card { position: relative; padding: clamp(1.15rem, 0.95rem + 0.9vw, 1.6rem); background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); }
+.kn-card__title { font-size: 1.12rem; line-height: 1.2; text-transform: uppercase; letter-spacing: -0.01em; }
+.kn-card__text { margin-top: 0.55rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-2); }
+.kn-booking { background: radial-gradient(90% 80% at 0% 0%, rgba(var(--green-rgb), 0.16), transparent 70%), var(--ink-800); }
+.kn-booking .kn-chips { margin-top: 1rem; }
+.kn-booking .btn { margin-top: 1.1rem; }
+.kn-card__more { display: inline-flex; align-items: center; gap: 0.4em; min-height: 44px; margin-top: 0.5rem; font-size: 0.88rem; font-weight: 700; color: var(--accent); }
+.kn-card__more .ic { width: 1em; height: 1em; transition: transform var(--dur) var(--ease); }
+.kn-card__more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.kn-card__more:hover .ic { transform: translate(2px, -2px); }
+.kn-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin-top: 1rem; background: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+.kn-tool { display: grid; grid-template-rows: auto auto 1fr; justify-items: start; gap: 0.3rem; min-height: 104px; padding: 0.95rem 1rem; text-align: left;
+  background: var(--ink-900); transition: background-color var(--dur) var(--ease); }
+.kn-tool .ic { width: 22px; height: 22px; margin-bottom: 0.2rem; color: rgb(var(--kn-neon)); }
+.kn-tool span { font-weight: 700; font-size: 0.92rem; line-height: 1.25; color: var(--text); }
+.kn-tool small { align-self: end; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--text-2); }
+.kn-tool:hover { background: var(--ink-700); }
+.kn-tool:focus-visible { outline-offset: -3px; }
+.kn-tool--danger .ic, .kn-tool--danger span { color: rgb(var(--kn-red)); }
+
+/* ---------- the confirm window (the site's .modal) ---------- */
+.kn-dialog .modal__lead { margin-bottom: 0; }
+.kn-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.6rem; margin-top: 1.6rem; }
+@media (max-width: 480px) { .kn-dialog__actions .btn { flex: 1 1 auto; } }   /* a phone: the buttons fill their rows */
+
+/* ---------- how it works (static, readable without JS) ---------- */
+.kn-about { background: var(--bg); border-top: 1px solid var(--line); }
+.kn-how { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+.kn-how__item { display: grid; align-content: start; gap: 0.55rem; padding: clamp(1.25rem, 1rem + 1vw, 2rem); background: var(--bg); }
+.kn-how__n { font-family: var(--font-mono); font-size: 0.78rem; color: rgb(var(--kn-neon)); }
+.kn-how__t { font-size: var(--fs-h4); }
+.kn-how__item p { max-width: 62ch; color: var(--text-2); line-height: 1.6; }
+
+/* ---------- every page: the footer link and the request form's «Заполнить из «Моей машины»» ---------- */
+.kn-foot { display: inline-flex; align-items: center; gap: 0.85rem; margin-top: 1.5rem; padding: 0.65rem 1.1rem 0.65rem 0.65rem; background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 0 0 1px var(--line-2); transition: box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+.kn-foot__ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; color: rgb(var(--kn-neon)); background: rgba(var(--kn-neon), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.3); }
+.kn-foot__ic .ic { width: 22px; height: 22px; }
+.kn-foot__t b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: #fff; }
+.kn-foot__t small { display: block; margin-top: 0.1rem; font-size: 0.8rem; color: var(--gray-300); }
+.kn-foot:hover { background: rgba(var(--kn-neon), 0.05); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.75); }
+.kn-fill { display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 52px; margin: 0 0 1.2rem; padding: 0.65rem 1rem; text-align: left; color: var(--text);
+  background: rgba(var(--kn-neon), 0.06); box-shadow: inset 0 0 0 1px rgba(var(--kn-neon), 0.5); transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.kn-fill .ic { flex: none; width: 22px; height: 22px; color: rgb(var(--kn-neon)); }
+.kn-fill__t { font-weight: 700; font-size: 0.95rem; }
+.kn-fill__car { margin-left: auto; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); text-align: right; overflow-wrap: anywhere; }
+.kn-fill:hover { background: rgba(var(--kn-neon), 0.12); box-shadow: inset 0 0 0 1px rgb(var(--kn-neon)); }
+
+/* ---------- touch: 44 px targets ---------- */
+@media (pointer: coarse) {
+  .kn-link { min-height: 44px; min-width: 44px; }
+  .kn-chip span { min-height: 44px; }
+  .kn-foot { min-height: 56px; }
+}
+
+/* ---------- layout ---------- */
+@media (min-width: 761px) {
+  .kn-desk { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kn-log, .kn-side { grid-column: 1 / -1; }
+  .kn-side { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+@media (min-width: 1100px) {
+  .kn-desk { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .kn-car { grid-column: 1 / span 5; }
+  .kn-next { grid-column: 6 / span 7; }
+  .kn-log { grid-column: 1 / span 8; }
+  .kn-side { grid-column: 9 / span 4; grid-template-columns: minmax(0, 1fr); position: sticky; top: calc(var(--header-h) + 1rem); }
+}
+@media (max-width: 900px) {
+  .kn-start { grid-template-columns: minmax(0, 1fr); }
+  .kn-bay { width: 100%; max-width: 560px; aspect-ratio: 16 / 11; justify-self: center; }
+}
+@media (max-width: 640px) {
+  .kn-entry { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when tools" "body body"; padding: 0.9rem 0.9rem 1rem; }
+  .kn-entry__when { grid-area: when; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.8rem; }
+  .kn-entry__body { grid-area: body; }
+  .kn-entry__tools { grid-area: tools; flex-direction: row; gap: 0; }
+  .kn-entry__tools .kn-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .kn-entry__tools .kn-link .ic { width: 1.25em; height: 1.25em; }
+  .kn-stamp { margin-top: 0; }
+  .kn-log__head .btn { margin-left: 0; width: 100%; }
+  .kn-tool { min-height: 96px; padding: 0.85rem; }
+  .kn-how { grid-template-columns: minmax(0, 1fr); }
+  .kn-fill { flex-wrap: wrap; row-gap: 0.2rem; }
+  .kn-fill__car { width: 100%; margin-left: calc(22px + 0.75rem); text-align: left; }
+  .kn-next__actions .btn { width: 100%; height: auto; min-height: 52px; padding-block: 0.7em; white-space: normal; text-align: center; line-height: 1.25; }
+  .kn-odoform__row { grid-template-columns: minmax(0, 1fr) auto; }
+  .kn-odoform__row .btn--primary { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 380px) {
+  .kn-plate__specs { column-gap: 1.25rem; }
+  .kn-plate__label { letter-spacing: 0.12em; }
+  .kn-odo { font-size: 1.12rem; }
+  .kn-interval__f .input { width: 7.8rem; }
+  .kn-tools { grid-template-columns: minmax(0, 1fr); }
+  .kn-tool { min-height: 0; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 0.75rem; }
+  .kn-tool .ic { grid-row: 1 / span 2; margin: 0; }
+}
+
+/* reduced motion: base.css shortens transitions and animations; their delays go too, so the state shows at once */
+@media (prefers-reduced-motion: reduce) {
+  .kn-odo__s, .kn-meter__fill, .kn-meter__mark, .kn-bay__car, .kn-start.is-open .kn-bay__car { transition-delay: 0s !important; }
+  .kn-bay__sign, .kn-entry.is-new, .kn-entry.is-new::after { animation: none !important; }
+}
+
+/* ---------- print: a plain sheet — the passport, the interval and the log in order of dates ---------- */
+.kn-print { display: none; }
+@media print {
+  @page { margin: 14mm 12mm; }
+  body.page-knizhka { display: block; min-height: 0; padding: 0 !important; background: #fff !important; color: #111 !important; }
+  .page-knizhka :is(.topline, .site-header, .mobile-menu, .mobile-bar, .site-footer, .page-hero, .kn-about, .request, .kn-privacy, .kn-nojs, dialog, .toast, .sprite) { display: none !important; }
+  .page-knizhka .kn-sec { padding: 0; background: none !important; }
+  .page-knizhka .kn-sec::before { display: none; }
+  .page-knizhka .kn-sec > .wrap { width: auto; }
+  .page-knizhka .kn > :not(.kn-print) { display: none !important; }
+  .page-knizhka .kn { min-height: 0; }
+  .page-knizhka .kn-print { display: block !important; font: 10.5pt/1.45 var(--font-text); color: #111; }
+  .kn-print__kicker { font-family: var(--font-mono); font-size: 8pt; letter-spacing: 0.18em; text-transform: uppercase; color: #444; }
+  .kn-print__car { margin-top: 2mm; font-family: var(--font-display); font-size: 18pt; line-height: 1.1; text-transform: uppercase; color: #111; }
+  .kn-print__facts { margin-top: 1.5mm; font-family: var(--font-mono); font-size: 9pt; color: #222; }
+  .kn-print__line { margin-top: 1.5mm; color: #111; }
+  .kn-print__h { margin: 6mm 0 2mm; font-size: 12pt; color: #111; }
+  .kn-print__table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  .kn-print__table th, .kn-print__table td { padding: 1.8mm 2mm; border: 0.6pt solid #999; text-align: left; vertical-align: top; color: #111; }
+  .kn-print__table th { font-family: var(--font-mono); font-size: 7.5pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: #eee; }
+  .kn-print__table td:first-child, .kn-print__table td:nth-child(2) { white-space: nowrap; }
+  .kn-print__table td:nth-child(2) { text-align: right; }
+  .kn-print__table th:last-child { width: 30mm; }
+  .kn-print__table tr { break-inside: avoid; }
+  .kn-print__foot { margin-top: 6mm; font-size: 8pt; color: #555; }
+}

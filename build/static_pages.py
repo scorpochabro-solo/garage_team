@@ -2,7 +2,7 @@
 """Static pages: about, contacts, payment, delivery, parts, catalogs, search, call/*, registration, agreement, reviews, 404."""
 import re
 
-from . import arki, otkryto, schema
+from . import arki, knizhka, otkryto, schema
 from . import data as D
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
@@ -299,6 +299,19 @@ def render_registration():
     return document(title, desc, "/registration/", body, body_class="page-registration")
 
 
+# ---------- «Моя машина»: the service book in the browser (build/knizhka.py) ----------
+def render_moya_mashina():
+    crumbs = [("Главная", "/"), (knizhka.H1, None)]
+    hero = page_hero(knizhka.H1, crumbs, eyebrow=knizhka.EYEBROW, lead=esc(knizhka.LEAD), aside=phone_aside("Заказать звонок"),
+                     mark_icon="inspection", title_html=knizhka.h1_html())
+    title, desc = D.page_meta(knizhka.SEO_KEY, knizhka.TITLE, knizhka.DESCRIPTION)
+    body = f"""{hero}
+{knizhka.body()}
+{request_section("Оставить заявку")}"""
+    graph = schema.breadcrumbs(crumbs, D.SITE_URL + knizhka.PATH)
+    return document(title, desc, knizhka.PATH, body, body_class="page-knizhka", jsonld=schema.dump(graph))
+
+
 # ---------- agreement / reviews / 404 ----------
 def render_soglashenie():
     pg = P["soglashenie"]
@@ -343,5 +356,6 @@ PAGES = {
     "/registration/": render_registration,
     "/page/soglashenie/": render_soglashenie,
     "/otzyvy.html": render_otzyvy,
+    knizhka.PATH: render_moya_mashina,
     "/404.html": render_404,
 }

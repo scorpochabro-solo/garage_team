@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
-from . import otkryto
+from . import knizhka, otkryto
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -145,6 +145,7 @@ def footer():
           <a href="{D.VK_URL}" target="_blank" rel="noopener" aria-label="ВКонтакте">{icon('vk')}</a>
           <a href="{D.FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">{icon('facebook')}</a>
         </div>
+        {knizhka.footer_link()}
       </div>
       <div>
         <div class="footer__title">Разделы</div>
@@ -372,6 +373,7 @@ def request_section(title="Оставить запрос", section_id="request",
 
       <div class="rq__panel is-active" data-panel="1">
         <div class="rq__title"><span>Ваш автомобиль</span><button class="rq__switch" type="button" data-mode-toggle>Не нашли свой автомобиль?</button></div>
+        {knizhka.fill_button()}
         <div data-mode="select">
           <div class="form-grid form-grid--2">
             <div class="field"><label class="field__label" for="tecdoc_car_brand">Марка автомобиля <span class="req">*</span></label><select class="select" id="tecdoc_car_brand" name="request_part[tecdoc_car_brand]"><option value="-1">Выберите марку</option>{brands}</select><span class="field__error">Укажите марку автомобиля</span></div>

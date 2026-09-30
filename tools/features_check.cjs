@@ -182,6 +182,27 @@ async function shiny(page) {
   line(d.sel === '225/45/17' && !!d.out, '«Шинный калькулятор»: a typed size is read', `${d.sel}, ${d.out}`);
 }
 
+async function knizhka(page, phone) {
+  // «Моя машина»: a passport saved in this browser, then the request form of the home page takes the car from it
+  await page.goto(BASE + '/moya-mashina/', { waitUntil: 'networkidle' });
+  await page.evaluate(() => localStorage.removeItem('garage.knizhka.v1'));
+  await page.reload({ waitUntil: 'networkidle' });
+  const press = async (loc) => { await loc.scrollIntoViewIfNeeded(); if (phone) await loc.tap(); else await loc.click(); };
+  await press(page.locator('[data-kn-go]'));
+  await page.fill('#kn-c-brand', 'Kia');
+  await page.fill('#kn-c-model', 'Rio');
+  await page.fill('#kn-c-km', '84500');
+  await press(page.locator('[data-kn-car-form] [type=submit]'));
+  await page.waitForTimeout(600);
+  const name = await page.$eval('[data-kn-name]', (e) => e.textContent);
+  line(name === 'Kia Rio', '«Моя машина»: the passport is saved', name);
+  await page.goto(BASE + '/', { waitUntil: 'networkidle' });
+  await press(page.locator('#request [data-kn-fill]'));
+  const brand = await page.$eval('#text_car_brand', (e) => e.value);
+  line(brand === 'Kia', '«Моя машина»: «Заполнить из «Моей машины»» fills the request form', brand);
+  await page.evaluate(() => localStorage.removeItem('garage.knizhka.v1'));
+}
+
 (async () => {
   for (const run of RUNS) {
     console.log(`=== ${run.name}`);
@@ -194,7 +215,7 @@ async function shiny(page) {
     page.on('console', (m) => { if (m.type() === 'error' && (m.location().url || BASE).startsWith(BASE)) errors.push('console: ' + m.text() + ' ' + (m.location().url || '')); });
     page.on('requestfailed', (r) => { if (r.url().startsWith(BASE)) errors.push('failed: ' + r.url()); });
     const phone = !!run.ctx.isMobile;
-    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page)]) {
+    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page), () => knizhka(page, phone)]) {
       try { await step(); } catch (e) { line(false, 'step crashed', e.message.split('\n')[0]); }
     }
     line(errors.length === 0, 'no errors in the console', errors.slice(0, 5).join(' | '));
