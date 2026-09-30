@@ -70,6 +70,10 @@
 .gate__addr { display: grid; gap: 0.45rem; margin-top: clamp(1.1rem, 2.5vh, 1.6rem); }
 .gate__addr b { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem); letter-spacing: -0.01em; color: #fff; }
 .gate__addr .mono { color: var(--gray-300); }
+/* the live status of «Открыто сейчас» under the address (build/otkryto.py inline(), js/otkryto.js): the plain hours
+   without JS; the dot and the state word take the state colour, «Закрыто» stays white */
+.gate__oc { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.86rem; letter-spacing: 0.02em; color: var(--gray-300); }
+.gate__oc:is([data-oc-state="closed"], [data-oc-state="note"]) .oc__word { color: #fff; }
 .gate__route { margin-top: clamp(1.2rem, 3vh, 1.8rem); }
 
 /* the remote beside the gate: a slim wall box — ▲ opens, ▼ closes (scrolls the page to that point of the scene) */

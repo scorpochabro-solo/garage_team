@@ -108,6 +108,13 @@ def menu_item() -> str:
             f'<p><b class="oc__text" hidden></b><span>{lines}</span></p></div>')
 
 
+def inline(hours: list[tuple[str, str]], cls: str = "") -> str:
+    """One line inside another block (the «Ворота» scene under the address): «● Открыто · до 19:00» with JS,
+    the plain hours («Пн–Пт 9:00–19:00 · Сб 9:00–17:00») without it."""
+    return (f'<span class="oc{" " + cls if cls else ""}" data-oc="{_data(hours)}">{_DOT}'
+            f'<span class="oc__text">{esc(compact(hours))}</span></span>')
+
+
 # ---------- the week ----------
 def schedule(hours: list[tuple[str, str]], title: str | None = None, label: str = "Часы работы по дням недели",
              holidays: bool = True, big: bool = False) -> str:

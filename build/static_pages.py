@@ -2,8 +2,8 @@
 """Static pages: about, contacts, payment, delivery, parts, catalogs, search, call/*, registration, agreement, reviews, 404."""
 import re
 
+from . import arki, otkryto, schema
 from . import data as D
-from . import otkryto, schema
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
                      request_section, review_card)
@@ -82,9 +82,12 @@ def render_contacts():
       <div class="block-title"><span class="tag-num">// магазин</span><h2 class="h3">Магазин запчастей</h2></div>
       {otkryto.schedule(D.SHOP_HOURS, label="Часы работы магазина по дням недели", holidays=False, big=True)}
     </div>
-    <div class="map reveal" style="min-height:440px">
-      <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} Схема проезда — построить маршрут</a>
+    <div class="find">
+      {arki.door()}
+      <div class="map reveal">
+        <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} Схема проезда — построить маршрут</a>
+      </div>
     </div>
   </div>
   {_side()}

@@ -2,10 +2,8 @@
 """Homepage renderer."""
 import json
 
-from . import arki
+from . import arki, otkryto, schema, svet
 from . import data as D
-from . import otkryto, schema
-from . import svet
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
 from .pribory import pribory_section
@@ -233,9 +231,10 @@ def team():
 def contacts_strip():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
-    # the section heading lives in the «Ворота» scene (build/vorota.py): the facade, the gate, the way in
+    # the section heading lives in the «Ворота» scene (build/vorota.py): the facade, the gate, the way in;
+    # under the address the scene shows the live status of «Открыто сейчас» (build/otkryto.py)
     return f"""<section class="section section--black section--gate" id="contacts" aria-labelledby="contacts-title">
-  {gate_scene(esc(otkryto.ROUTE_URL))}
+  {gate_scene(esc(otkryto.ROUTE_URL), otkryto.inline(D.HOURS, "gate__oc"))}
   <div class="wrap contacts">
     <div class="reveal">
       <ul class="contacts__list">
@@ -265,8 +264,10 @@ def render_home():
         ticker(),
         services_map(),
         pribory_section(),
-        arki.inside_section(),
+        # the light «Почему выбирают» (with the director in an arched niche) sits between the two dark tool/photo blocks,
+        # and the pendant of «Свет ламп» hangs from the edge where the paper ends and «Как у нас» begins
         advantages(),
+        arki.inside_section(lamp=svet.mini()),
         gallery(),
         team(),
         reviews_section(paper=True),

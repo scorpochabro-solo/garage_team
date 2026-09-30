@@ -3,7 +3,7 @@
 
   inside_section()  «Как у нас» — four real photos framed as arched windows: black steel frame, a fan-light
                     with radial bars like the office windows, a brick arch ring drawn around each opening
-  door()            the facade photo as an arched doorway in the contacts block
+  door()            the facade photo as an arched doorway beside the map on /contacts/
   wall()            the brick arch ring, jambs and sill around an opening (also around the director's portrait)
 
 Geometry: every opening is a true semicircle on top of a rectangle (border-radius 999px 999px 0 0 makes the radius
@@ -86,11 +86,13 @@ INSIDE_ASIDE = ("Кирпичное здание с арочными окнам�
 DOOR_CAPTION = "Кирпичное здание, ворота в чёрном портале, над ними вывеска GARAGE TEAM"
 
 
-def inside_section():
+def inside_section(lamp=""):
+    """lamp: a pendant hanging over the heading (home.py passes svet.mini(), which lights up with the heading's .reveal)."""
     arches = "".join(_arch(i, *row) for i, row in enumerate(INSIDE))
     return f"""<section class="section inside" id="inside" aria-labelledby="inside-title">
   <div class="wrap">
-    <div class="sec-head reveal">
+    <div class="sec-head reveal{" svet-lit" if lamp else ""}">
+      {lamp}
       <div><p class="eyebrow">// Красная слобода, 9</p><h2 class="h2 sec-head__title" id="inside-title">Как у нас</h2></div>
       <p class="sec-head__aside">{nb(INSIDE_ASIDE)}</p>
     </div>
@@ -102,8 +104,9 @@ def inside_section():
 
 
 def door():
-    """The facade as an arched doorway next to the address: what the building looks like from the street."""
-    # art-directed: a tall doorway in the desktop column, a squarer one when the block is a single column
+    """The facade as an arched doorway beside the map on /contacts/: what the building looks like from the street.
+    On the home page the «Ворота» scene shows the facade already, so the doorway lives on the contacts page."""
+    # art-directed: a tall doorway in its own column, a squarer one when the block is a single column (≤ 900px)
     return f"""<figure class="arch arch--door reveal" style="--d:120ms">
       <div class="arch__opening">
         {wall()}

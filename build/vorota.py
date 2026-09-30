@@ -94,9 +94,11 @@ def _srcset(name, widths):
     return f"/assets/img/real/{name}-{small}.webp {small}w, /assets/img/real/{name}.webp {full}w"
 
 
-def gate_scene(route):
+def gate_scene(route, hours=None):
+    """route: href of «Схема проезда», already escaped; hours: markup of the line under the address
+    (home.py passes the live status of «Открыто сейчас»), the plain hours by default."""
     wide, tall = GATE_ART["wide"], GATE_ART["tall"]
-    hours = "Пн–Пт 9–19 · Сб 9–17"
+    hours = hours or '<span class="mono">Пн–Пт 9–19 · Сб 9–17</span>'
     return f"""<div class="gate" data-gate>
     <div class="gate__stage">
       <div class="gate__world">
@@ -115,7 +117,7 @@ def gate_scene(route):
         <div class="wrap">
           <p class="eyebrow">// 06 — Контакты</p>
           <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
-          <p class="gate__addr"><b>ул. Красная слобода, 9</b><span class="mono">{hours}</span></p>
+          <p class="gate__addr"><b>ул. Красная слобода, 9</b>{hours}</p>
           <a class="btn btn--primary gate__route" href="{route}" target="_blank" rel="noopener">{icon('pin')} Схема проезда</a>
         </div>
       </div>

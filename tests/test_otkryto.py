@@ -84,6 +84,15 @@ class HoursTest(unittest.TestCase):
         self.assertIn("понедельник: с 9:00 до 19:00", week, "screen readers hear words, not a dash")
         self.assertEqual(O.actions().count(" hidden>"), 2, "copy and vCard buttons wait for JS")
 
+    def test_inline_status_in_the_gate_scene(self):
+        line = O.inline(D.HOURS, "gate__oc")
+        self.assertTrue(line.startswith('<span class="oc gate__oc" data-oc="'), "otkryto.js finds every [data-oc]")
+        data = re.search(r'data-oc="([^"]+)"', line).group(1)
+        self.assertEqual(json.loads(data.replace("&quot;", '"'))["week"], O.week(D.HOURS))
+        self.assertIn(f'<span class="oc__text">{D.esc(O.compact(D.HOURS))}</span>', line, "without JS: the plain hours")
+        self.assertNotIn("data-oc-brief", line, "the scene has room for the full form («откроемся завтра в 9:00»)")
+        self.assertTrue(O.inline(D.HOURS).startswith('<span class="oc" data-oc="'))
+
 
 @unittest.skipUnless(NODE, "node is not installed")
 class StatusTest(unittest.TestCase):
