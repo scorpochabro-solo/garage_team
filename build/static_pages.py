@@ -2,7 +2,7 @@
 """Static pages: about, contacts, payment, delivery, parts, catalogs, search, call/*, registration, agreement, reviews, 404."""
 import re
 
-from . import arki, otkryto, schema
+from . import arki, fonar, otkryto, schema
 from . import data as D
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
@@ -321,12 +321,13 @@ def render_otzyvy():
 
 
 def render_404():
-    body = f"""<section class="wrap notfound">
+    # a lost page in a dark garage: the block is a zone of the brick wall («Фонарь по кирпичу», build/fonar.py)
+    body = fonar.mark(f"""<section class="wrap notfound">
   <div class="notfound__code" aria-hidden="true">404</div>
   <h1 class="h2" style="margin-top:1rem">Страница не найдена</h1>
   <p class="lead" style="margin:1rem auto 0">Возможно, адрес изменился. Загляните в услуги или позвоните нам — поможем.</p>
   <div class="notfound__actions"><a class="btn btn--primary" href="/">На главную</a><a class="btn btn--ghost is-on-dark" href="/services.html">Все услуги</a><a class="btn btn--ghost is-on-dark" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a></div>
-</section>"""
+</section>""")
     return document("Страница не найдена | Гараж", "Страница не найдена.", "/404.html", body, body_class="page-404", noindex=True)
 
 

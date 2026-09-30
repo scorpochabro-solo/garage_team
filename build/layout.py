@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
-from . import otkryto
+from . import fonar, otkryto
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -266,7 +266,8 @@ def page_hero(title, crumb_items, eyebrow=None, lead=None, aside=None, mark_icon
     ld = f'<p class="lead page-hero__lead">{lead}</p>' if lead else ""
     aside_html = f'<div class="page-hero__aside">{aside}</div>' if aside else ""
     mark = f'<div class="page-hero__mark" aria-hidden="true">{icon(mark_icon)}</div>' if mark_icon else ""
-    return f"""<section class="page-hero">
+    # the dark heading band of every inner page is a zone of the brick wall («Фонарь по кирпичу», build/fonar.py)
+    return fonar.mark(f"""<section class="page-hero">
   {mark}
   <div class="wrap page-hero__in">
     <div>
@@ -277,7 +278,7 @@ def page_hero(title, crumb_items, eyebrow=None, lead=None, aside=None, mark_icon
     </div>
     {aside_html}
   </div>
-</section>"""
+</section>""")
 
 
 def phone_aside(cta_label="Записаться на приём", preset=None):

@@ -2,7 +2,7 @@
 """Homepage renderer."""
 import json
 
-from . import arki, otkryto, schema, svet
+from . import arki, fonar, otkryto, schema, svet
 from . import data as D
 from .icons import icon, icon_for_href
 from .layout import document, request_section, reviews_section, green_note, slider_nav
@@ -259,23 +259,25 @@ def jsonld():
 
 
 def render_home():
+    # fonar.mark(): the dark sections are the brick wall of «Фонарь по кирпичу» (build/fonar.py); not the first screen
+    # (it has its own hand lamp), the paper sections and the request form; in #contacts only below the «Ворота» photo
     body = "\n".join([
         hero(),
         ticker(),
-        services_map(),
-        pribory_section(),
+        fonar.mark(services_map()),
+        fonar.mark(pribory_section()),
         # the light «Почему выбирают» (with the director in an arched niche) sits between the two dark tool/photo blocks,
         # and the pendant of «Свет ламп» hangs from the edge where the paper ends and «Как у нас» begins
         advantages(),
-        arki.inside_section(lamp=svet.mini()),
-        gallery(),
-        team(),
+        fonar.mark(arki.inside_section(lamp=svet.mini())),
+        fonar.mark(gallery()),
+        fonar.mark(team()),
         reviews_section(paper=True),
-        stuk_section(),
-        zima_section(),
+        fonar.mark(stuk_section()),
+        fonar.mark(zima_section()),
         request_section("Оставить запрос"),
         green_note_wrap(),
-        contacts_strip(),
+        fonar.mark(contacts_strip(), after=".gate"),
     ])
     title, desc = D.page_meta(
         "home", "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж",
