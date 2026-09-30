@@ -1,0 +1,255 @@
+/* ============================================================
+   «Расшифровка кода ошибки» on the computer diagnostics page (build/kod.py, js/kod.js):
+   a scan-tool screen that splits an OBD-II code into its parts, and the reference list of common codes.
+   Motion: the cells of a new code drop in and a light sweeps over them once — transform and opacity only.
+   ============================================================ */
+.kod {
+  --kod-neon-rgb: 64, 240, 192;     /* the mint of the workshop's neon sign: the scan tool's screen */
+  --kod-neon: rgb(var(--kod-neon-rgb));
+  --kod-amber-rgb: 240, 169, 59;    /* a manufacturer's code: the amber of the tyre calculator's warning */
+  --kod-amber: rgb(var(--kod-amber-rgb));
+  --kod-screen: #040b08;
+  --kod-pad: clamp(1rem, 0.6rem + 1.6vw, 1.6rem);
+  /* LCD glass: fine scan lines over the dark screen */
+  --kod-glass: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 3px), var(--kod-screen);
+}
+.kod__intro { max-width: 70ch; margin-bottom: 1.4rem; font-size: 1.02rem; line-height: 1.7; color: var(--text-2); }
+/* without JavaScript the field cannot answer: the worked example and the reference list stay, the form goes */
+@media (scripting: none) { .kod-form, .kod__js, .kod-cta__note { display: none; } .kod .reveal { opacity: 1; transform: none; } }
+
+/* ---------- the scan tool ---------- */
+.kod-scan {
+  container-type: inline-size; position: relative;
+  /* the glow stays faint: the small grey labels on it keep 4.5:1 */
+  background: radial-gradient(90% 60% at 0% 0%, rgba(var(--kod-neon-rgb), 0.03), transparent 70%), linear-gradient(180deg, #0a100e, #080c0a);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg);
+}
+.kod-scan::before, .kod-scan::after { content: ""; position: absolute; z-index: 1; width: 22px; height: 22px; pointer-events: none; border: 0 solid var(--kod-neon); }
+.kod-scan::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.kod-scan::after { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+.kod-scan__bar {
+  display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem var(--kod-pad); border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
+}
+.kod-scan__led { width: 8px; height: 8px; border-radius: 50%; background: var(--kod-neon); box-shadow: 0 0 10px rgba(var(--kod-neon-rgb), 0.85); transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.kod-scan[data-state="error"] .kod-scan__led { background: var(--kod-amber); box-shadow: 0 0 10px rgba(var(--kod-amber-rgb), 0.85); }
+.kod-scan__std { margin-left: auto; }
+
+/* ---------- the field ---------- */
+.kod-form { padding: var(--kod-pad) var(--kod-pad) 1.2rem; }
+.kod-form__label { display: block; margin-bottom: 0.55rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-2); }
+.kod-form__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; }
+.kod-form__input {
+  width: 100%; height: 62px; padding: 0 1rem; border: 0; border-radius: 0; -webkit-appearance: none; appearance: none;
+  background: var(--kod-glass); box-shadow: inset 0 0 0 1px rgba(var(--kod-neon-rgb), 0.24);
+  font-family: var(--font-mono); font-size: 1.45rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--kod-neon); caret-color: var(--kod-neon); text-shadow: 0 0 12px rgba(var(--kod-neon-rgb), 0.45);
+  transition: box-shadow var(--dur) var(--ease);
+}
+/* dimmer than a typed code and without the glow, yet 5:1 on the glass */
+.kod-form__input::placeholder { color: rgba(var(--kod-neon-rgb), 0.58); font-weight: 400; text-shadow: none; opacity: 1; }
+.kod-form__input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--kod-neon), 0 0 0 4px rgba(var(--kod-neon-rgb), 0.14); }
+.kod-form__input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px rgba(var(--kod-amber-rgb), 0.8); }
+.kod-form__input[aria-invalid="true"]:focus { box-shadow: inset 0 0 0 1px var(--kod-amber), 0 0 0 4px rgba(var(--kod-amber-rgb), 0.14); }
+/* the key of the scan tool: a mint frame on the dark glass, filled on hover */
+.kod-form__go { --h: 62px; --px: 1.3em; color: var(--kod-neon); background: rgba(var(--kod-neon-rgb), 0.55); }
+.kod-form__go::before {
+  content: ""; position: absolute; inset: 1px; z-index: -1; background: #0b1511;
+  clip-path: polygon(calc(var(--chamfer) - 0.5px) 0, 100% 0, 100% calc(100% - var(--chamfer) + 0.5px), calc(100% - var(--chamfer) + 0.5px) 100%, 0 100%, 0 calc(var(--chamfer) - 0.5px));
+  transition: background-color var(--dur) var(--ease);
+}
+.kod-form__go:hover { color: #03130d; background: var(--kod-neon); }
+.kod-form__go:hover::before { background: var(--kod-neon); }
+.kod-form__go:focus-visible { outline-color: var(--kod-neon); }
+.kod-form__hint { margin-top: 0.55rem; font-size: 0.84rem; line-height: 1.5; color: var(--text-3); }
+.kod-form__errors { display: grid; gap: 0.35rem; margin-top: 0.7rem; }
+.kod-form__errors[hidden] { display: none; }     /* display: grid above would otherwise beat the hidden attribute */
+.kod-form__error { display: flex; gap: 0.55rem; align-items: flex-start; font-size: 0.92rem; line-height: 1.5; color: #ffc46b; }
+.kod-form__error .ic { flex: none; margin-top: 0.22em; color: var(--kod-amber); }
+
+.kod-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-top: 1rem; }
+.kod-examples__label { margin-right: 0.2rem; font-size: 0.86rem; color: var(--text-3); }
+.kod-chip {
+  min-height: 38px; padding: 0 0.85rem; font-family: var(--font-mono); font-size: 0.86rem; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--text-2); background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px var(--line-2);
+  transition: color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.kod-chip:hover { color: var(--kod-neon); background: rgba(var(--kod-neon-rgb), 0.06); box-shadow: inset 0 0 0 1px rgba(var(--kod-neon-rgb), 0.6); }
+.kod-chip:active { transform: translateY(1px); }
+
+/* ---------- the answer ---------- */
+.kod-out { padding: var(--kod-pad); border-top: 1px solid var(--line); }
+/* the code in the field is being retyped: the answer to the old one steps back until the new one is complete */
+.kod-out .kod-card, .kod-out .kod-codes { transition: opacity var(--dur) var(--ease); }
+.kod-out.is-stale .kod-card, .kod-out.is-stale .kod-codes { opacity: 0.4; }
+.kod-out:focus { outline: none; }
+.kod-out:focus-visible { outline: 2px solid var(--kod-neon); outline-offset: -3px; }
+
+/* several codes: the list of a real scan tool, the chosen one opened below */
+.kod-codes { margin-bottom: 1.5rem; }
+.kod-codes__head, .kod-card__label, .kod-card__tag { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
+.kod-codes__list { display: grid; gap: 1px; margin-top: 0.55rem; background: var(--line); box-shadow: 0 0 0 1px var(--line); }
+.kod-codes__btn {
+  display: grid; grid-template-columns: 5.4rem minmax(0, 1fr); gap: 0.2rem 1rem; align-items: center; width: 100%; min-height: 50px;
+  padding: 0.6rem 0.95rem; text-align: left; background: #0a100e; color: var(--text-2);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.kod-codes__btn:hover { background: #0e1613; color: var(--text); }
+.kod-codes__btn[aria-pressed="true"] { background: rgba(var(--kod-neon-rgb), 0.08); color: var(--text); box-shadow: inset 3px 0 0 var(--kod-neon); }
+.kod-codes__btn:focus-visible { outline-offset: -3px; }
+.kod-codes__code { font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.08em; color: var(--kod-neon); }
+.kod-codes__btn[data-kind="maker"] .kod-codes__code { color: var(--kod-amber); }
+.kod-codes__btn[data-known="0"] .kod-codes__name { color: var(--text-3); }
+.kod-codes__name { font-size: 0.92rem; line-height: 1.4; }
+.kod-codes__more { margin-top: 0.5rem; font-size: 0.84rem; color: var(--text-3); }
+
+.kod-card { display: grid; gap: 1.6rem; }
+.kod-card__tag { display: flex; align-items: center; gap: 0.6em; margin-bottom: 0.8rem; color: var(--kod-neon); }
+.kod-card__tag::before { content: ""; width: 8px; height: 8px; background: var(--kod-neon); }
+
+/* the code on the LCD: five cells, brackets under them name the parts */
+.kod-lcd { --cell: clamp(2.7rem, 1.5rem + 6cqi, 4.2rem); --gap: clamp(0.3rem, 0.2rem + 0.6cqi, 0.5rem); width: max-content; max-width: 100%; }
+.kod-lcd__cells { position: relative; display: grid; grid-template-columns: repeat(5, var(--cell)); gap: var(--gap); overflow: hidden; }
+.kod-lcd__cell {
+  display: grid; place-items: center; height: calc(var(--cell) * 1.28);
+  font-family: var(--font-mono); font-weight: 700; font-size: calc(var(--cell) * 0.64); line-height: 1; color: var(--kod-neon);
+  text-shadow: 0 0 14px rgba(var(--kod-neon-rgb), 0.6);
+  background: var(--kod-glass); box-shadow: inset 0 0 0 1px rgba(var(--kod-neon-rgb), 0.18), inset 0 -14px 22px -16px rgba(var(--kod-neon-rgb), 0.35);
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.kod-card[data-kind="maker"] .kod-lcd__cell[data-role="type"] { color: var(--kod-amber); text-shadow: 0 0 14px rgba(var(--kod-amber-rgb), 0.6); box-shadow: inset 0 0 0 1px rgba(var(--kod-amber-rgb), 0.4); }
+.kod-lcd__keys { display: grid; grid-template-columns: repeat(5, var(--cell)); gap: var(--gap); margin-top: 0.5rem; }
+.kod-lcd__key {
+  position: relative; grid-column: span var(--n); padding-top: 0.45rem; text-align: center;
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+  box-shadow: inset 0 1px 0 rgba(var(--kod-neon-rgb), 0.35);
+}
+.kod-lcd__key::before, .kod-lcd__key::after { content: ""; position: absolute; top: 0; width: 1px; height: 6px; background: rgba(var(--kod-neon-rgb), 0.35); }
+.kod-lcd__key::before { left: 0; }
+.kod-lcd__key::after { right: 0; }
+
+/* what every part means; pointing at a part lights its cells */
+.kod-parts { margin-top: 1.3rem; border-top: 1px solid var(--line); }
+.kod-part { display: grid; grid-template-columns: 6.4rem minmax(0, 1fr); gap: 0.25rem 1rem; padding: 0.7rem 0; border-bottom: 1px solid var(--line); transition: background-color var(--dur) var(--ease); }
+.kod-part dt { padding-top: 0.2rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.kod-part dd { display: flex; gap: 0.65rem; align-items: baseline; margin: 0; font-size: 0.93rem; line-height: 1.55; color: var(--text-2); }
+.kod-part__ch {
+  flex: none; min-width: 2rem; padding: 0.05rem 0.4rem; text-align: center; font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.06em;
+  color: var(--kod-neon); background: rgba(var(--kod-neon-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--kod-neon-rgb), 0.28);
+}
+.kod-card[data-kind="maker"] .kod-part[data-role="type"] .kod-part__ch { color: var(--kod-amber); background: rgba(var(--kod-amber-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--kod-amber-rgb), 0.4); }
+.kod-card[data-kind="maker"] .kod-part[data-role="type"] dd > span { color: var(--text); }
+.kod-part:hover { background: rgba(var(--kod-neon-rgb), 0.035); }
+.kod-card:has(.kod-part[data-role="sys"]:hover) .kod-lcd__cell[data-role="sys"],
+.kod-card:has(.kod-part[data-role="type"]:hover) .kod-lcd__cell[data-role="type"],
+.kod-card:has(.kod-part[data-role="sub"]:hover) .kod-lcd__cell[data-role="sub"],
+.kod-card:has(.kod-part[data-role="num"]:hover) .kod-lcd__cell[data-role="num"] {
+  /* an inner glow: the row of cells clips anything outside it (the sweep needs that) */
+  background: rgba(var(--kod-neon-rgb), 0.16); box-shadow: inset 0 0 0 1px var(--kod-neon), inset 0 0 18px rgba(var(--kod-neon-rgb), 0.3);
+}
+
+/* meaning, checks, the page, the caveat */
+.kod-card__text { min-width: 0; }
+.kod-card__text .kod-card__label + * { margin-top: 0.4rem; }
+.kod-card__text * + .kod-card__label { margin-top: 1.3rem; }
+.kod-card__name { font-size: clamp(1.12rem, 1.02rem + 0.45vw, 1.32rem); font-weight: 700; line-height: 1.4; color: var(--text); text-wrap: pretty; }
+.kod-card__check { font-size: 0.97rem; line-height: 1.65; color: var(--text-2); text-wrap: pretty; }
+.kod-card__check::first-letter { text-transform: uppercase; }
+.kod-card__urge { display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 0.7rem; font-size: 0.92rem; font-weight: 600; color: #ffc46b; }
+.kod-card__urge .ic { flex: none; margin-top: 0.2em; color: var(--kod-amber); }
+.kod-card__link { margin-top: 0.9rem; }
+.kod-card__note, .kod-card__none { display: flex; gap: 0.6rem; align-items: flex-start; line-height: 1.6; }
+.kod-card__note { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px dashed var(--line-2); font-size: 0.86rem; color: var(--text-3); }
+.kod-card__note .ic { flex: none; margin-top: 0.25em; color: var(--kod-neon); }
+.kod-card__none { padding: 0.9rem 1.05rem; font-size: 0.98rem; color: var(--text); background: rgba(var(--kod-neon-rgb), 0.05); box-shadow: inset 3px 0 0 var(--kod-neon); }
+.kod-card[data-kind="maker"] .kod-card__none { background: rgba(var(--kod-amber-rgb), 0.07); box-shadow: inset 3px 0 0 var(--kod-amber); }
+.kod-card[data-kind="reserved"] .kod-card__none { background: var(--surface); box-shadow: inset 3px 0 0 var(--gray-400); }
+
+/* a new answer: the cells drop in one after another, a light sweeps over the glass, the words follow */
+@keyframes kod-cell { from { opacity: 0; transform: translateY(-8px); } }
+@keyframes kod-sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes kod-rise { from { opacity: 0; transform: translateY(10px); } }
+.kod-out.is-live .kod-lcd__cell { animation: kod-cell 0.42s var(--ease) both; }
+.kod-out.is-live .kod-lcd__cell:nth-child(2) { animation-delay: 50ms; }
+.kod-out.is-live .kod-lcd__cell:nth-child(3) { animation-delay: 100ms; }
+.kod-out.is-live .kod-lcd__cell:nth-child(4) { animation-delay: 150ms; }
+.kod-out.is-live .kod-lcd__cell:nth-child(5) { animation-delay: 200ms; }
+.kod-out.is-live .kod-lcd__cells::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0 35%, rgba(var(--kod-neon-rgb), 0.22) 50%, transparent 65%);
+  animation: kod-sweep 0.8s var(--ease-io) 0.12s both;
+}
+.kod-out.is-live .kod-parts, .kod-out.is-live .kod-card__text { animation: kod-rise 0.5s var(--ease) 0.16s both; }
+
+/* ---------- the call to action ---------- */
+.kod-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem 1.4rem; padding: 1.1rem var(--kod-pad); border-top: 1px solid var(--line); background: rgba(255, 255, 255, 0.015); }
+.kod-cta__note { font-size: 0.86rem; line-height: 1.5; color: var(--text-3); }
+
+/* ---------- wide screen: the code and its parts beside the meaning ---------- */
+@container (min-width: 700px) {
+  .kod-card { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 1.6rem 2.4rem; align-items: start; }
+}
+/* narrow screen: the button under the field, the examples in one row of four, the part names only on the LCD
+   brackets (the words stay for screen readers), the long call to action on two lines if it must */
+@container (max-width: 520px) {
+  .kod-form__row { grid-template-columns: minmax(0, 1fr); }
+  .kod-form__go { width: 100%; }
+  .kod-examples { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kod-examples__label { grid-column: 1 / -1; }
+  .kod-chip { padding: 0; }
+  .kod-codes__btn { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+  .kod-part { grid-template-columns: minmax(0, 1fr); }
+  .kod-part dt { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .kod-cta .btn { width: 100%; height: auto; min-height: 52px; padding-block: 0.8rem; white-space: normal; line-height: 1.25; text-align: center; }
+}
+
+/* ---------- the reference list ---------- */
+.kod-ref { margin-top: clamp(2rem, 1.6rem + 1.5vw, 2.8rem); }
+.kod-ref__title { font-family: var(--font-text); font-size: 1.1rem; font-weight: 700; letter-spacing: 0; line-height: 1.35; }
+.kod-ref__intro { max-width: 72ch; margin-top: 0.35rem; font-size: 0.93rem; line-height: 1.6; color: var(--text-2); }
+.kod-ref__legend { display: grid; gap: 0.3rem; margin-top: 0.8rem; font-size: 0.86rem; line-height: 1.55; color: var(--text-3); }
+.kod-ref__legend b { font-weight: 600; color: var(--text-2); }
+.kod-ref__groups { margin-top: 1.2rem; border-top: 1px solid var(--line); }
+.kod-group { border-bottom: 1px solid var(--line); }
+.kod-group__sum {
+  display: flex; align-items: center; gap: 1rem; min-height: 56px; padding: 0.6rem 0.2rem; cursor: pointer; list-style: none;
+  transition: color var(--dur) var(--ease);
+}
+.kod-group__sum::-webkit-details-marker { display: none; }
+.kod-group__title { font-weight: 700; font-size: 1rem; line-height: 1.35; color: var(--text); transition: color var(--dur) var(--ease); }
+.kod-group__n { margin-left: auto; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; color: var(--text-3); }
+.kod-group__ic { flex: none; width: 20px; height: 20px; color: var(--kod-neon); transition: transform var(--dur) var(--ease); }
+.kod-group[open] .kod-group__ic { transform: rotate(45deg); }
+.kod-group__sum:hover .kod-group__title { color: var(--kod-neon); }
+.kod-group__sum:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.kod-rows { padding-bottom: 0.9rem; }
+.kod-row { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: 0.35rem 1rem; padding: 0.9rem 0.2rem; border-top: 1px solid var(--line); scroll-margin-top: calc(var(--header-h) + 16px); }
+.kod-row__code { padding-top: 0.05rem; font-family: var(--font-mono); font-size: 0.98rem; font-weight: 700; letter-spacing: 0.06em; color: var(--kod-neon); }
+/* with JavaScript the code is a key that decodes it on the screen above */
+.kod-row__pick {
+  min-height: 36px; margin-top: -0.45rem; padding: 0 0.5rem; font: inherit; letter-spacing: inherit; color: inherit;
+  background: rgba(var(--kod-neon-rgb), 0.05); box-shadow: inset 0 0 0 1px rgba(var(--kod-neon-rgb), 0.22);
+  transition: background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.kod-row__pick:hover { background: rgba(var(--kod-neon-rgb), 0.14); box-shadow: inset 0 0 0 1px var(--kod-neon); }
+.kod-row__body { margin: 0; min-width: 0; }
+.kod-row__name { font-weight: 600; line-height: 1.45; color: var(--text); }
+.kod-row__check { margin-top: 0.3rem; font-size: 0.9rem; line-height: 1.6; color: var(--text-2); }
+.kod-row__lbl { color: var(--text-3); }
+.kod-row__urge { margin-top: 0.3rem; font-size: 0.88rem; font-weight: 600; color: #ffc46b; }
+.kod-row__link { margin-top: 0.4rem; font-size: 0.9rem; }
+.kod-row:target { background: rgba(var(--kod-neon-rgb), 0.05); }
+
+/* «Что горит на панели?»: the line in the Check Engine card that leads here (build/pribory.py) */
+.lamp-card__kod { margin-top: 0.75rem; font-size: 0.95rem; }
+
+/* ---------- touch screens: every control at least 44px ---------- */
+@media (pointer: coarse) {
+  .kod-chip { min-height: 44px; min-width: 44px; }
+  .kod-row__pick { min-height: 44px; min-width: 44px; margin-top: -0.7rem; }
+}
+@media (max-width: 480px) {
+  .kod-row { grid-template-columns: minmax(0, 1fr); }
+  .kod-lcd__key { letter-spacing: 0.04em; }
+}

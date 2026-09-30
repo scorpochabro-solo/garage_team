@@ -15,6 +15,7 @@ import json
 import math
 
 from . import data as D
+from . import kod
 from .icons import icon
 
 esc = D.esc
@@ -112,7 +113,8 @@ LAMPS = [
              "катализатор. Снизьте нагрузку и скорость и не откладывайте диагностику, а если мотор заметно троит, "
              "дальше лучше не ехать.",
      "links": ["/services/diagnostika/komputernaa-diagnostika.html",
-               "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-svecej.html"]},
+               "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-svecej.html"],
+     "kod": True},                                # «Есть код ошибки? Расшифруйте» → the decoder (build/kod.py)
     {"key": "oil", "tone": "red", "name": "Давление масла", "short": "Давление масла", "look": "маслёнка с каплей", "off": 60,
      "means": "Давление масла в двигателе упало ниже нормы: масла мало, неисправен масляный насос или датчик. "
               "Без смазки детали двигателя можно повредить за считанные минуты.",
@@ -311,6 +313,7 @@ def _card(l):
                     for href, label in _links(l["links"]))
     preset = json.dumps({"message": l.get("message") or MESSAGE.format(short=l["short"])}, ensure_ascii=False)
     note = f'<p class="lamp-card__note">{esc(l["note"])}</p>' if l.get("note") else ""
+    note += kod.lamp_link() if l.get("kod") else ""   # the link to the decoder goes under «Что это значит» too
     k = l["key"]
     return f"""<article class="lamp-card" id="pribory-{k}" data-lamp-card="{k}" data-tone="{l['tone']}" data-short="{esc(l['short'])}" aria-labelledby="pribory-{k}-title">
       <div class="lamp-card__in">

@@ -182,6 +182,21 @@ async function shiny(page) {
   line(d.sel === '225/45/17' && !!d.out, '«Шинный калькулятор»: a typed size is read', `${d.sel}, ${d.out}`);
 }
 
+async function kod(page) {
+  await page.goto(BASE + '/services/diagnostika/komputernaa-diagnostika.html', { waitUntil: 'networkidle' });
+  const input = page.locator('[data-kod] [data-kod-input]');
+  await input.scrollIntoViewIfNeeded();
+  await input.fill('р0 301, P0171');   // Cyrillic «р» and a space inside the code, as people type it
+  await page.waitForTimeout(400);
+  const d = await page.evaluate(() => ({
+    codes: Array.from(document.querySelectorAll('#kod .kod-codes__btn'), (b) => b.dataset.kodPick).join(' '),
+    name: ((document.querySelector('#kod .kod-card__name') || {}).textContent || '').trim(),
+    message: JSON.parse(document.querySelector('[data-kod-cta]').dataset.preset).message,
+  }));
+  line(d.codes === 'P0301 P0171' && /цилиндре\s1/.test(d.name) && /P0301, P0171/.test(d.message),
+    '«Расшифровка кода ошибки»: typed codes are decoded, the call-back message carries them', `${d.codes} · ${d.name}`);
+}
+
 (async () => {
   for (const run of RUNS) {
     console.log(`=== ${run.name}`);
@@ -194,7 +209,7 @@ async function shiny(page) {
     page.on('console', (m) => { if (m.type() === 'error' && (m.location().url || BASE).startsWith(BASE)) errors.push('console: ' + m.text() + ' ' + (m.location().url || '')); });
     page.on('requestfailed', (r) => { if (r.url().startsWith(BASE)) errors.push('failed: ' + r.url()); });
     const phone = !!run.ctx.isMobile;
-    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page)]) {
+    for (const step of [() => home(page, phone), () => contacts(page), () => shiny(page), () => kod(page)]) {
       try { await step(); } catch (e) { line(false, 'step crashed', e.message.split('\n')[0]); }
     }
     line(errors.length === 0, 'no errors in the console', errors.slice(0, 5).join(' | '));

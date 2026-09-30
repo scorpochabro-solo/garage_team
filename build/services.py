@@ -3,6 +3,7 @@
 import re
 
 from . import data as D
+from . import kod
 from . import schema
 from . import service_blocks as B
 from . import shiny
@@ -256,7 +257,7 @@ def render_service(svc):
         orig_imgs = [] if generated or svc["path"] in D.PHOTOS else [u for u in re.findall(r'<img src="([^"]+)"', descr_html) if _src_exists(u)]
         lead_img = (f'<div class="intro__img"><img src="{D.img(orig_imgs[0])}" alt="{esc(svc["h1"])}" width="600" height="400" loading="lazy"></div>'
                     if orig_imgs else "")
-        blocks = [_photo_block(svc), B.lead(content, flags, lead_img), shiny.block(svc), _price_block(svc, content.get("price_h2") or "Цены"), B.price_factors(content),
+        blocks = [_photo_block(svc), B.lead(content, flags, lead_img), shiny.block(svc), kod.block(svc), _price_block(svc, content.get("price_h2") or "Цены"), B.price_factors(content),
                   cta, B.symptoms(content), B.includes(content), B.steps(content), B.sections(content), article, B.faq(content),
                   B.staff(content), _gallery_block(svc),
                   # a direction without sub-pages lists its neighbours automatically; the hand-picked «related» list replaces that
