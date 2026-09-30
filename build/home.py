@@ -2,6 +2,7 @@
 """Homepage renderer."""
 import json
 
+from . import arki
 from . import data as D
 from . import otkryto, schema
 from .icons import icon, icon_for_href
@@ -173,8 +174,9 @@ def advantages():
     <p class="adv__note">{esc(S['advantages_note'])}</p>
 
     <div class="director reveal" id="director">
-      <div class="director__photo">
-        <img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async">
+      <div class="director__photo director__photo--arch">
+        {arki.wall()}
+        <div class="director__win"><img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async"></div>
         <span class="badge director__badge">{icon('shield', 'ic--sm')} генеральный директор</span>
       </div>
       <blockquote class="director__quote">
@@ -233,7 +235,7 @@ def contacts_strip():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
     return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
-  <div class="wrap contacts">
+  <div class="wrap contacts contacts--door">
     <div class="reveal">
       <p class="eyebrow">// 06 — Контакты</p>
       <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
@@ -246,6 +248,7 @@ def contacts_strip():
       {otkryto.actions()}
       <a class="link-arrow link-arrow--inline oc-go__more" href="/contacts/">Страница контактов {icon('arrow')}</a>
     </div>
+    {arki.door()}
     <div class="map reveal">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
       <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
@@ -264,6 +267,7 @@ def render_home():
         ticker(),
         services_map(),
         pribory_section(),
+        arki.inside_section(),
         advantages(),
         gallery(),
         team(),

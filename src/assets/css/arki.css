@@ -1,0 +1,132 @@
+/* ============================================================
+   «Арки»: the arched windows and doorways of the building on Красная слобода
+   (section «Как у нас», facade doorway in contacts, director's portrait; markup in build/arki.py).
+   An opening is a true semicircle on a rectangle: border-radius 999px 999px 0 0 always resolves to half the width.
+   The brick ring, jambs and sill are hairlines in brick tone; the frame and the fan-light bars are black steel.
+   Ring geometry (window radius = 100): ring 106–120 → jambs 3% and 10% of the width outside the opening;
+   the ring's SVG box (viewBox −122…122) is 122% wide and starts 11% of the width above and left of the opening.
+   ============================================================ */
+:root {
+  --brick-rgb: 181, 85, 58;        /* lit brick #b5553a (measured on the photos) */
+  --brick-deep-rgb: 156, 74, 50;   /* brick #9c4a32: the ring on the light paper surface */
+  --lamp-rgb: 255, 207, 138;       /* warm lamp light #ffcf8a */
+  --steel: #151615;
+  --arch-frame: 6px;
+  --arch-bar: 3px;
+}
+
+/* ---------- opening ---------- */
+.arch { position: relative; margin: 0; --ring: rgba(var(--brick-rgb), 0.62); }
+.arch__opening { position: relative; }
+
+/* the wall around the opening: brick ring on top, jambs down both sides, sill under it */
+.arch__wall { position: absolute; inset: 0; pointer-events: none; opacity: 0.7; transition: opacity var(--dur-slow) var(--ease) var(--arch-delay, 0ms); }
+.arch__wall::before, .arch__wall::after { content: ""; position: absolute; top: 0; bottom: 0; margin-top: 50%; border: 0 solid var(--ring); }   /* margin-top in % is taken from the width: the spring line */
+.arch__wall::before { left: -3%; right: -3%; border-width: 0 1px; }
+.arch__wall::after { left: -10%; right: -10%; bottom: -1px; border-width: 0 1px 1px; }
+.arch__ring { position: absolute; left: -11%; top: 0; width: 122%; max-width: none; margin-top: -11%; aspect-ratio: 2 / 1; overflow: visible; fill: none; stroke: var(--ring); stroke-width: 1px; }
+.arch__ring path, .arch__bars path { vector-effect: non-scaling-stroke; }
+
+/* warm light spilling onto the wall around a lit window: a plain gradient, only its opacity changes */
+.arch__glow { position: absolute; left: -42%; right: -42%; top: -26%; bottom: -6%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(var(--lamp-rgb), 0.3), rgba(var(--lamp-rgb), 0.1) 58%, transparent);
+  opacity: 0.3; transition: opacity 1.1s var(--ease) var(--arch-delay, 0ms); }
+
+/* the window: photo clipped to the arch; translateZ keeps the clip while the photo scales (Safari) */
+.arch__win { position: relative; display: block; height: 100%; border-radius: 999px 999px 0 0; overflow: hidden; background: var(--ink-700); transform: translateZ(0); }
+.arch__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.arch__win picture { display: contents; }
+/* black steel frame, concentric with the arch (an inset shadow follows the radius), with a faint edge highlight */
+.arch__win::after { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--arch-frame) var(--steel), inset 0 0 0 calc(var(--arch-frame) + 1px) rgba(255, 255, 255, 0.08); }
+/* lamp light behind the glass: warm at the top of the window, shows up when the window is lit */
+.arch__win::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(130% 60% at 50% 4%, rgba(var(--lamp-rgb), 0.26), rgba(var(--lamp-rgb), 0.08) 55%, transparent 82%);
+  opacity: 0; transition: opacity 1s var(--ease); }
+/* dusk over the glass: a cool dark veil that clears when the light comes on */
+.arch__veil { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(8, 10, 16, 0.88), rgba(7, 8, 11, 0.8)); opacity: 0.3; transition: opacity 0.9s var(--ease) var(--arch-delay, 0ms); }
+/* fan-light: transom on the spring line and three radial bars, a 2:1 box exactly over the semicircle;
+   its background is the glass of the fan-light catching the light from the street */
+.arch__bars { position: absolute; left: 0; top: 0; z-index: 3; width: 100%; aspect-ratio: 2 / 1; overflow: visible; fill: none; stroke: var(--steel); stroke-width: var(--arch-bar); pointer-events: none;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02) 42%, transparent 60%); }
+.arch__win:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+
+.arch__cap { margin-top: 1.4rem; display: grid; gap: 0.3rem; }
+.arch__n { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.arch__cap b { font-family: var(--font-display); font-weight: 700; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; color: var(--text); }
+.arch__cap > span:last-child { font-size: 0.88rem; line-height: 1.45; color: var(--text-2); text-wrap: pretty; }
+
+/* ---------- lit: pointer on the window, keyboard focus, or (strip) the window at the start of the strip ---------- */
+.arch:hover .arch__veil, .arch:has(.arch__win:focus-visible) .arch__veil, .arch.is-lit .arch__veil { opacity: 0; }
+.arch:hover .arch__win::before, .arch__win:focus-visible::before, .arch.is-lit .arch__win::before { opacity: 1; }
+.arch:hover .arch__glow, .arch:has(.arch__win:focus-visible) .arch__glow, .arch.is-lit .arch__glow { opacity: 1; }
+.arch:hover .arch__wall, .arch:has(.arch__win:focus-visible) .arch__wall, .arch.is-lit .arch__wall { opacity: 1; }
+.arch:hover .arch__img, .arch__win:focus-visible .arch__img { transform: scale(1.04); }
+/* one room lit at a time: the other windows dim a little */
+.inside__row:has(.arch:hover) .arch:not(:hover) .arch__veil { opacity: 0.7; }
+.inside__row:has(.arch__win:focus-visible) .arch:not(:has(.arch__win:focus-visible)) .arch__veil { opacity: 0.7; }
+
+/* ---------- «Как у нас» ---------- */
+.inside { background: var(--black); overflow: hidden; }
+/* evening light on the brick: a warm wash behind the row of windows */
+.inside::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 58% 46% at 50% 64%, rgba(var(--brick-rgb), 0.11), transparent 72%); }
+.inside > .wrap { position: relative; }
+.inside__row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: clamp(4rem, 1.2rem + 4.4vw, 6rem); padding: 2.4rem 2% 0; }   /* side padding: the outer jambs stay inside the column grid */
+.inside__row .arch__opening { aspect-ratio: 4 / 7; }
+
+/* JS (src/assets/js/arki.js) keeps the windows dark until the row is on screen, then they light up one after another */
+.inside__row { --arch-step: 330ms; }
+.inside__row.is-waking .arch { --arch-delay: calc(var(--i) * var(--arch-step) + 200ms); }
+.inside__row.is-dark .arch__veil { opacity: 1; }
+.inside__row.is-dark .arch__glow { opacity: 0; }
+.inside__row.is-dark .arch__wall { opacity: 0.35; }
+
+/* phones and tablets: a strip of windows to swipe through, the next one peeks in from the right */
+@media (max-width: 999px) {
+  .inside__row {
+    --aw: clamp(220px, 60vw, 300px);
+    display: flex; gap: calc(var(--aw) * 0.2 + 1.6rem); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin-inline: calc(-1 * var(--gutter-safe)); padding: 3.2rem calc(var(--gutter-safe) + var(--aw) * 0.1) 0.5rem;
+    scroll-padding-inline: calc(var(--gutter-safe) + var(--aw) * 0.1);
+  }
+  .inside__row::-webkit-scrollbar { display: none; }
+  .inside__row .arch { flex: 0 0 var(--aw); scroll-snap-align: start; }
+  .inside__row::after { content: ""; flex: 0 0 1px; }   /* keeps the end padding in every browser */
+  .inside__row .arch__glow { top: -9%; }   /* the strip clips above its top padding: the halo must end inside it */
+}
+
+/* ---------- contacts: the facade as an arched doorway next to the address ---------- */
+.arch--door { display: flex; flex-direction: column; padding-top: 11%; }   /* room for the ring above the opening */
+.arch--door .arch__opening { flex: 1; min-height: 360px; }
+.arch--door .arch__wall { opacity: 0.85; }
+.arch--door .arch__img { object-position: 52% 50%; }
+/* three columns only where «Приезжайте» still fits its column in one line (the heading is not hyphenated on desktops) */
+@media (min-width: 1340px) {
+  .contacts--door { grid-template-columns: minmax(0, 1fr) minmax(220px, 0.5fr) minmax(0, 1fr); column-gap: clamp(3rem, 1rem + 3vw, 4.5rem); }
+}
+/* narrower: a doorway of its own width, never a wide window (padding in % is taken from the column, like the width) */
+@media (min-width: 901px) and (max-width: 1339px) {
+  .contacts--door { grid-template-columns: minmax(280px, 1fr) minmax(240px, 0.62fr); }
+  .contacts--door .map { grid-column: 1 / -1; }
+  .arch--door { width: min(80%, 330px); justify-self: center; padding-top: calc(min(80%, 330px) * 0.11); }   /* the ring and the jambs stay inside the column */
+}
+@media (max-width: 900px) {
+  .arch--door { width: min(80%, 340px); margin-left: min(10%, 34px); padding-top: calc(min(80%, 340px) * 0.11); }
+  .arch--door .arch__opening { flex: none; min-height: 0; aspect-ratio: 5 / 6; }
+}
+
+/* ---------- director: the portrait in an arched niche ---------- */
+.director__photo--arch { overflow: visible; background: none; width: 78%; justify-self: center; margin-top: 11%; --ring: rgba(var(--brick-deep-rgb), 0.55); }
+.director__photo--arch::after { content: none; }
+.director__win { position: absolute; inset: 0; border-radius: 999px 999px 0 0; overflow: hidden; background: var(--ink-700); transform: translateZ(0); }
+.director__win::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 var(--arch-frame) var(--steel); }
+.director__photo--arch .arch__wall { opacity: 1; }
+.director__photo--arch .director__badge { z-index: 1; left: calc(var(--arch-frame) + 0.8rem); bottom: calc(var(--arch-frame) + 0.8rem); }
+@media (max-width: 860px) { .director__photo--arch { width: 80%; max-width: 340px; margin-left: 10%; justify-self: start; } }
+
+/* ---------- lightbox: the photos of the building are 4:3 and 3:4, taller than the gallery's 3:2 frames;
+   max-height: 100% does not hold inside the stage's auto grid row, so the height is capped by the viewport
+   minus the stage padding (components.css) ---------- */
+.lightbox__img { max-height: calc(100dvh - 8rem); }
+@media (max-width: 720px) { .lightbox__img { max-height: calc(100dvh - 9rem - env(safe-area-inset-bottom)); } }
