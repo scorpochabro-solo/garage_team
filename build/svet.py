@@ -5,7 +5,7 @@ dome pendants that light it, and between them the «GARAGE TEAM» neon sign from
     wall()   decorative layers inside .hero__bg: the brick photo, the light pools under the lamps, the shade that keeps
              the headline readable, the night / hand-lamp layers of the dark room and the glow of the neon
     room()   the lamps (real toggle buttons) and the neon sign
-    mini()   the same pendant, small, over the «Приезжайте в Гараж» heading: it lights up when the heading scrolls in
+    mini()   the same pendant, small, over a heading (home: «Как у нас», build/arki.py): it lights up when the heading scrolls in
 
 Behaviour is in src/assets/js/svet.js, styles in src/assets/css/svet.css. Without JavaScript the room is simply lit.
 """
@@ -130,7 +130,7 @@ def room():
 
 
 def mini():
-    """Decorative: hangs from the top edge of the contacts section; svet.css switches it on with the .reveal of its block."""
+    """Decorative: hangs from the top edge of the section of its block (.svet-lit); svet.css switches it on with the block's .reveal."""
     return """<div class="svet-mini" aria-hidden="true">
         <span class="svet-lamp__cord"></span>
         <span class="svet-mini__glow"></span>

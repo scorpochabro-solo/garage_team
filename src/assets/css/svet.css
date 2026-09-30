@@ -148,7 +148,7 @@
   .svet-lamp--2, .svet-pool--2 { --x: 85; }
 }
 
-/* ---------- a small pendant over «Приезжайте в Гараж»: it switches on when the block scrolls into view ---------- */
+/* ---------- a small pendant over a heading (home: «Как у нас»): it switches on when the block scrolls into view ---------- */
 .svet-lit { position: relative; --warm: 255, 212, 158; --mini-w: 56px; --i: 0; }
 .svet-mini { position: absolute; left: clamp(4.5rem, 12vw, 8.5rem); top: calc(-1 * var(--section-y)); width: var(--mini-w); height: calc(var(--section-y) - 1.4rem); pointer-events: none; }
 .svet-mini .svet-lamp__cord { height: calc(100% - var(--mini-w) * 0.85); }
