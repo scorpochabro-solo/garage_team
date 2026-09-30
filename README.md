@@ -45,7 +45,10 @@ garage-2027/
 │   └── wordstat-report.md # последний срез (показы в месяц)
 ├── tools/
 │   ├── kie_images.py      # генерация фото услуг через kie.ai (GPT Image 2.5), ключ берётся из .env
-│   └── iphone_audit.cjs   # проверка всех страниц в движке Safari на профилях iPhone 16 Pro / 17 Pro Max
+│   ├── iphone_audit.cjs   # проверка всех страниц в движке Safari на профилях iPhone 16 Pro / 17 Pro Max
+│   ├── features_check.cjs # варианты и плюшки на месте и работают: Chromium и WebKit, десктоп и iPhone
+│   ├── preview_variants.py # превью веток для владельца: каждая ветка — копия сайта в _preview/v/<ключ>/
+│   └── preview_thumbs.cjs # картинки карточек для оглавления превью
 ├── tests/                 # python3 -m unittest discover -s tests
 ├── src/assets/{css,js,fonts,img,logo}   # img/photo/<slug>.jpg — сгенерированные фото услуг
 ├── .env                   # KIE_API_KEY=… (в .gitignore, в репозиторий не попадает)
@@ -79,6 +82,22 @@ garage-2027/
 - Поиск по услугам, фильтр каталогов «Легковые / Грузовые», лайтбокс, счётчики, JSON-LD (AutoRepair),
   sitemap.xml, robots.txt, Open Graph, favicon/apple-touch-icon.
 - Согласие на обработку персональных данных в формах (чекбокс) — обязательное по 152-ФЗ.
+
+## Оформление по фото и плюшки (выбор владельца 30.09.2026)
+
+На сайте: варианты оформления «Свет ламп» (первый экран), «Арки» (блок «Как у нас», директор в арочной нише, фасад
+у карты на `/contacts/`), «Ворота» (сцена в контактах, меню и окна как рольставня) и плюшки «Что горит на панели?»,
+«Что стучит?», «Готова ли машина к зиме?», «Открыто сейчас», «Шинный калькулятор». У каждой свои `build/<ключ>.py`,
+`src/assets/css/<ключ>.css`, `src/assets/js/<ключ>.js` и описание с текстами на подтверждение в `notes/`.
+
+```bash
+# проверить, что всё на месте и работает (Playwright ставится один раз в любую временную папку)
+mkdir -p /tmp/pw && cd /tmp/pw && npm i playwright && npx playwright install webkit chromium
+cp <проект>/tools/features_check.cjs . && node features_check.cjs      # сайт должен быть запущен на :5181
+# превью веток для владельца: манифест с карточками → _preview/v/ (сервер garage-2027-preview, порт 5182)
+python3 tools/preview_variants.py _preview/manifest.json && node preview_thumbs.cjs <проект>/_preview/manifest.json \
+  && python3 tools/preview_variants.py _preview/manifest.json --index-only
+```
 
 ## Фото услуг (kie.ai, GPT Image 2.5)
 
