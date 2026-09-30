@@ -177,7 +177,10 @@ async function interactions(page, device) {
     ok('menu locks page scroll', st.bodyOverflow === 'hidden', st.bodyOverflow);
     ok('menu end is not under the bottom bar', st.lastBottom <= st.barTop + 1, `last bottom ${Math.round(st.lastBottom)}, bar top ${Math.round(st.barTop)}, bar visible ${st.barVisible}`);
     await burger.tap();
-    await page.waitForTimeout(300);
+    // the menu rolls back up like a shutter (vorota.css, 0.55 s): wait until it is gone before looking for buttons
+    await page.waitForFunction(() => !document.querySelector('#mobile-menu').classList.contains('is-open')
+      && getComputedStyle(document.querySelector('#mobile-menu')).display === 'none', null, { timeout: 3000 }).catch(() => {});
+    await page.waitForTimeout(100);
   }
   // call-back modal
   const opener = page.locator('[data-modal="call"]:visible').first();

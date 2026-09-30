@@ -56,10 +56,10 @@
 .oc-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); max-width: 27rem; margin-top: 0.85rem; box-shadow: inset 0 0 0 1px var(--line-2); }
 .oc-week li { position: relative; display: grid; align-content: start; justify-items: center; gap: 0.25rem; padding: 0.6rem 0.15rem 0.55rem; text-align: center; }
 .oc-week li + li { box-shadow: inset 1px 0 0 var(--line); }
-.oc-sched .oc-week__d { display: block; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.oc-sched .oc-week__d { display: block; font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
 .oc-sched .oc-week__t { display: block; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.25; color: var(--text); white-space: nowrap; }
 .oc-sched .is-off .oc-week__t { color: var(--text-3); }
-.oc-sched .is-note .oc-week__t { font-size: 0.66rem; white-space: normal; color: var(--text-2); }
+.oc-sched .is-note .oc-week__t { font-size: 0.6875rem; white-space: normal; color: var(--text-2); }
 /* today: the state colour frames the day, a bar on top like a marker on a dial */
 .oc-week li.is-today { background: rgba(var(--oc-rgb), 0.09); box-shadow: inset 0 0 0 1px var(--oc-c); }
 .oc-week li.is-today::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--oc-c); }
@@ -100,7 +100,7 @@
 }
 .section--black .oc-go { --oc-go-bg: var(--black); }
 .oc-go__btn .ic { grid-area: 1 / 1; width: 22px; height: 22px; color: var(--accent); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
-.oc-go__tag { grid-area: 1 / 2; justify-self: end; font-family: var(--font-mono); font-size: 0.62rem; line-height: 1.6; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.oc-go__tag { grid-area: 1 / 2; justify-self: end; font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.6; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
 .oc-go__label { grid-area: 2 / 1 / 3 / -1; align-self: end; font-weight: 700; font-size: 0.95rem; line-height: 1.25; }
 .oc-go__btn:hover { background: var(--accent); }
 .oc-go__btn:hover::before { background: var(--ink-800); }

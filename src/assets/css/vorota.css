@@ -93,8 +93,8 @@
 .gate__remote-btn:focus-visible { outline-offset: -4px; outline-color: #fff; }
 .gate__remote-meter { position: relative; width: 3px; height: clamp(36px, 7vh, 64px); background: var(--line-2); overflow: hidden; }
 .gate__remote-meter i { position: absolute; inset: 0; background: var(--green-bright); transform: scaleY(0); transform-origin: bottom; }
-.gate__remote-value { width: 100%; text-align: center; font-size: 0.66rem; letter-spacing: 0.02em; color: #fff; font-variant-numeric: tabular-nums; contain: layout paint; }
-.gate__remote-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.62rem; letter-spacing: 0.22em; color: var(--text-3); order: 1; }
+.gate__remote-value { width: 100%; text-align: center; font-size: 0.6875rem; letter-spacing: 0.02em; color: #fff; font-variant-numeric: tabular-nums; contain: layout paint; }
+.gate__remote-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 0.6875rem; letter-spacing: 0.22em; color: var(--text-3); order: 1; }
 
 /* browsers without container units (Safari < 16): the photo simply covers the stage, nothing is drawn over it */
 @supports not (width: 1cqw) {
