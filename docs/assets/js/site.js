@@ -24,11 +24,23 @@
       burger.setAttribute('aria-expanded', String(open));
       menu.classList.toggle('is-open', open);
       document.body.classList.toggle('no-scroll', open);
+      document.body.classList.toggle('is-menu-open', open);   // hides the fixed mobile bar: the menu has its own call buttons
     };
     burger.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
     menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
     addEventListener('resize', () => { if (innerWidth > 1100) setOpen(false); }, { passive: true });
+  }
+
+  /* ---------- side index: open next to the content on wide screens, collapsed under it on phones ---------- */
+  const sideIndex = $('[data-side-index]');
+  if (sideIndex) {
+    const wide = matchMedia('(min-width: 1001px)');
+    const sync = () => { sideIndex.open = wide.matches; };
+    sync();
+    if (wide.addEventListener) wide.addEventListener('change', sync); else wide.addListener(sync);
+    // next to the content the list is always shown: its title is a heading there, not a toggle
+    sideIndex.querySelector('summary').addEventListener('click', (e) => { if (wide.matches) e.preventDefault(); });
   }
 
   /* ---------- active nav ---------- */
@@ -72,18 +84,25 @@
     const run = (el) => {
       const end = Number(el.dataset.countup);
       if (G.reducedMotion || !Number.isFinite(end)) { el.textContent = el.dataset.countup; return; }
+      // the markup holds the final number: its width is kept while counting, otherwise a narrow fact card re-wrapped
+      // «360 дн.» on every other frame and the whole first screen jumped (layout shift 0.2–0.6 at 1180–1300 px)
+      el.style.display = 'inline-block';
+      el.style.minWidth = `${el.getBoundingClientRect().width}px`;
       const dur = 1400; const t0 = performance.now();
       const step = (t) => {
         const p = Math.min(1, (t - t0) / dur); const e = 1 - Math.pow(1 - p, 3);
         el.textContent = String(Math.round(end * e));
         if (p < 1) requestAnimationFrame(step);
+        else el.style.minWidth = '';   // the final number has that width anyway; a later resize must not keep it
       };
       requestAnimationFrame(step);
     };
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
     }, { threshold: 0.5 });
-    counters.forEach((el) => io.observe(el));
+    // the width is measured in the real font: start once the web fonts are in (a failed font does not block it)
+    const fontsIn = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    fontsIn.catch(() => {}).then(() => counters.forEach((el) => io.observe(el)));
   }
 
   /* ---------- hero parallax ---------- */
@@ -106,8 +125,10 @@
     if (!dlg) return;
     if (preset) { Object.entries(preset).forEach(([k, v]) => { const f = dlg.querySelector(`[name="${k}"]`); if (f) f.value = v; }); }
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    // with a mouse the cursor goes straight to the first field; on a phone that would throw the keyboard over the form
+    // before it is read, so there the dialog keeps its own focus on the close button and the visitor taps a field
     const first = dlg.querySelector('input:not([type=hidden]):not([disabled]), select, textarea');
-    if (first) setTimeout(() => first.focus(), 60);
+    if (first && G.canHover) setTimeout(() => first.focus(), 60);
   };
   G.closeModal = (dlg) => { if (!dlg) return; if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); };
   document.addEventListener('click', (e) => {
@@ -177,15 +198,18 @@
   G.postForm = async (form) => {
     const body = new FormData(form);
     const action = form.getAttribute('action') || location.pathname;
-    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json, text/html' }, credentials: 'same-origin' });
+    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' }, credentials: 'same-origin' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const ct = res.headers.get('content-type') || '';
     if (ct.includes('json')) {
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
+      if (!data || typeof data !== 'object') throw new Error('invalid_response');
       if (data && (data.error || data.success === false)) throw new Error(data.error || 'server');
+      const created = data.data || data;
+      if (data.success !== true && !(created && (typeof created.id === 'string' || typeof created.id === 'number'))) throw new Error('invalid_response');
       return data;
     }
-    return {};
+    throw new Error('invalid_response');
   };
 
   /* ---------- copyright year ---------- */
@@ -394,7 +418,7 @@
   function readoutHTML(d) {
     const price = d.price
       ? `<b>${d.price}</b><span>${d.price_note || ''}</span>`
-      : '<span>Стоимость уточняйте по телефону</span>';
+      : '<span>Стоимость уточняйте по\u00a0телефону</span>';
     return `
       <div class="svc-readout__icon"><svg class="ic" aria-hidden="true"><use href="#i-${d.icon}"/></svg></div>
       <div class="svc-readout__body">
@@ -409,6 +433,35 @@
   }
   const roamHTML = '<div class="svc-readout__icon"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></div><div class="svc-readout__hint">Ведите прицел по автомобилю. Рядом с точкой он «прилипнет» к узлу и покажет услугу.</div>';
   let swapTimer = 0;
+
+  /* the panel keeps one size for every service: the tallest of all its possible contents at the current width */
+  let readoutW = 0;
+  function lockReadout(force) {
+    if (!readout) return;
+    const w = readout.offsetWidth;
+    if (!w || (w === readoutW && !force)) return;
+    readoutW = w;
+    const probe = readout.cloneNode(false);
+    probe.removeAttribute('data-readout');
+    probe.removeAttribute('aria-live');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = `position:absolute;left:0;top:0;width:${w}px;height:auto;visibility:hidden;pointer-events:none`;
+    readout.parentNode.appendChild(probe);
+    let max = 0;
+    [hintHTML, roamHTML, ...Object.values(data).map(readoutHTML)].forEach((html) => {
+      probe.innerHTML = html;
+      max = Math.max(max, probe.offsetHeight);
+    });
+    probe.remove();
+    readout.style.setProperty('--readout-h', `${Math.ceil(max)}px`);
+  }
+  lockReadout(true);
+  if (document.fonts) {
+    // web fonts change line wrapping: measure again once they are in
+    document.fonts.ready.then(() => lockReadout(true));
+    document.fonts.addEventListener('loadingdone', () => lockReadout(true));
+  }
+
   function updateReadout(key, roam) {
     if (!readout) return;
     const d = key ? data[key] : null;
@@ -558,6 +611,7 @@
     if (resizeRaf) return;
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = 0;
+      lockReadout();
       if (!measured) return;
       measure();
       const s = spotByKey.get(active);
@@ -565,6 +619,161 @@
     });
   };
   if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(stage); else addEventListener('resize', onResize, { passive: true });
+})();
+
+/* ============================================================
+   «Что горит на приборной панели» (#pribory): warning-light cluster.
+   The cards are rendered by build/pribory.py; without this script they
+   stay a readable list. Here: one card at a time, the lamps as toggle
+   buttons, the ignition bulb check once when the panel first comes
+   into view. No animation loop: every effect is a class switch that
+   fades opacity (css/pribory.css).
+   ============================================================ */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-pribory]');
+  if (!root) return;
+  const G = window.G || {};
+  const cluster = root.querySelector('[data-cluster]');
+  const lamps = Array.from(root.querySelectorAll('[data-lamp]'));
+  const cards = new Map(Array.from(root.querySelectorAll('[data-lamp-card]'), (c) => [c.dataset.lampCard, c]));
+  const screen = root.querySelector('.cluster__screen');
+  const screenText = root.querySelector('[data-cluster-screen]');
+  const live = root.querySelector('[data-pribory-live]');
+  if (!cluster || !lamps.length) return;
+  const CHECK_MS = 1100;       // how long every lamp stays lit at «ignition»; each then goes out after its own --off delay
+  const SEEN = 96;             // px of the card that must show above the bottom edge for the page to stay where it is
+
+  root.classList.add('is-live');   // one card at a time (the section's inline first line normally set this already)
+
+  let current = '';
+  let checking = false;
+  let checkTimer = 0;
+
+  /* ---------- the trip-computer line ---------- */
+  function showOnScreen(key) {
+    if (!screen || !screenText) return;
+    const card = key ? cards.get(key) : null;
+    screenText.textContent = card ? card.dataset.short : screen.dataset[checking ? 'check' : 'idle'];
+    if (card) screen.dataset.tone = card.dataset.tone; else screen.removeAttribute('data-tone');
+  }
+
+  /* ---------- bring the card into view when it opened below the fold (phones: the card is under the panel) ---------- */
+  // page position from offsetTop: unlike getBoundingClientRect it ignores a scroll-reveal that is still sliding in
+  const pageTop = (el) => { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; };
+  function reveal(card, force) {
+    const header = document.querySelector('[data-header]');
+    const bar = document.querySelector('.mobile-bar');
+    const top = header ? header.getBoundingClientRect().height : 0;
+    const bottom = innerHeight - (bar ? bar.getBoundingClientRect().height : 0);
+    const y = pageTop(card) - scrollY;
+    if (!force && y >= top && y <= bottom - SEEN) return;
+    // a link to one lamp shows the panel together with its card when both fit on the screen
+    const stage = card.closest('.pribory__stage');
+    const target = force && stage && stage.offsetHeight <= bottom - top - 24 ? stage : card;
+    scrollTo({ top: Math.max(0, pageTop(target) - top - 12), behavior: G.reducedMotion ? 'auto' : 'smooth' });
+  }
+
+  function stopCheck() {
+    if (!checking) return;
+    checking = false;
+    clearTimeout(checkTimer);
+    cluster.classList.remove('is-check');
+  }
+
+  /* ---------- select a lamp: '' shows the colour legend again ---------- */
+  function select(key, opts = {}) {
+    if (!cards.has(key)) key = '';
+    stopCheck();
+    current = key;
+    lamps.forEach((b) => {
+      const on = b.dataset.lamp === key;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    cards.forEach((c, k) => c.classList.toggle('is-active', k === key));
+    cluster.classList.toggle('has-active', !!key);
+    showOnScreen(key);
+    const card = cards.get(key);
+    if (live) {
+      const title = key && card.querySelector('.lamp-card__title');
+      const urgency = key && card.querySelector('.lamp-card__urgency');
+      live.textContent = key ? `${title.textContent}. ${urgency.textContent}` : '';
+    }
+    if (key && opts.scroll !== false) reveal(card);
+  }
+
+  cluster.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-lamp]');
+    if (!b) return;
+    // a second press on the lit lamp switches it off: back to the colour legend (toggle-button semantics)
+    select(b.dataset.lamp === current ? '' : b.dataset.lamp);
+  });
+
+  /* ---------- the screen previews the lamp under the mouse or the keyboard focus ---------- */
+  // keyboard focus only: a mouse click also focuses the button and would leave a stale name on the screen
+  const byKeyboard = (el) => { try { return el.matches(':focus-visible'); } catch (_) { return false; } };
+  lamps.forEach((b) => {
+    b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') showOnScreen(b.dataset.lamp); });
+    b.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') showOnScreen(current); });
+    b.addEventListener('focus', () => { if (byKeyboard(b)) showOnScreen(b.dataset.lamp); });
+    b.addEventListener('blur', () => showOnScreen(current));
+  });
+
+  /* ---------- arrows move between lamps as on the grid; Tab still visits every lamp ---------- */
+  const columns = () => {
+    const top = lamps[0].offsetTop;
+    const n = lamps.findIndex((b) => b.offsetTop !== top);
+    return n > 0 ? n : lamps.length;
+  };
+  cluster.addEventListener('keydown', (e) => {
+    const i = lamps.indexOf(document.activeElement);
+    if (i < 0) return;
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns(), ArrowUp: -columns() }[e.key];
+    let j = step === undefined ? { Home: 0, End: lamps.length - 1 }[e.key] : i + step;
+    if (j === undefined) return;
+    e.preventDefault();
+    j = Math.min(lamps.length - 1, Math.max(0, j));
+    lamps[j].focus();
+  });
+
+  /* ---------- ignition: all lamps light up for a moment and go out, as when the key is turned ---------- */
+  function ignition() {
+    cluster.classList.add('is-awake');
+    if (current) return;   // a lamp was already chosen (a quick tap or a link to #pribory-…): no light show over it
+    checking = true;
+    cluster.classList.add('is-check');
+    showOnScreen('');
+    checkTimer = setTimeout(() => { stopCheck(); showOnScreen(current); }, CHECK_MS);
+  }
+  if (G.reducedMotion || !('IntersectionObserver' in window)) {
+    cluster.classList.add('is-awake');
+  } else {
+    // most of the panel on screen (or half the screen filled by it, on a short landscape phone)
+    const onScreen = (r) => {
+      const seen = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+      return seen >= r.height * 0.75 || seen >= innerHeight * 0.5;
+    };
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((en) => onScreen(en.boundingClientRect))) return;
+      io.disconnect();
+      // let the scroll-reveal fade the panel in first; if it was only scrolled past, wait for the next time it shows
+      setTimeout(() => { if (onScreen(cluster.getBoundingClientRect())) ignition(); else io.observe(cluster); }, 450);
+    }, { threshold: [0.25, 0.5, 0.75, 1] });
+    io.observe(cluster);
+  }
+
+  /* ---------- a link to one lamp: /#pribory-oil opens its card ---------- */
+  const fromHash = () => {
+    const key = decodeURIComponent(location.hash.replace(/^#pribory-/, ''));
+    if (!key || key === location.hash || !cards.has(key)) return;
+    select(key, { scroll: false });
+    // scroll once the web fonts are in: until then the text above is set in a fallback font and every offset is off
+    const go = () => reveal(cards.get(key), true);
+    if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(go); else go();
+  };
+  fromHash();
+  addEventListener('hashchange', fromHash);
 })();
 
 /* ============================================================
@@ -578,18 +787,44 @@
   document.querySelectorAll('[data-slider]').forEach((slider) => {
     const track = slider.querySelector('.slider__track');
     if (!track) return;
-    const prev = slider.querySelector('[data-prev]');
-    const next = slider.querySelector('[data-next]');
-    const step = () => Math.max(track.clientWidth * 0.72, 280);
+    // the arrows sit in the section heading, outside the slider, and name their track with aria-controls
+    const control = (sel) => (track.id && document.querySelector(`${sel}[aria-controls="${track.id}"]`)) || slider.querySelector(sel);
+    const prev = control('[data-prev]');
+    const next = control('[data-next]');
     const behavior = G.reducedMotion ? 'auto' : 'smooth';
-    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior }));
-    if (next) next.addEventListener('click', () => track.scrollBy({ left: step(), behavior }));
+    const EDGE = 2;   // px of rounding slack at both ends
+    // a page is the set of fully visible cards: "next" brings the first cut-off card to the left edge,
+    // "prev" goes back until the current first card becomes the last visible one
+    const starts = () => {
+      const left = track.getBoundingClientRect().left - track.scrollLeft;
+      return Array.from(track.children, (el) => {
+        const r = el.getBoundingClientRect();
+        return { start: r.left - left, end: r.right - left };
+      });
+    };
+    const maxLeft = () => track.scrollWidth - track.clientWidth;
+    const go = (dir) => {
+      const x = track.scrollLeft;
+      const cards = starts();
+      let target;
+      if (dir > 0) {
+        const cut = cards.find((c) => c.end > x + track.clientWidth + EDGE);
+        target = cut ? cut.start : maxLeft();
+      } else {
+        const back = cards.find((c) => c.start >= x - track.clientWidth - EDGE);
+        target = back && back.start < x - EDGE ? back.start : 0;
+      }
+      track.scrollTo({ left: Math.max(0, Math.min(target, maxLeft())), behavior });
+    };
+    if (prev) prev.addEventListener('click', () => go(-1));
+    if (next) next.addEventListener('click', () => go(1));
     const update = () => {
-      if (prev) prev.disabled = track.scrollLeft <= 2;
-      if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      const noScroll = maxLeft() <= EDGE;
+      if (prev) prev.disabled = noScroll || track.scrollLeft <= EDGE;
+      if (next) next.disabled = noScroll || track.scrollLeft >= maxLeft() - EDGE;
     };
     track.addEventListener('scroll', update, { passive: true });
-    addEventListener('resize', update, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(update).observe(track); else addEventListener('resize', update, { passive: true });
     update();
 
     let down = false, startX = 0, startLeft = 0, moved = false;
@@ -719,13 +954,14 @@
       });
       if (n > 1) form.scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'start' });
       const first = $(`.rq__panel[data-panel="${n}"] input:not([type=hidden]):not([disabled]), .rq__panel[data-panel="${n}"] select:not([disabled])`, form);
-      if (first && n > 1) setTimeout(() => first.focus(), 350);
+      // phones: no automatic focus, it would open the keyboard or a select wheel on its own (see G.openModal)
+      if (first && n > 1 && G.canHover) setTimeout(() => first.focus(), 350);
     };
 
     /* car selection mode toggle */
     const setMode = (mode, note) => {
       const isSelect = mode === 'select';
-      if (modeInput) modeInput.value = isSelect ? '1' : '0';
+      if (modeInput) modeInput.value = isSelect ? '1' : '2';
       if (selectMode) selectMode.hidden = !isSelect;
       if (textMode) textMode.hidden = isSelect;
       $$('[data-mode-toggle]', form).forEach((b) => { b.textContent = isSelect ? 'Не нашли свой автомобиль?' : 'Выбрать из списка'; });
@@ -821,7 +1057,9 @@
         const first = $('.part input[type=text]', form);
         const filled = $$('.part input[type=text]', form).some((i) => i.value.trim());
         const comment = $('[name="request_part[what]"]', form);
-        const ok = filled || (comment && comment.value.trim());
+        // «Когда удобно приехать?» (vremya.js) writes its line into this text: the line alone does not describe the task
+        const text = comment ? (G.vremya ? G.vremya.ownText(comment) : comment.value) : '';
+        const ok = filled || text.trim();
         if (first) G.setError(first, !ok);
         return !!ok;
       }
@@ -909,6 +1147,609 @@
   $$('dialog').forEach((d) => d.addEventListener('close', () => {
     $$('form[data-simple-form]', d).forEach((f) => { f.reset(); $$('[data-body]', f).forEach((b) => { b.hidden = false; }); const s = $('[data-success]', f); if (s) s.classList.remove('is-visible'); $$('.field', f).forEach((x) => x.classList.remove('is-error')); });
   }));
+})();
+
+/* ============================================================
+   winter checklist on the home page (#zima, build/zima.py):
+   ticks → instrument gauge, unticked items → message for the call modal or the request form.
+   What keeps it cheap:
+     1. nothing runs until the section is ~600px away (IntersectionObserver);
+     2. the needle turns and the segments fade in by CSS transitions (transform / opacity only);
+     3. the only requestAnimationFrame loop counts the percentage for 0.7–1.2 s after a change, then stops.
+   Ticks and the engine type are kept in localStorage (wrapped in try/catch: private mode, blocked storage).
+   ============================================================ */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-zima]');
+  if (!root) return;
+  const G = window.G || {};
+  const $ = (s, r = root) => r.querySelector(s);
+  const $$ = (s, r = root) => Array.from(r.querySelectorAll(s));
+  const KEY = 'garage.zima.v1';
+  const START = -120;           // needle angle at 0 %, degrees (build/zima.py: START, SWEEP)
+  const SWEEP = 240;
+  const TICK_MS = 700;           // the count after a tick (the needle: 0.85 s with a small overshoot, zima.css)
+  const WAKE_MS = 1200;          // first sweep to the saved value: .zima.is-awake in zima.css has the same duration
+  const easeOut = (p) => 1 - Math.pow(1 - p, 3);
+  const easeInOut = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(2 - 2 * p, 3) / 2);
+  const easeInOutInv = (q) => (q < 0.5 ? Math.cbrt(q / 4) : 1 - Math.cbrt(2 * (1 - q)) / 2);
+
+  const plural = (n, one, few, many) => {
+    const m10 = n % 10; const m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  };
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  const load = () => {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      return s && typeof s === 'object' ? s : null;
+    } catch (_) { return null; }
+  };
+
+  function init() {
+    const items = $$('.zima-item');
+    const inputs = new Map(items.map((li) => [li, $('.zima-item__input', li)]));
+    const radios = $$('input[name="zima-engine"]');
+    const dial = $('.zima-dial');
+    const needle = $('.zima-dial__needle');
+    const segs = $$('.zima-dial__seg');
+    const glow = $('.zima-dial__glow');
+    const pctEl = $('[data-zima-pct]');
+    const countEl = $('[data-zima-count]');
+    const titleEl = $('[data-zima-title]');
+    const textEl = $('[data-zima-text]');
+    const live = $('[data-zima-live]');
+    const reset = $('[data-zima-reset]');
+    const mini = $('[data-zima-mini]');
+    const cells = $$('.zima-mini__bar i');
+    const book = $('[data-zima-book]');
+    const add = $('[data-zima-add]');
+    const nextEl = $('[data-zima-next]');
+    const hintTitle = titleEl ? titleEl.textContent : '';
+    const hintText = textEl ? textEl.textContent : '';
+
+    let engine = (radios.find((r) => r.checked) || {}).value || 'petrol';
+    let awake = false;          // the dial shows the real value once it has been on screen
+    let shown = 0;              // percentage currently printed in the dial
+    let raf = 0;
+
+    const visible = () => items.filter((li) => !li.hidden);
+    const done = (li) => inputs.get(li).checked;
+
+    /* ---------- state: restore, save ---------- */
+    const saved = load();
+    if (saved) {
+      if (saved.engine === 'diesel' || saved.engine === 'petrol') engine = saved.engine;
+      const set = new Set(Array.isArray(saved.done) ? saved.done : []);
+      items.forEach((li) => { inputs.get(li).checked = set.has(li.dataset.key); });
+    }
+    const save = () => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ engine, done: items.filter(done).map((li) => li.dataset.key) }));
+      } catch (_) { /* storage unavailable: the checklist still works for this visit */ }
+    };
+    const applyEngine = (animate) => {
+      radios.forEach((r) => { r.checked = r.value === engine; });
+      items.forEach((li) => {
+        if (!li.dataset.engine) return;
+        const was = li.hidden;
+        li.hidden = li.dataset.engine !== engine;
+        if (animate && was && !li.hidden) {   // the item that comes in for the other engine fades in once
+          li.classList.remove('is-swap');
+          void li.offsetWidth;
+          li.classList.add('is-swap');
+        }
+      });
+    };
+
+    /* ---------- the message: unticked items in plain words ---------- */
+    const message = () => {
+      const left = visible().filter((li) => !done(li)).map((li) => li.dataset.acc);
+      const head = `Подготовка к зиме (${engine === 'diesel' ? 'дизель' : 'бензин'})`;
+      return left.length
+        ? `${head}: проверить ${left.join(', ')}.`   // commas only: the items have «и» inside («свет и фары»)
+        : `${head}: по чек-листу на сайте всё отмечено, хочу записаться на общую проверку перед зимой.`;
+    };
+
+    /* ---------- gauge ---------- */
+    const countTo = (to, animate, ms = TICK_MS, ease = easeOut) => {
+      cancelAnimationFrame(raf);
+      if (!animate || G.reducedMotion) { shown = to; pctEl.textContent = String(to); return; }
+      const from = shown; const t0 = performance.now();
+      const step = (t) => {
+        const p = Math.min(1, (t - t0) / ms);
+        shown = Math.round(from + (to - from) * ease(p));
+        pctEl.textContent = String(shown);
+        raf = p < 1 ? requestAnimationFrame(step) : 0;
+      };
+      raf = requestAnimationFrame(step);
+    };
+
+    const render = (opts = {}) => {
+      const list = visible();
+      const total = list.length || 1;
+      const left = list.filter((li) => !done(li));
+      if (nextEl) nextEl.textContent = left.length ? `В заявку попадёт: ${left.length} ${plural(left.length, 'пункт', 'пункта', 'пунктов')} для проверки.` : 'Все пункты отмечены. Можно обсудить дополнительные вопросы с мастером.';
+      const n = total - left.length;
+      const ready = n === total;
+      const pct = Math.round((n / total) * 100);
+      const lit = Math.round((n / total) * segs.length);
+
+      items.forEach((li) => li.classList.toggle('is-done', done(li)));
+      root.classList.toggle('is-ready', ready);
+      root.classList.toggle('is-empty', n === 0);
+      if (reset) reset.disabled = n === 0;
+      if (dial) {
+        dial.setAttribute('aria-valuemax', String(total));
+        dial.setAttribute('aria-valuenow', String(n));
+        dial.setAttribute('aria-valuetext', ready ? `Отмечено ${n} из ${total}: машина готова к зиме` : `Отмечено ${n} из ${total}`);
+      }
+
+      // status: what is left, three names at most so the card keeps its height
+      if (titleEl && textEl) {
+        if (ready) {
+          titleEl.textContent = 'Все пункты отмечены';
+          textEl.textContent = 'Вы прошли свой список проверки. Если остались вопросы по машине, обсудите их с мастером.';
+        } else if (n === 0) {
+          titleEl.textContent = hintTitle;
+          textEl.textContent = hintText;
+        } else {
+          titleEl.textContent = `Осталось ${left.length} ${plural(left.length, 'пункт', 'пункта', 'пунктов')}`;
+          const names = left.map((li) => $('.zima-item__name', li).textContent.toLowerCase());
+          const shownNames = names.length > 3 ? `${names.slice(0, 3).join(', ')} и ещё ${names.length - 3}` : names.join(', ');
+          textEl.textContent = `${cap(shownNames)}.`;
+        }
+      }
+
+      // mini bar (phones): no counting, it just follows
+      if (mini) mini.textContent = String(pct);
+      cells.forEach((c, i) => c.classList.toggle('is-on', i < lit));
+
+      // the dial stays at zero until it has been seen, then wakes up to the saved value
+      if (awake) {
+        if (needle) needle.style.transform = `rotate(${START + SWEEP * (n / total)}deg)`;
+        segs.forEach((s, i) => s.classList.toggle('is-on', i < lit));
+        if (countEl) countEl.textContent = String(n);
+        if (glow) glow.style.opacity = ready ? '1' : String(0.12 + 0.38 * (n / total));
+        if (opts.wake && !G.reducedMotion) {
+          // each segment lights up as the sweeping needle passes its middle
+          segs.forEach((sg, i) => { sg.style.transitionDelay = i < lit ? `${Math.round(easeInOutInv((i + 0.5) / lit) * WAKE_MS)}ms` : ''; });
+          countTo(pct, true, WAKE_MS, easeInOut);
+        } else countTo(pct, opts.animate !== false);
+      }
+
+      if (opts.announce && live) {
+        live.textContent = ready ? `Отмечено ${n} из ${total}. Машина готова к зиме.` : `Отмечено ${n} из ${total}. Осталось ${left.length} ${plural(left.length, 'пункт', 'пункта', 'пунктов')}.`;
+      }
+      if (book) book.dataset.preset = JSON.stringify({ message: message() });
+    };
+
+    /* ---------- events ---------- */
+    root.addEventListener('change', (e) => {
+      const t = e.target;
+      if (t.name === 'zima-engine') {
+        engine = t.value;
+        applyEngine(true);
+        render({ announce: true });
+        save();
+        return;
+      }
+      if (t.classList.contains('zima-item__input')) {
+        render({ announce: true });
+        save();
+      }
+    });
+
+    if (reset) reset.addEventListener('click', () => {
+      items.forEach((li) => { inputs.get(li).checked = false; });
+      render();
+      save();
+      if (live) live.textContent = 'Отметки сброшены.';
+      // the button disables itself: keep the keyboard focus inside the card
+      const first = visible()[0];
+      if (first && document.activeElement === reset) inputs.get(first).focus();
+    });
+
+    // «Записаться…» is a data-modal="call" button: its preset is refreshed here, core.js opens the modal
+    if (book) book.addEventListener('click', () => { book.dataset.preset = JSON.stringify({ message: message() }); });
+
+    // «Добавить в заявку»: the text goes to the request form (step 2, «Или опишите задачу»), the link scrolls to it
+    const what = document.getElementById('request_what');
+    let inserted = '';
+    if (add && !what) add.hidden = true;
+    if (add && what) add.addEventListener('click', (e) => {
+      const text = message();
+      const cur = what.value;
+      if (inserted && cur.includes(inserted)) what.value = cur.replace(inserted, () => text);
+      else what.value = cur.trim() ? `${cur.replace(/\s+$/, '')}\n${text}` : text;
+      inserted = text;
+      what.dispatchEvent(new Event('input', { bubbles: true }));   // clears a «fill in the field» error of the form
+      const panel = what.closest('.rq__panel');
+      if (panel && panel.classList.contains('is-active')) {
+        // the visitor is already on step 2: go straight to the field
+        e.preventDefault();
+        what.scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'center' });
+        if (G.canHover) setTimeout(() => what.focus({ preventScroll: true }), 400);
+        if (G.toast) G.toast('Список добавлен в заявку');
+      } else if (G.toast) {
+        G.toast('Список добавлен в заявку — он будет на шаге 2 «Ввод запроса»');
+      }
+    });
+
+    /* ---------- start ---------- */
+    applyEngine();
+    render({ animate: false });
+
+    const wake = () => {
+      if (awake) return;
+      awake = true;
+      root.classList.add('is-awake');
+      render({ wake: true });
+      // after the first sweep the needle answers each tick with a shorter, livelier move
+      setTimeout(() => { root.classList.remove('is-awake'); segs.forEach((sg) => { sg.style.transitionDelay = ''; }); }, WAKE_MS + 300);
+    };
+    if (G.reducedMotion || !('IntersectionObserver' in window) || !dial) wake();
+    else {
+      const io = new IntersectionObserver((entries) => {
+        // a short pause lets the card finish most of its scroll-reveal fade before the needle starts
+        if (entries.some((en) => en.isIntersecting)) { io.disconnect(); setTimeout(wake, 220); }
+      }, { threshold: 0.35 });
+      io.observe(dial);
+    }
+
+    // phones: while the dial is off screen, a slim progress bar follows the list (see .zima-mini)
+    const gauge = $('.zima-gauge');
+    if (gauge && 'IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        entries.forEach((en) => root.classList.toggle('is-away', !en.isIntersecting));
+      }, { threshold: 0 }).observe(gauge);
+    }
+  }
+
+  if (!('IntersectionObserver' in window)) { init(); return; }
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some((en) => en.isIntersecting)) { io.disconnect(); init(); }
+  }, { rootMargin: '600px 0px' });
+  io.observe(root);
+})();
+
+/* ============================================================
+   «Что стучит?» (home page, section #stuk, table in build/stuk.py):
+   what was noticed → when → (where) → possible causes with links to the
+   service pages and a ready request text for the callback modal or the
+   request form. The table is fetched only when the section comes near the
+   screen; there are no loops or timers, only clicks.
+   ============================================================ */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-stuk]');
+  if (!root) return;
+  const G = window.G || {};
+  const $ = (s, r = root) => r.querySelector(s);
+  const $$ = (s, r = root) => Array.from(r.querySelectorAll(s));
+  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  // «Стойки стабилизатора» → «стойки стабилизатора», but «ТНВД» and «ABS» stay as they are
+  const lower = (s) => (s.length > 1 && s[1] === s[1].toLowerCase() ? s[0].toLowerCase() + s.slice(1) : s);
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const ic = (name) => `<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-${name}"/></svg>`;
+
+  const steps = [1, 2, 3].map((n) => $(`[data-q="${n}"]`));
+  const tiles = $$('.stuk-sym');
+  const chipsBox = $('[data-chips]');
+  const zoneBtns = $$('.stuk-zone');
+  const car = $('.stuk-car__svg');
+  const out = $('[data-out]');
+  const idle = $('[data-idle]');
+  const res = $('[data-res]');
+  const resBody = $('[data-res-body]');
+  const resLabel = $('[data-res-label]');
+  const cta = $('[data-cta]');
+  const live = $('[data-live]');
+  const narrow = matchMedia('(max-width: 1099px)');   // one column: answered questions fold (stuk.css)
+  const ZONE_KEYS = ['front', 'hood', 'under', 'rear'];
+
+  let data = null;
+  let loading = null;
+  let lastAdded = '';
+  const state = { s: null, c: null, z: null };
+
+  /* ---------- data: fetched once, when the section is about to be seen (or on the first tap) ---------- */
+  const load = () => {
+    if (data) return Promise.resolve(data);
+    if (!loading) {
+      loading = fetch(root.dataset.src, { credentials: 'same-origin' })
+        .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then((json) => { data = json; return json; })
+        .catch((err) => {
+          loading = null;
+          showError();
+          throw err;
+        });
+    }
+    return loading;
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((en) => en.isIntersecting)) { io.disconnect(); load().catch(() => {}); }
+    }, { rootMargin: '600px 0px' });
+    io.observe(root);
+  } else {
+    load().catch(() => {});
+  }
+
+  /* ---------- lookups ---------- */
+  const sym = () => (data && state.s ? data.s[state.s] : null);
+  const ctx = () => { const s = sym(); return s && state.c ? s.c.find((c) => c[0] === state.c) || null : null; };
+  const zonesOf = (c) => (c && c[5]) || {};
+  const causeKeys = () => { const c = ctx(); const z = zonesOf(c); return state.z && z[state.z] ? z[state.z] : c[4]; };
+  const say = () => ctx()[2].replace('{где}', state.z ? data.z[state.z][1] : '');
+  const words = (k) => data.c[k][3] || lower(data.c[k][0]);
+  const message = () => `${say()}. Возможные причины: ${causeKeys().map(words).join(', ')}.`;
+
+  /* ---------- painting ---------- */
+  const announce = (text) => {
+    live.textContent = '';
+    requestAnimationFrame(() => { live.textContent = text; });
+  };
+
+  const setStep = (n, { value = '', done = false, current = false } = {}) => {
+    const step = steps[n - 1];
+    step.classList.toggle('is-done', done);
+    step.classList.toggle('is-current', current);
+    step.classList.remove('is-editing');
+    $('[data-val]', step).textContent = value;
+  };
+
+  const paintTiles = () => {
+    tiles.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.s === state.s)));
+    root.classList.toggle('has-s', !!state.s);
+  };
+
+  const renderChips = () => {
+    const s = sym();
+    $('#stuk-q2').textContent = s ? s.q2 : 'Когда?';
+    $('[data-wait]').hidden = !!s;
+    chipsBox.hidden = !s;
+    if (!s) { chipsBox.innerHTML = ''; return; }
+    chipsBox.innerHTML = s.c.map((c, i) => {
+      const sw = c[6] ? `<span class="stuk-chip__sw" style="--sw:${esc(c[6])}" aria-hidden="true"></span>` : '';
+      return `<button class="stuk-chip" type="button" aria-pressed="false" data-c="${esc(c[0])}" style="--i:${i}">${sw}${esc(c[1])}</button>`;
+    }).join('');
+    // restart the entrance animation of the new set of chips
+    chipsBox.classList.remove('is-in');
+    void chipsBox.offsetWidth;
+    chipsBox.classList.add('is-in');
+  };
+
+  const paintChips = () => {
+    $$('.stuk-chip', chipsBox).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.c === state.c)));
+  };
+
+  const paintZones = () => {
+    const c = ctx();
+    const zones = zonesOf(c);
+    const on = (k) => Object.prototype.hasOwnProperty.call(zones, k);
+    const where = steps[2];
+    where.hidden = !Object.keys(zones).length;
+    if (where.hidden) return;
+    $('#stuk-q3').textContent = sym().q3 || 'Где?';
+    zoneBtns.forEach((b) => {
+      b.hidden = !on(b.dataset.z);
+      b.setAttribute('aria-pressed', String(b.dataset.z === state.z));
+    });
+    ZONE_KEYS.forEach((k) => {
+      $$(`.z-${k}, .stuk-car__hit[data-z="${k}"]`, car).forEach((el) => {
+        el.classList.toggle('is-on', on(k));
+        el.classList.toggle('is-sel', k === state.z);
+      });
+    });
+  };
+
+  // «норма» items get a check instead of a number, so the faults are counted 01, 02… on their own
+  const causeHTML = (k, i, keys) => {
+    const [title, text, page] = data.c[k];
+    const n = keys.slice(0, i + 1).filter((x) => data.c[x][2]).length;
+    if (!page) {
+      return `<li class="stuk-cause stuk-cause--ok" style="--i:${i}"><span class="stuk-cause__n">${ic('check')}</span>` +
+        `<div class="stuk-cause__b"><p class="stuk-cause__t">${esc(title)} <span class="stuk-cause__tag">норма</span></p><p class="stuk-cause__x">${esc(text)}</p></div></li>`;
+    }
+    const [href, name] = data.p[page];
+    return `<li class="stuk-cause" style="--i:${i}"><span class="stuk-cause__n">${pad2(n)}</span>` +
+      `<div class="stuk-cause__b"><p class="stuk-cause__t">${esc(title)}</p>` +
+      `<a class="stuk-cause__a" href="${esc(href)}">${esc(name)} ${ic('arrow-up-right')}</a>` +
+      `<p class="stuk-cause__x">${esc(text)}</p></div></li>`;
+  };
+
+  const renderOut = () => {
+    const s = sym();
+    const c = ctx();
+    idle.hidden = !!s;
+    res.hidden = !s;
+    out.classList.toggle('is-on', !!c);
+    cta.hidden = !c;
+    if (!s) { resBody.innerHTML = ''; return; }
+    if (!c) {
+      // a symptom without its context yet: what usually gives it and what to answer next
+      resLabel.textContent = '// Подсказка';
+      resBody.innerHTML = `<h3 class="stuk-res__title" tabindex="-1">${esc(s.n)}</h3>` +
+        `<p class="stuk-res__lead">${esc(s.lead)}</p>` +
+        `<p class="stuk-res__next stuk-res__next--ask">${ic('arrow')}<span>${esc(s.q2)}</span></p>`;
+      return;
+    }
+    const keys = causeKeys();
+    const [diagHref, diagName] = data.p[c[3]];
+    const needWhere = Object.keys(zonesOf(c)).length && !state.z;
+    resLabel.textContent = '// Возможные причины';
+    resBody.innerHTML = `<h3 class="stuk-res__title" tabindex="-1">${esc(say())}</h3>` +
+      (needWhere ? `<p class="stuk-res__next">${ic('arrow')}<span>${esc(s.q3)} Уточните\u00a0— список станет точнее.</span></p>` : '') +
+      `<ol class="stuk-causes">${keys.map(causeHTML).join('')}</ol>` +
+      `<p class="stuk-res__note">${ic('info')}<span>Это подсказка, а не диагноз: один и тот же признак дают разные узлы. ` +
+      `Точную причину покажет <a href="${esc(diagHref)}">${esc(lower(diagName))}</a>.</span></p>` +
+      `<div class="stuk-res__msg"><p class="stuk-res__msg-label">Текст для заявки</p><p class="stuk-res__msg-text">${esc(message())}</p></div>`;
+  };
+
+  const paint = () => {
+    paintTiles();
+    paintChips();
+    paintZones();
+    renderOut();
+    const s = sym();
+    const c = ctx();
+    setStep(1, { value: s ? s.n : '', done: !!s, current: !s });
+    setStep(2, { value: c ? c[1] : '', done: !!c, current: !!s && !c });
+    setStep(3, { value: state.z ? data.z[state.z][0] : '', done: !!state.z, current: !!c && !state.z });
+  };
+
+  /* ---------- phones and tablets: keep the answer in view ---------- */
+  const headerH = () => { const h = document.querySelector('[data-header]'); return h ? h.getBoundingClientRect().height : 0; };
+  const bringIntoView = () => {
+    if (!narrow.matches) return;
+    const top = out.getBoundingClientRect().top;
+    if (top > headerH() && top < innerHeight * 0.6) return;
+    const app = $('[data-app]').getBoundingClientRect().top + scrollY - headerH() - 12;
+    scrollTo({ top: app, behavior: G.reducedMotion ? 'auto' : 'smooth' });
+  };
+  // keyboard users land on the next thing to answer when the question they answered folds away
+  const focusNext = (el) => { if (el && narrow.matches) el.focus({ preventScroll: true }); };
+
+  /* ---------- actions ---------- */
+  const pickSymptom = (key, byKeyboard) => {
+    if (state.s !== key) { state.s = key; state.c = null; state.z = null; renderChips(); }
+    paint();
+    const s = sym();
+    announce(`${s.n}. ${s.q2}`);
+    if (byKeyboard) focusNext($('.stuk-chip', chipsBox));
+  };
+
+  const pickContext = (key, byKeyboard) => {
+    state.c = key;
+    state.z = null;
+    paint();
+    const titles = causeKeys().map((k) => lower(data.c[k][0]));
+    announce(`${say()}. Возможные причины: ${titles.join(', ')}. Это подсказка, а не диагноз.`);
+    bringIntoView();
+    if (byKeyboard) focusNext(steps[2].hidden ? $('.stuk-res__title') : $('.stuk-zone:not([hidden])'));
+  };
+
+  const pickZone = (key, byKeyboard) => {
+    const c = ctx();
+    if (!c || !Object.prototype.hasOwnProperty.call(zonesOf(c), key)) return;
+    state.z = state.z === key ? null : key;   // tapping the chosen place again goes back to the general list
+    paint();
+    const titles = causeKeys().map((k) => lower(data.c[k][0]));
+    announce(`${say()}. Возможные причины: ${titles.join(', ')}.`);
+    bringIntoView();
+    if (byKeyboard) focusNext($('.stuk-res__title'));
+  };
+
+  const reset = (byKeyboard) => {
+    state.s = null; state.c = null; state.z = null;
+    renderChips();
+    paint();
+    announce('Подсказка очищена. Что заметили?');
+    if (narrow.matches) {
+      const top = $('[data-app]').getBoundingClientRect().top;
+      if (top < headerH()) scrollTo({ top: top + scrollY - headerH() - 12, behavior: G.reducedMotion ? 'auto' : 'smooth' });
+    }
+    if (byKeyboard) tiles[0].focus({ preventScroll: true });
+  };
+
+  const preset = (value) => {
+    const [s, c, z] = value.split('|');
+    state.s = s; state.c = null; state.z = null;
+    renderChips();
+    pickContext(c);
+    if (z) pickZone(z);
+  };
+
+  const edit = (n) => {
+    const step = steps[n - 1];
+    step.classList.add('is-editing');
+    const chosen = $('[aria-pressed="true"]', step) || $('button:not([hidden]):not([data-edit])', $('.stuk-q__body', step));
+    if (chosen) chosen.focus({ preventScroll: true });
+    step.scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+  };
+
+  const callback = () => { if (G.openModal) G.openModal('call', { message: message() }); };
+
+  // the request form keeps the text through its own steps: it only validates and posts request_part[what]
+  const toRequest = () => {
+    const text = message();
+    const form = document.getElementById('request-form');
+    const field = document.getElementById('request_what');
+    const section = document.getElementById('request');
+    const sent = form && form.querySelector('[data-success].is-visible');
+    if (!form || !field || !section || sent) { callback(); return; }
+    const current = field.value.trim();
+    if (lastAdded && current.includes(lastAdded)) field.value = current.replace(lastAdded, text);
+    else field.value = current ? `${current}\n${text}` : text;
+    lastAdded = text;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // the form may still be on its first step (the car): a note at the top of that step says where the text went;
+    // on the description step the text is in plain sight
+    const panel = form.querySelector('.rq__panel.is-active');
+    $$('.stuk-rq-note', form).forEach((n) => n.remove());
+    if (panel && panel.dataset.panel !== '2') {
+      const note = document.createElement('p');
+      note.className = 'stuk-rq-note';
+      note.innerHTML = `${ic('check')}<span>Описание неисправности уже в заявке, на шаге 2 «Ввод запроса».</span>`;
+      panel.insertBefore(note, panel.firstElementChild);
+    }
+    announce('Описание добавлено в заявку, на шаг 2 «Ввод запроса».');
+    // on a phone the section starts with its heading and texts, the form itself is a screen lower
+    (narrow.matches ? form : section).scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    if (G.canHover) {
+      const first = panel && panel.dataset.panel === '2' ? field
+        : panel && panel.querySelector('select:not([disabled]), input:not([type=hidden]):not([disabled])');
+      if (first) setTimeout(() => first.focus({ preventScroll: true }), 450);
+    }
+  };
+
+  const showError = () => {
+    idle.hidden = true;
+    res.hidden = false;
+    cta.hidden = true;
+    resLabel.textContent = '// Подсказка';
+    resBody.innerHTML = '<p class="stuk-res__lead">Подсказка не загрузилась. Обновите страницу или позвоните нам\u00a0— поможем разобраться по телефону.</p>';
+  };
+
+  /* ---------- one click listener for the whole section ---------- */
+  root.addEventListener('click', (e) => {
+    const t = e.target;
+    const byKeyboard = e.detail === 0;
+    const tile = t.closest('.stuk-sym');
+    const chip = t.closest('.stuk-chip:not(.stuk-zone)');
+    const zone = t.closest('.stuk-zone') || t.closest('.stuk-car__hit.is-on');
+    const pre = t.closest('.stuk-preset');
+    const ed = t.closest('[data-edit]');
+    const act = t.closest('[data-act]');
+    if (!(tile || chip || zone || pre || ed || act)) return;
+    load().then(() => {
+      if (tile) pickSymptom(tile.dataset.s, byKeyboard);
+      else if (chip) pickContext(chip.dataset.c, byKeyboard);
+      else if (zone) pickZone(zone.dataset.z, byKeyboard && !!zone.closest('button'));
+      else if (pre) preset(pre.dataset.preset);
+      else if (ed) edit(Number(ed.dataset.edit));
+      else if (act.dataset.act === 'reset') reset(byKeyboard);
+      else if (act.dataset.act === 'call') callback();
+      else if (act.dataset.act === 'request') toRequest();
+    }).catch(() => {});
+  });
+
+  /* ---------- the car and the place buttons light up together ---------- */
+  const hover = (key, on) => {
+    if (!key) return;
+    $$(`.z-${key}`, car).forEach((el) => el.classList.toggle('is-hover', on));
+    zoneBtns.forEach((b) => { if (b.dataset.z === key) b.classList.toggle('is-hover', on); });
+  };
+  const hoverKey = (t) => { const el = t.closest('.stuk-car__hit.is-on, .stuk-zone'); return el ? el.dataset.z : null; };
+  steps[2].addEventListener('pointerover', (e) => hover(hoverKey(e.target), true), { passive: true });
+  steps[2].addEventListener('pointerout', (e) => hover(hoverKey(e.target), false), { passive: true });
 })();
 
 /* ============================================================
@@ -1008,4 +1849,3765 @@
       } finally { btn.disabled = false; }
     });
   }
+})();
+
+/* ============================================================
+   «Шинный калькулятор» (build/shiny.py): two tyre sizes -> diameter, sidewall, clearance, speedometer.
+   The page arrives with the default pair already counted and drawn; the script starts when the block comes near
+   the screen. Drawing: one short tween of SVG transforms per change, no loop; the meter and the marking bar are
+   CSS transitions. localStorage only remembers the last pair (in try/catch).
+   ============================================================ */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-shiny]');
+  if (!root) return;
+  const G = window.G || {};
+  const NB = '\u00a0';
+  const MINUS = '\u2212';
+  const STORE = 'garage.shiny';
+  const conf = root.dataset;           // speeds, the 3 % limit, the meter range and every phrase: build/shiny.py
+  const SPEEDS = conf.speeds.split(' ').map(Number);
+  const LIMIT = +conf.limit;
+  const METER = +conf.meter;
+
+  /* ---------- maths: the same formulas as build/shiny.py, lengths in hundredths of a millimetre ---------- */
+  const sidewall = (s) => s.w * s.p;
+  const rim = (s) => s.d * 2540;
+  const outer = (s) => rim(s) + 2 * sidewall(s);
+  const tenths = (h) => (h >= 0 ? 1 : -1) * Math.floor((Math.abs(h) + 5) / 10);
+  const round1 = (x) => (x ? Math.sign(x) * Math.floor(Math.abs(x) * 10 + 0.5) / 10 : 0);
+
+  const compare = (a, b) => {
+    const odA = outer(a); const odB = outer(b); const diff = odB - odA;
+    return {
+      odA: tenths(odA), odB: tenths(odB), odD: tenths(odB) - tenths(odA),
+      sA: tenths(sidewall(a)), sB: tenths(sidewall(b)), sD: tenths(sidewall(b)) - tenths(sidewall(a)),
+      wD: b.w - a.w,
+      clearance: tenths(diff / 2),                     // outer() is always even
+      pct: round1(diff / odA * 100),
+      speeds: SPEEDS.map((v) => round1(v * odB / odA)),
+      same: a.w === b.w && a.p === b.p && a.d === b.d,
+    };
+  };
+
+  /* ---------- formatting: decimal comma, real minus, no-break space before the unit ---------- */
+  const dec = (t) => { t = Math.abs(t); return Math.floor(t / 10) + ',' + (t % 10); };
+  const signedT = (t) => (t === 0 ? '0' : (t > 0 ? '+' : MINUS) + dec(t));
+  const signedF = (x) => signedT(Math.round(x * 10));
+  const signedI = (n) => (n === 0 ? '0' : (n > 0 ? '+' : MINUS) + Math.abs(n));
+  const label = (s) => `${s.w}/${s.p} R${s.d}`;
+
+  /* ---------- elements ---------- */
+  const $ = (sel, el = root) => el.querySelector(sel);
+  const $$ = (sel, el = root) => Array.from(el.querySelectorAll(sel));
+  const out = {};
+  $$('[data-o]').forEach((el) => { out[el.dataset.o] = el; });
+  const sizes = {};
+  $$('[data-size]').forEach((fs) => {
+    sizes[fs.dataset.size] = {
+      text: $('[data-text]', fs), err: $('[data-err]', fs),
+      w: $('[data-part="w"]', fs), p: $('[data-part="p"]', fs), d: $('[data-part="d"]', fs),
+    };
+  });
+  const texts = conf;
+  const cta = $('[data-cta]');
+  const live = $('[data-live]');
+  const svg = $('.shiny-svg');
+
+  const read = (k) => ({ w: +sizes[k].w.value, p: +sizes[k].p.value, d: +sizes[k].d.value });
+  // a size is allowed when every part is one of the options of the selects
+  const has = (sel, v) => Array.from(sel.options).some((o) => +o.value === v);
+  const valid = (s) => !!s && has(sizes.a.w, s.w) && has(sizes.a.p, s.p) && has(sizes.a.d, s.d);
+  const write = (k, s) => {
+    const f = sizes[k];
+    f.w.value = String(s.w); f.p.value = String(s.p); f.d.value = String(s.d);
+    f.text.value = label(s);
+    showError(k, '');
+  };
+
+  /* «205/55 R16», «205/55R16», «205 55 16», «205-55-r16», «225/45 ZR17 94W», Cyrillic «Р» — width, profile, rim */
+  const parse = (raw) => {
+    const m = String(raw).toUpperCase().match(/(\d{3})\s*[/\\\-.,\s]\s*(\d{2})\s*[/\\\-.,]?\s*[A-ZА-ЯЁ]{0,3}\s*[/\\\-.,]?\s*(\d{2})(?!\d)/);
+    return m ? { w: +m[1], p: +m[2], d: +m[3] } : null;
+  };
+  function showError(k, which) {
+    const f = sizes[k];
+    f.err.hidden = !which;
+    if (which) f.err.textContent = which === 'range' ? texts.errRange : texts.errParse;
+    f.text.setAttribute('aria-invalid', which ? 'true' : 'false');
+  }
+
+  /* ---------- drawing: SVG transforms by data-t, the same strings as transforms() in build/shiny.py ---------- */
+  const view = {
+    ground: +svg.dataset.ground, top: +svg.dataset.top, side: +svg.dataset.side, newSide: +svg.dataset.newSide, front: +svg.dataset.front,
+    min: +svg.dataset.min, bar: svg.dataset.bar.split(' ').map(Number),
+  };
+  const parts = {};
+  $$('[data-t]', svg).forEach((el) => { parts[el.dataset.t] = el; });
+  const f3 = (x) => String(+x.toFixed(3));
+  // what the drawing depends on, in millimetres and viewBox units per millimetre; a tween interpolates these numbers
+  const shape = (a, b) => {
+    const odA = outer(a) / 100; const odB = outer(b) / 100;
+    const topMm = Math.max(view.min, Math.ceil(Math.max(odA, odB) / 100) * 100);
+    return { s: (view.ground - view.top) / topMm, odA, odB, rimA: a.d * 25.4, rimB: b.d * 25.4, wA: a.w, wB: b.w };
+  };
+  const draw = (g) => {
+    const ra = g.odA / 2 * g.s; const rb = g.odB / 2 * g.s;
+    const put = (name, value) => { if (parts[name]) parts[name].setAttribute('transform', value); };
+    put('tyre-b', `translate(${view.newSide} ${f3(view.ground - rb)}) scale(${f3(rb / 100)})`);
+    put('rim-b', `translate(${view.newSide} ${f3(view.ground - rb)}) scale(${f3(g.rimB / 2 * g.s / 100)})`);
+    put('tyre-a', `translate(${view.side} ${f3(view.ground - ra)}) scale(${f3(ra / 100)})`);
+    put('rim-a', `translate(${view.side} ${f3(view.ground - ra)}) scale(${f3(g.rimA / 2 * g.s / 100)})`);
+    put('front-b', `translate(${view.front} ${view.ground}) scale(${f3(g.wB * g.s)} ${f3(g.odB * g.s)})`);
+    put('front-a', `translate(${view.front} ${view.ground}) scale(${f3(g.wA * g.s)} ${f3(g.odA * g.s)})`);
+    put('top-b', `translate(0 ${f3(view.ground - 2 * rb)})`);
+    put('top-a', `translate(0 ${f3(view.ground - 2 * ra)})`);
+    put('bar', `translate(${view.bar[0]} ${view.bar[1]}) scale(${f3(100 * g.s)} 1)`);
+  };
+  let shown = null; let raf = 0;
+  const morph = (to, animate) => {
+    cancelAnimationFrame(raf); raf = 0;
+    if (!animate || !shown || G.reducedMotion) { shown = to; draw(to); return; }
+    const from = shown; const t0 = performance.now(); const dur = 560;
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / dur); const e = 1 - Math.pow(1 - p, 4);
+      const g = {};
+      Object.keys(to).forEach((k) => { g[k] = from[k] + (to[k] - from[k]) * e; });
+      shown = g; draw(g);
+      raf = p < 1 ? requestAnimationFrame(step) : 0;
+    };
+    raf = requestAnimationFrame(step);
+  };
+
+  /* ---------- render ---------- */
+  const set = (key, text) => { if (out[key] && out[key].textContent !== text) out[key].textContent = text; };
+  let liveTimer = 0;
+  const render = (animate) => {
+    const a = read('a'); const b = read('b'); const r = compare(a, b);
+    set('head', r.odD === 0 ? texts.headSame : `${r.odD > 0 ? texts.headMore : texts.headLess} ${dec(r.odD)}${NB}мм`);
+    set('pct', `${signedF(r.pct)}${NB}%`);
+    set('odA', dec(r.odA)); set('odB', dec(r.odB)); set('odD', `${signedT(r.odD)}${NB}мм`);
+    set('sA', dec(r.sA)); set('sB', dec(r.sB)); set('sD', `${signedT(r.sD)}${NB}мм`);
+    set('wA', String(a.w)); set('wB', String(b.w)); set('wD', `${signedI(r.wD)}${NB}мм`);
+    set('cD', `${signedT(r.clearance)}${NB}мм`);
+    r.speeds.forEach((v, i) => set('v' + i, dec(Math.round(v * 10))));
+    set('labelA', label(a)); set('labelB', label(b));
+
+    const state = r.same ? 'same' : Math.abs(r.pct) <= LIMIT ? 'ok' : 'over';
+    const lead = texts[state];
+    const more = state === 'over' ? (r.pct > 0 ? texts.overMore : texts.overLess) : '';
+    out.verdict.dataset.state = state;
+    set('verdict-text', lead);
+    set('verdict-more', more);
+    const verdict = more ? `${lead} ${more}` : lead;
+    const pos = (Math.max(-METER, Math.min(METER, r.pct)) + METER) / (2 * METER) * 100;
+    out.meter.style.transform = `translateX(${pos.toFixed(2)}%)`;
+
+    const fill = (tpl, extra) => Object.entries({ now: label(a), new: label(b), ...extra }).reduce((t, [k, v]) => t.split(`{${k}}`).join(v), tpl);
+    cta.dataset.preset = JSON.stringify({ message: fill(r.same ? texts.msgSame : texts.msg) });
+    morph(shape(a, b), animate);
+
+    try { localStorage.setItem(STORE, JSON.stringify({ a, b })); } catch (_) { /* private mode */ }
+    // screen readers: one short summary after the last change, not a word per select
+    clearTimeout(liveTimer);
+    if (animate) {
+      liveTimer = setTimeout(() => {
+        const diff = r.odD === 0 ? texts.headSame : `${r.odD > 0 ? texts.headMore : texts.headLess} ${dec(r.odD)} мм, ${signedF(r.pct)} %`;
+        live.textContent = r.same ? verdict : fill(texts.live, { diff, v90: dec(Math.round(r.speeds[1] * 10)), verdict });
+      }, 700);
+    }
+  };
+
+  /* ---------- marking strip ---------- */
+  const markLine = $('.shiny-mark__line');
+  const markBar = $('.shiny-mark__bar');
+  const markParts = $$('[data-mark]');
+  const placeBar = () => {
+    const btn = markParts.find((x) => x.classList.contains('is-active')) || markParts[0];
+    if (!btn || !markBar) return;
+    // over the part's own underline (::after, 2px in from each side)
+    markBar.style.transform = `translate(${btn.offsetLeft + 2}px, ${btn.offsetTop + btn.offsetHeight - 2}px) scaleX(${(btn.offsetWidth - 4) / 100})`;
+  };
+  const pick = (btn) => {
+    markParts.forEach((x) => {
+      const on = x === btn;
+      x.classList.toggle('is-active', on);
+      x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const about = root.querySelector(`[data-about="${x.dataset.mark}"]`);
+      if (about) about.hidden = !on;
+    });
+    placeBar();
+  };
+
+  /* ---------- start: when the block comes near the screen ---------- */
+  const start = () => {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (_) { saved = null; }
+    ['a', 'b'].forEach((k) => write(k, saved && valid(saved[k]) ? saved[k] : read(k)));
+    render(false);
+
+    Object.keys(sizes).forEach((k) => {
+      const f = sizes[k];
+      [f.w, f.p, f.d].forEach((sel) => sel.addEventListener('change', () => { f.text.value = label(read(k)); showError(k, ''); render(true); }));
+      f.text.addEventListener('input', () => {
+        const s = parse(f.text.value);
+        if (s && valid(s)) {
+          showError(k, '');
+          const cur = read(k);
+          if (cur.w !== s.w || cur.p !== s.p || cur.d !== s.d) { f.w.value = String(s.w); f.p.value = String(s.p); f.d.value = String(s.d); render(true); }
+        }
+      });
+      const settle = () => {
+        const v = f.text.value.trim();
+        const s = parse(v);
+        if (!v) { f.text.value = label(read(k)); showError(k, ''); return; }
+        if (!s) { showError(k, 'parse'); return; }
+        if (!valid(s)) { showError(k, 'range'); return; }
+        f.text.value = label(s); showError(k, '');
+      };
+      f.text.addEventListener('change', settle);
+      f.text.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); settle(); f.text.blur(); } });
+    });
+
+    const swap = $('[data-swap]');
+    let turns = 0;
+    swap.addEventListener('click', () => {
+      const a = read('a'); const b = read('b');
+      write('a', b); write('b', a);
+      turns += 1; swap.style.setProperty('--turn', String(turns));
+      render(true);
+    });
+
+    markParts.forEach((btn) => btn.addEventListener('click', () => pick(btn)));
+    placeBar();
+    if ('ResizeObserver' in window) new ResizeObserver(placeBar).observe(markLine);
+    else addEventListener('resize', placeBar, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeBar);
+  };
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((en) => en.isIntersecting)) { io.disconnect(); start(); }
+    }, { rootMargin: '300px 0px' });
+    io.observe(root);
+  } else {
+    start();
+  }
+})();
+
+/* ============================================================
+   otkryto: «Открыто сейчас» — the live status in Moscow time from the hours in data-oc (build/otkryto.py: 7 days
+   from Monday, [opens, closes] in minutes, {note} or null), today in the week; «Как добраться»: copy the address,
+   save the contact as a vCard. Without JS the plain hours stay in the markup.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = (window.G = window.G || {});
+  const TZ = 'Europe/Moscow';   // Nizhny Novgorod keeps Moscow time: UTC+3 all year, no daylight saving
+  const UTC_OFFSET = 180;       // minutes, for a browser without time zone data
+  const SOON = 60;              // «Скоро закрываемся»: the last hour
+  const NB = '\u00a0';           // no line break after a short preposition: «в 9:00», «до 19:00» stay whole
+  const ON_DAY = ['в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу', 'в воскресенье'].map((d) => d.replace(' ', NB));
+  const UNTIL_DAY = ['понедельника', 'вторника', 'среды', 'четверга', 'пятницы', 'субботы', 'воскресенья'];
+  const WEEKDAY = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+
+  /* ---------- time: the Moscow wall clock of a Date, { day: 0 (Monday) … 6, min: minutes since midnight } ---------- */
+  let clock = null;
+  const moscow = (date) => {
+    try {
+      clock = clock || new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false });
+      const p = {};
+      clock.formatToParts(date).forEach((x) => { p[x.type] = x.value; });
+      const day = WEEKDAY[p.weekday];
+      const min = (Number(p.hour) % 24) * 60 + Number(p.minute);   // % 24: some engines say «24» at midnight
+      if (day !== undefined && !p.dayPeriod && Number.isFinite(min)) return { day, min };
+    } catch (_) { /* no time zone data: UTC+3 below */ }
+    const t = new Date(date.getTime() + UTC_OFFSET * 60000);
+    return { day: (t.getUTCDay() + 6) % 7, min: t.getUTCHours() * 60 + t.getUTCMinutes() };
+  };
+  const hm = (min) => Math.floor(min / 60) + ':' + String(min % 60).padStart(2, '0');
+
+  /* ---------- status: { state: open | soon | closed | note, word, rest, brief } ----------
+     rest goes after the word in the contacts and the menu; brief is the shorter form for the header's top line */
+  const status = (week, now, calendar = {}) => {
+    const specAt = (offset) => {
+      const weekday = (now.day + offset) % 7;
+      if (!now.iso) return week[weekday];
+      const iso = new Date(Date.parse(now.iso + 'T00:00:00Z') + offset * 86400000).toISOString().slice(0, 10);
+      if (calendar.calendarThrough && iso > calendar.calendarThrough) return { note: 'график уточняйте по телефону' };
+      return (calendar.closedDates || []).includes(iso) ? null : week[weekday];
+    };
+    const today = specAt(0);
+    if (Array.isArray(today)) {
+      const opens = today[0];
+      const closes = today[1];
+      if (now.min >= opens && now.min < closes) {
+        const soon = closes - now.min <= SOON;
+        const until = 'до' + NB + hm(closes);
+        return { state: soon ? 'soon' : 'open', word: soon ? 'Скоро закрываемся' : 'Открыто', rest: until, brief: until };
+      }
+      if (now.min < opens) return { state: 'closed', word: 'Закрыто', rest: 'откроемся сегодня в' + NB + hm(opens), brief: 'до' + NB + hm(opens) };
+    } else if (today && today.note) {
+      return { state: 'note', word: 'Сегодня', rest: today.note, brief: today.note };
+    }
+    for (let k = 1; k <= 31; k += 1) {
+      const d = (now.day + k) % 7;
+      const next = specAt(k);
+      if (Array.isArray(next)) {
+        const at = hm(next[0]);
+        return k === 1
+          ? { state: 'closed', word: 'Закрыто', rest: 'откроемся завтра в' + NB + at, brief: 'до завтра, ' + at }
+          : { state: 'closed', word: 'Закрыто', rest: 'откроемся ' + ON_DAY[d] + ' в' + NB + at, brief: 'до ' + UNTIL_DAY[d] + ', ' + at };
+      }
+      if (next && next.note) {
+        const rest = (k === 1 ? 'завтра' : ON_DAY[d]) + ' ' + next.note;
+        return { state: 'closed', word: 'Закрыто', rest, brief: rest };
+      }
+    }
+    return { state: 'closed', word: 'Закрыто', rest: '', brief: '' };
+  };
+
+  // the vCard lines come escaped and folded from build/otkryto.py; a file wants CRLF line ends
+  const vcardFile = (lines) => lines.join('\r\n') + '\r\n';
+  G.otkryto = { moscow, status, hm, vcardFile };
+
+  /* ---------- the widgets: header top line, mobile menu, the weeks on the home page and /contacts/ ---------- */
+  const widgets = [];
+  document.querySelectorAll('[data-oc]').forEach((el) => {
+    let week = null;
+    let calendar = {};
+    try { calendar = JSON.parse(el.dataset.oc); week = calendar.week; } catch (_) { week = null; }
+    if (Array.isArray(week) && week.length === 7) widgets.push({ el, week, calendar, brief: el.hasAttribute('data-oc-brief'), key: '' });
+  });
+
+  const paint = (w, now) => {
+    const iso = new Date(Date.now() + UTC_OFFSET * 60000).toISOString().slice(0, 10);
+    const s = status(w.week, { ...now, iso }, w.calendar);
+    const rest = w.brief ? s.brief : s.rest;
+    const key = [s.state, s.word, rest, now.day].join('|');
+    if (key === w.key) return;   // a minute tick that changes nothing touches nothing
+    w.key = key;
+    w.el.dataset.ocState = s.state;
+    w.el.classList.add('is-live');
+    w.el.querySelectorAll('.oc__text').forEach((text) => {
+      const word = document.createElement('span');
+      word.className = 'oc__word';
+      word.textContent = s.word;
+      text.textContent = '';
+      text.append(word);
+      if (rest) {
+        const sep = document.createElement('span');
+        sep.className = 'oc__sep';
+        sep.setAttribute('aria-hidden', 'true');
+        sep.textContent = '·';
+        text.append(' ', sep, ' ' + rest);
+      }
+      text.hidden = false;
+    });
+    w.el.querySelectorAll('.oc[hidden]').forEach((line) => { line.hidden = false; });
+    w.el.querySelectorAll('[data-day]').forEach((cell) => {
+      const on = Number(cell.dataset.day) === now.day;
+      cell.classList.toggle('is-today', on);
+      if (on) cell.setAttribute('aria-current', 'date'); else cell.removeAttribute('aria-current');
+    });
+  };
+
+  if (widgets.length) {
+    let timer = 0;
+    const tick = () => {
+      clearTimeout(timer);
+      const now = moscow(new Date());
+      widgets.forEach((w) => paint(w, now));
+      // next look right after the minute turns, and none while the tab is hidden
+      if (document.visibilityState !== 'hidden') timer = setTimeout(tick, 60000 - (Date.now() % 60000) + 200);
+    };
+    tick();
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') clearTimeout(timer); else tick(); });
+    addEventListener('pageshow', (e) => { if (e.persisted) tick(); });
+    // the dot's pulse stops off screen (base.css: .is-offscreen)
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => entries.forEach((en) => en.target.classList.toggle('is-offscreen', !en.isIntersecting)));
+      widgets.forEach((w) => io.observe(w.el));
+    }
+  }
+
+  /* ---------- «Как добраться»: copy the address ---------- */
+  const copyText = async (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (_) { /* refused: the old way below */ }
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');   // no keyboard on a phone
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';
+    document.body.appendChild(ta);
+    ta.focus({ preventScroll: true });   // the page must not jump to the hidden field
+    ta.select();
+    ta.setSelectionRange(0, text.length);   // iOS Safari selects only by range
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    ta.remove();
+    return ok;
+  };
+  document.querySelectorAll('[data-oc-copy]').forEach((btn) => {
+    let done = 0;
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.ocCopy;
+      if (await copyText(text)) {
+        btn.classList.add('is-done');
+        clearTimeout(done);
+        done = setTimeout(() => btn.classList.remove('is-done'), 2400);
+        if (G.toast) G.toast(btn.dataset.ocToast);
+      } else if (G.toast) {
+        G.toast('Не удалось скопировать. Адрес: ' + text, 'err');
+      }
+    });
+  });
+
+  /* ---------- «Как добраться»: save the contact (a .vcf made here, nothing is fetched) ---------- */
+  document.querySelectorAll('[data-oc-vcard]').forEach((btn) => {
+    let lines = null;
+    try { lines = JSON.parse(btn.dataset.ocVcard); } catch (_) { lines = null; }
+    if (!Array.isArray(lines) || !window.Blob || !window.URL || !URL.createObjectURL) return;
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const url = URL.createObjectURL(new Blob([vcardFile(lines)], { type: 'text/vcard;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = btn.dataset.ocFile || 'contact.vcf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);   // an iPhone reads the file after its own dialog
+      if (G.toast) G.toast(btn.dataset.ocToast);
+    });
+  });
+})();
+
+/* ============================================================
+   «Арки» (build/arki.py, arki.css): the arched windows of «Как у нас»
+   stay dark until the row comes into view, then light up one after another;
+   in the strip (phones, tablets) the window at the start of the strip is lit and the light follows the swipe.
+   No animation loop: class changes only, the transitions are opacity/transform in CSS.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = window.G || {};
+  const row = document.querySelector('[data-arcade]');
+  if (!row || !('IntersectionObserver' in window)) return;
+  const arches = Array.from(row.querySelectorAll('.arch'));
+
+  /* ---------- lightbox on a phone: the 800px copies of the full photos (build/images.py, RESPONSIVE_WIDTHS) ---------- */
+  if (matchMedia('(max-width: 640px)').matches) {
+    row.querySelectorAll('a[data-lightbox]').forEach((a) => a.setAttribute('href', a.getAttribute('href').replace(/\.webp$/, '-800.webp')));
+  }
+
+  /* ---------- lights on (without JS or with reduced motion the windows are simply lit) ---------- */
+  if (!G.reducedMotion) {
+    row.classList.add('is-dark');
+    const wake = new IntersectionObserver((entries) => {
+      if (!entries.some((en) => en.isIntersecting)) return;
+      wake.disconnect();
+      row.classList.add('is-waking');
+      row.classList.remove('is-dark');
+      // the stagger delay is only for this first sequence: hover must answer at once afterwards
+      const step = parseFloat(getComputedStyle(row).getPropertyValue('--arch-step')) || 330;
+      setTimeout(() => row.classList.remove('is-waking'), arches.length * step + 1400);
+    }, { threshold: 0.3 });
+    wake.observe(row);
+  }
+
+  /* ---------- strip: the window crossing the band 15–55% from the left edge of the strip is lit ---------- */
+  const strip = matchMedia('(max-width: 999px)');
+  let lit = null;
+  const sync = () => {
+    if (lit) { lit.disconnect(); lit = null; }
+    arches.forEach((a) => a.classList.remove('is-lit'));
+    if (!strip.matches) return;
+    lit = new IntersectionObserver((entries) => entries.forEach((en) => en.target.closest('.arch').classList.toggle('is-lit', en.isIntersecting)),
+      { root: row, rootMargin: '0px -45% 0px -15%', threshold: 0 });
+    arches.forEach((a) => lit.observe(a.querySelector('.arch__win')));
+  };
+  sync();
+  if (strip.addEventListener) strip.addEventListener('change', sync); else strip.addListener(sync);
+})();
+
+/* ============================================================
+   «Свет ламп»: the pendant lamps on the first screen (markup build/svet.py, styles svet.css).
+   A lamp is a toggle button: it switches off and on with a short flicker. With every lamp off the room goes dark,
+   the neon sign of the workshop lights up and, with a mouse, the cursor becomes a hand lamp over the brick.
+   Switching any lamp back on brings the light back.
+   The lamps sway a little when the page scrolls, when the cursor brushes them and when they are switched.
+   What keeps it cheap:
+     1. lamps and the hand lamp move with transform only, lights switch with opacity (CSS keyframes);
+     2. one requestAnimationFrame loop, running only while the hero is on screen and something still moves;
+     3. layout is read in one batch on resize, never inside the frame loop.
+   ============================================================ */
+(() => {
+  'use strict';
+  const room = document.querySelector('[data-svet]');
+  if (!room) return;
+  const G = window.G || {};
+  const hero = room.closest('.hero') || room.parentElement;
+  const pools = Array.from(hero.querySelectorAll('[data-svet-pool]'));
+  const lamps = Array.from(room.querySelectorAll('[data-svet-lamp]')).map((el, i) => ({
+    el, btn: el.querySelector('button'), pool: pools[i] || null, on: true,
+    a: 0, v: 0,                            // angle (deg) and angular velocity (deg/s)
+    f: 0.85 + (i % 3) * 0.12,              // each lamp takes a push a little differently, so they never swing in step
+    x: 0, y: 0, shown: true,               // dome centre in hero coordinates; a lamp hidden by CSS is skipped
+  }));
+  const status = room.querySelector('[data-svet-status]');
+  const torch = hero.querySelector('.svet-wall__torch');
+  const reduced = !!G.reducedMotion;
+  const hoverMq = matchMedia('(hover: hover) and (pointer: fine)');
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+  const K = 30;          // 1/s², stiffness: about 0.9 swings a second, a lamp on a short cord
+  const DAMP = 1.9;      // 1/s, a push dies out in 4–5 s
+  const MAX = 6;         // deg
+  const REST_A = 0.03;   // deg
+  const REST_V = 0.2;    // deg/s
+  const TORCH = 190;     // px, radius of the hand lamp's light
+  const TORCH_TAU = 70;  // ms, easing of the hand lamp towards the cursor
+
+  /* ---------- geometry: one batched read, refreshed on resize ---------- */
+  let W = 1; let H = 1; let heroTop = 0; let heroLeft = 0; let S = 1;
+  function paintTorch() {
+    const c = torch && torch.getContext('2d');
+    if (!c) return;
+    const n = torch.width; const half = n / 2;
+    const r = (TORCH * 1.35) / S * n;
+    const g = c.createRadialGradient(half, half, 0, half, half, r);
+    g.addColorStop(0, 'rgba(255, 196, 128, 0.1)');    // a warm hint in the middle of the beam
+    g.addColorStop(0.36, 'rgba(255, 190, 120, 0.02)');
+    g.addColorStop(0.6, 'rgba(6, 4, 3, 0.4)');
+    g.addColorStop(0.84, 'rgba(5, 4, 3, 0.84)');
+    g.addColorStop(1, 'rgba(5, 4, 3, 0.93)');
+    c.clearRect(0, 0, n, n);
+    c.fillStyle = g;
+    c.fillRect(0, 0, n, n);
+  }
+  function measure() {
+    const hr = hero.getBoundingClientRect();
+    W = hr.width || 1; H = hr.height || 1;
+    heroTop = hr.top + scrollY; heroLeft = hr.left + scrollX;
+    lamps.forEach((l) => {
+      const b = l.btn.getBoundingClientRect();
+      l.shown = b.width > 0;
+      l.x = b.left - hr.left + b.width / 2; l.y = b.top - hr.top + b.height / 2;
+      l.r = b.width * 0.75;
+    });
+    // the veil must still cover the far corner of the hero when the beam sits on the opposite edge
+    S = Math.ceil(2 * Math.max(W, H) + TORCH * 2);
+    if (torch) { torch.style.width = `${S}px`; torch.style.height = `${S}px`; paintTorch(); placeTorch(); }
+  }
+
+  /* ---------- the hand lamp (dark room, mouse only) ---------- */
+  const useTorch = !!torch && hoverMq.matches;
+  hero.classList.toggle('has-torch', useTorch);
+  let tx = 0; let ty = 0; let gx = -1; let gy = -1;
+  function placeTorch() {
+    if (!torch) return;
+    if (gx < 0) { gx = W * 0.5; gy = H * 0.3; tx = gx; ty = gy; }
+    torch.style.transform = `translate3d(${(tx - S / 2).toFixed(1)}px, ${(ty - S / 2).toFixed(1)}px, 0)`;
+  }
+
+  /* ---------- the swing: one rAF loop, only while something moves and the hero is on screen ---------- */
+  let raf = 0; let last = 0; let visible = true; let dark = false;
+  function frame(t) {
+    raf = 0;
+    const dt = Math.min(0.032, Math.max(0.001, (t - last) / 1000));
+    last = t;
+    let moving = false;
+    lamps.forEach((l) => {
+      if (!l.a && !l.v) return;
+      l.v += (-K * l.a - DAMP * l.v) * dt;
+      l.a = clamp(l.a + l.v * dt, -MAX, MAX);
+      if (Math.abs(l.a) < REST_A && Math.abs(l.v) < REST_V) { l.a = 0; l.v = 0; l.el.style.transform = ''; return; }
+      moving = true;
+      l.el.style.transform = `rotate(${l.a.toFixed(2)}deg)`;
+    });
+    if (dark && useTorch && (Math.abs(gx - tx) > 0.3 || Math.abs(gy - ty) > 0.3)) {
+      const k = reduced ? 1 : 1 - Math.exp(-(dt * 1000) / TORCH_TAU);
+      tx += (gx - tx) * k; ty += (gy - ty) * k;
+      placeTorch();
+      moving = true;
+    }
+    if (moving && visible) raf = requestAnimationFrame(frame);
+  }
+  function wake() {
+    if (raf || !visible) return;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+  function push(l, dv) {
+    if (reduced || !l.shown) return;
+    l.v = clamp(l.v + dv, -60, 60);
+    wake();
+  }
+
+  /* ---------- switching ---------- */
+  let darkTimer = 0;
+  function setDark(on) {
+    if (on === dark) return;
+    dark = on;
+    hero.classList.toggle('is-dark', on);
+    if (status) status.textContent = on ? 'Свет в офисе выключен' : '';
+    if (on && useTorch) { tx = gx; ty = gy; placeTorch(); }
+  }
+  function sync() {
+    clearTimeout(darkTimer);
+    const shown = lamps.filter((l) => l.shown);
+    if (shown.length && shown.every((l) => !l.on)) darkTimer = setTimeout(() => setDark(true), reduced ? 0 : 420);  // after the last flicker
+    else setDark(false);
+  }
+  function setLamp(l, on) {
+    if (l.on === on) return;
+    l.on = on;
+    [l.el, l.pool].forEach((n) => { if (n) { n.classList.toggle('is-off', !on); n.classList.toggle('is-relit', on); } });
+    l.btn.setAttribute('aria-pressed', String(on));
+  }
+  lamps.forEach((l) => {
+    l.btn.addEventListener('click', () => {
+      setLamp(l, !l.on);
+      push(l, (Math.random() < 0.5 ? -1 : 1) * 28);   // the hand that reaches for the switch nudges the lamp
+      sync();
+    });
+  });
+
+  /* ---------- the cursor brushes the lamps; in the dark it carries the hand lamp ---------- */
+  let px = -1; let py = -1;
+  hero.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    const x = e.pageX - heroLeft; const y = e.pageY - heroTop;
+    if (px >= 0) {
+      const dx = x - px;
+      lamps.forEach((l) => { if (Math.abs(x - l.x) < l.r && Math.abs(y - l.y) < l.r) push(l, clamp(dx, -24, 24) * 1.1 * l.f); });
+    }
+    px = x; py = y;
+    if (useTorch) { gx = x; gy = y; if (dark) wake(); }
+  }, { passive: true });
+
+  /* ---------- scrolling sways the row a little ---------- */
+  let lastY = scrollY;
+  addEventListener('scroll', () => {
+    const dy = scrollY - lastY;
+    lastY = scrollY;
+    if (!visible || reduced) return;
+    const kick = clamp(dy * 0.12, -4, 4);
+    if (Math.abs(kick) > 0.2) lamps.forEach((l) => { if (Math.abs(l.v) < 28) push(l, kick * l.f); });
+  }, { passive: true });
+
+  /* ---------- start / stop with the hero on screen ---------- */
+  measure();
+  let resizeRaf = 0;
+  addEventListener('resize', () => {
+    if (resizeRaf) return;
+    resizeRaf = requestAnimationFrame(() => { resizeRaf = 0; measure(); sync(); });
+  }, { passive: true });
+  addEventListener('load', measure);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => entries.forEach((en) => {
+      visible = en.isIntersecting;
+      if (visible) wake(); else if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    })).observe(hero);
+  }
+})();
+
+/* ============================================================
+   vorota: «Ворота» — the contacts scene (build/vorota.py, css/vorota.css)
+   the sign over the gate lights up when the facade comes into view; while the stage is pinned the scroll
+   rolls the shutter up and then walks the camera through the gate into the workshop.
+   One rAF loop, only while the scene is on screen and only until it catches up with the scroll.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = window.G || {};
+  const gate = document.querySelector('[data-gate]');
+  // without an observer or with reduced motion the scene stays static: gate open, sign lit (the CSS default)
+  if (!gate || !('IntersectionObserver' in window) || G.reducedMotion) return;
+  const stage = gate.querySelector('.gate__stage');
+  gate.classList.add('gate--scroll');
+
+  /* ---------- the sign: lights up once, when the sign itself is well inside the screen (above the phone call bar);
+     watched through its halo, one per framing — the hidden framing never intersects ---------- */
+  const lit = new IntersectionObserver((entries) => {
+    if (entries.some((en) => en.isIntersecting)) { gate.classList.add('is-lit'); lit.disconnect(); }
+  }, { threshold: 0.5, rootMargin: '0px 0px -12% 0px' });
+  gate.querySelectorAll('.gate__glow').forEach((el) => lit.observe(el));
+  new IntersectionObserver((entries) => entries.forEach((en) => gate.classList.toggle('is-offscreen', !en.isIntersecting))).observe(stage);
+
+  const world = gate.querySelector('.gate__world');
+  const inside = gate.querySelector('.gate__inside');
+  const insideImg = inside.querySelector('img');
+  const remote = gate.querySelector('[data-gate-remote]');
+  const btn = remote.querySelector('[data-gate-toggle]');
+  const meter = remote.querySelector('[data-gate-meter]');
+  const value = remote.querySelector('[data-gate-value]');
+  remote.hidden = false;
+
+  const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const phase = (p, a, b) => smooth(clamp01((p - a) / (b - a)));
+  // progress 0…1 over the pinned run: the shutter rolls up on 0.04–0.46, the scene rests at OPEN
+  // (the remote's «open» stop), the walk-in takes 0.5–0.94 and the workshop fades in on the way
+  const OPEN = 0.5;
+
+  let run = 1, pin = 0, shutter = null, spill = null, tx = 0, ty = 0, zoom = 2;
+  let cur = -1, raf = 0, shownPct = -1, isOpen = null;
+
+  const measure = () => {
+    pin = parseFloat(getComputedStyle(stage).top) || 0;
+    run = Math.max(1, gate.offsetHeight - stage.offsetHeight);
+    const art = Array.from(gate.querySelectorAll('.gate__art')).find((el) => el.offsetWidth);   // the framing on screen
+    if (!art) return;
+    shutter = art.querySelector('[data-gate-shutter]');
+    spill = art.querySelector('.gate__spill');
+    const op = art.querySelector('.gate__opening');
+    // layout values (transforms ignored): the middle of the opening is the zoom origin and travels to the middle of the stage
+    const ox = op.offsetLeft + op.offsetWidth / 2;
+    const oy = op.offsetTop + op.offsetHeight / 2;
+    world.style.transformOrigin = `${ox}px ${oy}px`;
+    tx = stage.clientWidth / 2 - (world.offsetLeft + ox);
+    ty = stage.clientHeight / 2 - (world.offsetTop + oy);
+    zoom = Math.min(2.4, 0.9 * Math.max(stage.clientWidth / op.offsetWidth, stage.clientHeight / op.offsetHeight));
+    cur = -1;   // redraw at once, without easing
+  };
+
+  const render = (p) => {
+    const open = phase(p, 0.04, 0.46);
+    const walk = phase(p, 0.5, 0.94);
+    const fade = phase(p, 0.66, 0.9);
+    if (shutter) shutter.style.transform = `translate3d(0, ${(-100 * open).toFixed(2)}%, 0)`;
+    if (spill) spill.style.opacity = clamp01(open * 1.6).toFixed(3);
+    world.style.transform = walk
+      ? `translate3d(${(tx * walk).toFixed(1)}px, ${(ty * walk).toFixed(1)}px, 0) scale(${(1 + (zoom - 1) * walk).toFixed(4)})`
+      : '';
+    inside.style.opacity = fade.toFixed(3);
+    insideImg.style.transform = `scale(${(1.12 - 0.12 * fade).toFixed(4)})`;
+    meter.style.transform = `scaleY(${open.toFixed(3)})`;
+    const pct = Math.round(open * 100);
+    if (pct !== shownPct) { shownPct = pct; value.textContent = pct + '%'; }
+    const o = p >= OPEN - 0.02;
+    if (o !== isOpen) {
+      isOpen = o;
+      remote.classList.toggle('is-open', o);
+      btn.setAttribute('aria-label', o ? 'Закрыть ворота' : 'Открыть ворота');
+    }
+  };
+
+  const progress = () => clamp01((pin - gate.getBoundingClientRect().top) / run);
+  // the remote drives the page like a gate motor: slow and steady, soft start and stop (inside the same loop)
+  let drive = null;
+  const html = document.documentElement;
+  const endDrive = () => { if (drive) { drive = null; html.style.scrollBehavior = ''; } };
+  const tick = (now) => {
+    raf = 0;
+    if (drive) {
+      const t = clamp01((now - drive.t0) / drive.dur);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      scrollTo(0, Math.round(drive.from + (drive.to - drive.from) * e));
+      if (t >= 1) endDrive();
+    }
+    const target = progress();
+    // a little inertia: the shutter follows the scroll like a motor, not like a sheet of paper
+    const next = cur < 0 ? target : cur + (target - cur) * 0.2;
+    cur = Math.abs(target - next) < 0.0005 ? target : next;
+    render(cur);
+    if (cur !== target || drive) raf = requestAnimationFrame(tick);
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+  /* ---------- the loop runs only while the scene is near the screen ---------- */
+  let active = false;
+  new IntersectionObserver((entries) => {
+    const on = entries[entries.length - 1].isIntersecting;
+    if (on === active) return;
+    active = on;
+    gate.classList.toggle('is-active', on);   // will-change only while it matters
+    if (on) {
+      addEventListener('scroll', kick, { passive: true });
+      kick();
+    } else {
+      removeEventListener('scroll', kick);
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      cur = progress();   // leave it in its end state (0 above the scene, 1 below)
+      render(cur);
+    }
+  }, { rootMargin: '15% 0px' }).observe(gate);
+
+  /* ---------- the remote: ▲ rolls the page to the open gate, ▼ back to the closed one; any scroll input takes over ---------- */
+  btn.addEventListener('click', () => {
+    const from = scrollY;
+    const to = Math.round(gate.getBoundingClientRect().top + scrollY - pin + (isOpen ? 0 : OPEN * run));
+    html.style.scrollBehavior = 'auto';   // steps of the drive must not be smoothed by the page's scroll-behavior
+    drive = { from, to, t0: performance.now(), dur: Math.min(2600, Math.max(900, (Math.abs(to - from) / run) * 3400)) };
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tick);
+  });
+  ['wheel', 'touchstart', 'keydown'].forEach((type) => addEventListener(type, (e) => { if (!btn.contains(e.target)) endDrive(); }, { passive: true }));
+
+  measure();
+  render(progress());
+  addEventListener('resize', () => { measure(); kick(); }, { passive: true });
+  addEventListener('load', () => { measure(); kick(); });
+})();
+
+/* ============================================================
+   «Пора переобуваться?» (#pogoda, build/pogoda.py): the Open-Meteo forecast for Nizhny Novgorod -> the verdict
+   «пора ли менять резину» and a chart of the days.
+   What keeps it cheap and safe:
+     1. nothing runs until the section is ~600px away (IntersectionObserver); then one request, or none: a forecast
+        younger than two hours, of the same Moscow day, comes from localStorage (wrapped in try/catch);
+     2. the answer is checked strictly — dates in a row, units, lengths, number ranges — before anything is drawn;
+     3. the bars grow in once by CSS transitions (transform and opacity only); no requestAnimationFrame loop;
+     4. any failure (offline, timeout, HTTP, a broken answer) leaves the rule of thumb and the booking button, with
+        «Попробовать ещё раз»; the reason goes to data-pg-error for debugging, nothing to the console.
+   The rule, the words and the address come from #pogoda-data. The pure part (parse, verdict, describe…) is also
+   G.pogoda: tests/pogoda_verdict.cjs runs it in node on test forecasts.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = (window.G = window.G || {});
+  const NB = '\u00a0';
+  const MINUS = '\u2212';
+  const DAY_MS = 86400000;
+  const MSK_OFFSET = 180;       // minutes: Moscow keeps UTC+3 all year — the fallback for a browser without time zones
+  const MIN_BAR = 0.04;         // share of the plot height: the shortest bar drawn
+  const ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+  /* ---------- dates: «YYYY-MM-DD» strings, arithmetic in UTC, so the machine's own time zone plays no part ---------- */
+  const utc = (iso) => {
+    const m = typeof iso === 'string' ? ISO.exec(iso) : null;
+    if (!m) return NaN;
+    const t = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return new Date(t).toISOString().slice(0, 10) === iso ? t : NaN;   // 2026-02-30 rolls over to March: not a date
+  };
+  const addDays = (iso, n) => new Date(utc(iso) + n * DAY_MS).toISOString().slice(0, 10);
+  const weekday = (iso) => (new Date(utc(iso)).getUTCDay() + 6) % 7;   // Monday = 0
+  const monthOf = (iso) => Number(iso.slice(5, 7));
+
+  // the wall clock of a moment in the forecast's time zone: { date: 'YYYY-MM-DD', time: 'H:MM' }
+  const clocks = {};
+  const zoned = (moment, tz) => {
+    try {
+      clocks[tz] = clocks[tz] || new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: '2-digit', hour12: false });
+      const p = {};
+      clocks[tz].formatToParts(moment).forEach((x) => { p[x.type] = x.value; });
+      const date = `${p.year}-${p.month}-${p.day}`;
+      const hour = Number(p.hour) % 24;   // some engines say «24» at midnight
+      const minute = String(p.minute || '').padStart(2, '0');
+      if (Number.isFinite(utc(date)) && Number.isFinite(hour) && /^\d{2}$/.test(minute)) return { date, time: `${hour}:${minute}` };
+    } catch (_) { /* no time zone data: UTC+3 below */ }
+    const t = new Date(moment.getTime() + MSK_OFFSET * 60000);
+    return { date: t.toISOString().slice(0, 10), time: `${t.getUTCHours()}:${String(t.getUTCMinutes()).padStart(2, '0')}` };
+  };
+
+  /* ---------- words ---------- */
+  const fill = (text, map) => String(text).replace(/\{(\w+)\}/g, (all, k) => (Object.prototype.hasOwnProperty.call(map, k) ? String(map[k]) : all));
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const plural = (n, forms) => {
+    const a = Math.abs(n) % 100;
+    const b = a % 10;
+    if (a > 10 && a < 20) return forms[2];
+    if (b === 1) return forms[0];
+    return b >= 2 && b <= 4 ? forms[1] : forms[2];
+  };
+  const count = (n, cfg) => `${n}${NB}${plural(n, cfg.dayForms)}`;                                // «4 дня»
+  const deg = (v) => { const n = Math.round(v); return n > 0 ? `+${n}` : n < 0 ? `${MINUS}${-n}` : '0'; };   // −0.4 -> «0»
+  const temp = (v) => `${deg(v)}${NB}°C`;
+  const dateText = (iso, cfg) => `${Number(iso.slice(8, 10))}${NB}${cfg.months[monthOf(iso) - 1]}`;   // «2 октября»
+  const dateWd = (iso, cfg) => `${dateText(iso, cfg)}, ${cfg.weekdays[weekday(iso)]}`;             // «2 октября, пт»
+
+  /* ---------- parse: the Open-Meteo answer -> [{ date, min, max, mean, precip, snow }], or an Error with the reason ---------- */
+  const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+  const parse = (json, cfg) => {
+    const fail = (why) => { throw new Error(why); };
+    if (!json || typeof json !== 'object' || Array.isArray(json)) fail('answer: not an object');
+    if (json.error) fail('answer: error');
+    if (json.timezone !== cfg.tz) fail('answer: time zone');
+    if (!isNum(json.latitude) || !isNum(json.longitude) || Math.abs(json.latitude - cfg.at[0]) > 0.5 || Math.abs(json.longitude - cfg.at[1]) > 0.5) fail('answer: place');
+    const daily = json.daily;
+    const units = json.daily_units;
+    if (!daily || typeof daily !== 'object' || !units || typeof units !== 'object') fail('answer: no daily data');
+    const time = daily.time;
+    const least = cfg.past + cfg.minDays;
+    if (!Array.isArray(time) || time.length < least || time.length > cfg.past + cfg.forecast) fail('dates: count');
+    if (units.time !== 'iso8601') fail('dates: format');
+    time.forEach((d, i) => {
+      if (!Number.isFinite(utc(d))) fail(`dates: ${i}`);
+      if (i && d !== addDays(time[i - 1], 1)) fail('dates: not in a row');
+    });
+    const col = {};
+    Object.keys(cfg.vars).forEach((k) => {
+      const name = cfg.vars[k];
+      if (units[name] !== cfg.units[name]) fail(`${name}: unit`);
+      const values = daily[name];
+      if (!Array.isArray(values) || values.length !== time.length) fail(`${name}: length`);
+      values.forEach((v) => { if (v !== null && !isNum(v)) fail(`${name}: value`); });
+      col[k] = values;
+    });
+    // a day without a temperature ends the series: the last forecast days may come empty, a gap inside may not
+    const known = (i) => col.min[i] !== null && col.max[i] !== null && col.mean[i] !== null;
+    let n = time.length;
+    while (n > 0 && !known(n - 1)) n -= 1;
+    if (n < least) fail('days: too few with data');
+    const [tLo, tHi] = cfg.limits.t;
+    const inside = (v, [lo, hi]) => v === null || (v >= lo && v <= hi);
+    const days = [];
+    for (let i = 0; i < n; i += 1) {
+      if (!known(i)) fail(`day ${i}: no temperature`);
+      const d = { date: time[i], min: col.min[i], max: col.max[i], mean: col.mean[i], precip: col.precip[i], snow: col.snow[i] };
+      if ([d.min, d.max, d.mean].some((t) => t < tLo || t > tHi)) fail(`day ${i}: temperature out of range`);
+      if (d.min > d.max || d.mean < d.min - 0.1 || d.mean > d.max + 0.1) fail(`day ${i}: min, mean, max`);
+      if (!inside(d.precip, cfg.limits.precip) || !inside(d.snow, cfg.limits.snow)) fail(`day ${i}: precipitation`);
+      days.push(d);
+    }
+    return days;
+  };
+
+  /* ---------- verdict: the rule of thumb over the days; t = the index of today ----------
+     { season, state: now | soon | early | summer | winter, from: the day it changes (index) or -1,
+       cause: cold | frost | warm | short, run: [first, last] cold spell or null, frost: first frost day or -1,
+       rebound: the first day of the warm end of the forecast (autumn) or -1 } */
+  const verdict = (days, t, cfg) => {
+    const n = days.length;
+    if (!(t >= 0 && t < n)) throw new Error('today is not in the forecast');
+    const season = cfg.seasons[String(monthOf(days[t].date))];
+    const cold = (d) => d.mean <= cfg.threshold;
+    const frosty = (d) => d.min <= cfg.frost;
+    const good = (d) => !cold(d) && !frosty(d);
+    const v = { season, state: season, from: -1, cause: '', run: null, frost: -1, rebound: -1 };
+    if (season === 'autumn') {
+      // the first spell of STREAK or more cold days that reaches today or later (it may have begun before today)
+      for (let i = 0; i < n && !v.run;) {
+        if (!cold(days[i])) { i += 1; continue; }
+        let j = i;
+        while (j + 1 < n && cold(days[j + 1])) j += 1;
+        if (j >= t && j - i + 1 >= cfg.streak) v.run = [i, j];
+        i = j + 1;
+      }
+      for (let i = t; i < n && v.frost < 0; i += 1) if (frosty(days[i])) v.frost = i;
+      const coldAt = v.run ? Math.max(v.run[0], t) : -1;
+      const at = [coldAt, v.frost].filter((i) => i >= 0);
+      if (!at.length) {
+        v.state = 'early';
+        v.cause = days.slice(t).some(cold) ? 'short' : 'warm';
+        return v;
+      }
+      v.from = Math.min(...at);
+      v.cause = v.from === coldAt ? 'cold' : 'frost';
+      v.state = v.from - t <= cfg.nowDays ? 'now' : 'soon';
+      // the forecast ends warm again: its last days, STREAK or more, above the threshold and frost-free
+      let r = n;
+      while (r > v.from + 1 && good(days[r - 1])) r -= 1;
+      if (n - r >= cfg.streak) v.rebound = r;
+      return v;
+    }
+    if (season === 'spring') {
+      // summer tyres from the day after the last cold or frosty day of the forecast, if STREAK good days follow it
+      let last = -1;
+      for (let i = t; i < n; i += 1) if (!good(days[i])) last = i;
+      const from = Math.max(t, last + 1);
+      if (n - from >= cfg.streak) {
+        v.from = from;
+        v.state = from - t <= cfg.nowDays ? 'now' : 'soon';
+        v.cause = 'warm';
+      } else {
+        v.state = 'early';
+        v.cause = days.slice(t).some(frosty) ? 'frost' : 'cold';
+      }
+    }
+    return v;
+  };
+
+  /* ---------- describe: the verdict in words — title, kicker, countdown chip, why, note, live text, message ---------- */
+  const describe = (v, days, t, cfg) => {
+    const T = cfg.texts;
+    const n = days.length;
+    const date = (i) => dateText(days[i].date, cfg);
+    const fromWord = (i) => (i === t ? T['from-today'] : i === t + 1 ? T['from-tomorrow'] : fill(T['from-date'], { date: date(i) }));
+    const onWord = (i) => (i === t ? T['on-today'] : i === t + 1 ? T['on-tomorrow'] : date(i));
+    const dayWord = (i) => (i === t ? T['day-today'] : i === t + 1 ? T['day-tomorrow'] : date(i));
+    const lowest = (key, from) => Math.min(...days.slice(from).map((d) => d[key]));
+    const highest = (key, from) => Math.max(...days.slice(from).map((d) => d[key]));
+    const neutral = v.season !== 'autumn' && v.season !== 'spring';
+    const winterish = (v.season === 'autumn' && v.state !== 'early') || (v.season === 'spring' && v.state === 'early') || v.season === 'winter';
+    const out = {
+      tone: winterish ? 'winter' : 'summer',
+      title: T[neutral ? v.season : `${v.season}-${v.state}`],
+      kick: '', chip: '', why: '', note: '',
+      message: cfg.messages[v.season === 'autumn' || v.season === 'spring' ? v.season : 'any'],
+    };
+    if (v.state === 'now') out.kick = v.from === t ? T['kick-today'] : T['kick-tomorrow'];
+    if (v.state === 'soon') {
+      out.kick = fill(T[`kick-${v.season}-soon`], { date: dateWd(days[v.from].date, cfg) });
+      out.chip = fill(T['in-days'], { n: count(v.from - t, cfg) });
+    }
+    if (v.state === 'early') out.kick = T[`kick-${v.season}-early`];
+
+    const why = [];
+    const coldText = () => {
+      const [a, b] = v.run;
+      if (a < t) return fill(T['why-cold-since'], { n: count(t - a + 1, cfg) });
+      const span = b === n - 1 ? T['till-end'] : fill(T['in-a-row'], { n: count(b - a + 1, cfg) });
+      return fill(T['why-cold-from'], { from: fromWord(a), span });
+    };
+    const frostText = (first) => fill(T[first ? 'why-frost' : 'why-frost-also'], { on: onWord(v.frost), day: dayWord(v.frost), min: temp(days[v.frost].min) });
+    if (neutral) why.push(T[`why-${v.season}`]);
+    else if (v.season === 'autumn' && v.state === 'early') why.push(v.cause === 'warm' ? fill(T['why-warm'], { n: count(n - t, cfg) }) : T['why-short']);
+    else if (v.season === 'autumn') {
+      if (v.cause === 'cold') { why.push(coldText()); if (v.frost >= 0) why.push(frostText(false)); }
+      else { why.push(frostText(true)); if (v.run) why.push(coldText()); }
+      if (v.rebound >= 0) out.note = fill(T['note-rebound'], { date: date(v.rebound), max: temp(highest('max', v.rebound)) });
+    } else if (v.state === 'early') {
+      why.push(v.cause === 'frost' ? fill(T['why-spring-frost'], { min: temp(lowest('min', t)) }) : fill(T['why-spring-cold'], { low: temp(lowest('mean', t)) }));
+    } else {
+      why.push(v.from === t ? fill(T['why-warm'], { n: count(n - t, cfg) }) : fill(T['why-warm-from'], { from: fromWord(v.from) }));
+    }
+    out.why = why.join(' ');
+    out.live = `${out.title}${out.kick ? ` ${out.kick}` : ''}${out.chip ? `, ${out.chip}` : ''}. ${out.why}`;
+    return out;
+  };
+
+  // the chart's scale: whole degrees with a degree of air, always holding the 0 °C line and the threshold
+  const scale = (days, cfg) => {
+    const lo = Math.floor(Math.min(cfg.frost, ...days.map((d) => d.min)) - 1);
+    const hi = Math.ceil(Math.max(cfg.threshold, ...days.map((d) => d.max)) + 1);
+    return { lo, hi, at: (x) => Math.round(((x - lo) / (hi - lo)) * 10000) / 10000 };
+  };
+
+  G.pogoda = { parse, verdict, describe, scale, zoned, temp, deg, dateText, dateWd, plural, addDays, fill };
+
+  /* ============================================================ the section ============================================================ */
+  const root = document.querySelector('[data-pogoda]');
+  if (!root) return;
+  let cfg = null;
+  try { cfg = JSON.parse(document.getElementById('pogoda-data').textContent); } catch (_) { cfg = null; }
+  if (!cfg || typeof cfg !== 'object' || !cfg.texts || !cfg.url) { root.dataset.pgError = 'config'; return; }   // the rule of thumb stays
+  const T = cfg.texts;
+  const $ = (s) => root.querySelector(s);
+  const el = {
+    status: $('[data-pg-status]'), rule: $('[data-pg-rule]'), face: $('[data-pg-face]'), verdict: $('[data-pg-verdict]'), title: $('[data-pg-title]'),
+    kick: $('[data-pg-kick]'), chip: $('[data-pg-chip]'), chipText: $('[data-pg-chip-text]'), why: $('[data-pg-why]'),
+    note: $('[data-pg-note]'), book: $('[data-pg-book]'), plot: $('[data-pg-plot]'), list: $('[data-pg-days]'),
+    msg: $('[data-pg-msg]'), msgText: $('[data-pg-msg-text]'), retry: $('[data-pg-retry]'), updated: $('[data-pg-updated]'),
+    live: $('[data-pg-live]'), snow: $('.pogoda-key--snow svg'),
+  };
+  if (Object.keys(el).some((k) => !el[k])) { root.dataset.pgError = 'markup'; return; }
+
+  const reduced = () => !!G.reducedMotion;
+  let shownAt = 0;              // when the forecast on screen was fetched (ms), 0 = nothing shown
+  let shownDay = '';            // the Moscow day it was shown for
+  let busy = false;
+  let said = '';
+  let asked = false;            // the visitor started this load («Попробовать ещё раз», the network came back)
+  let refocus = false;          // «Попробовать ещё раз» was pressed: the keyboard focus follows the result
+
+  const make = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  // the live region speaks when the visitor asked for the result or is looking at the section — not when the
+  // forecast quietly arrives while the section is still 600px away
+  const inView = () => { const r = root.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
+  const announce = (text) => {
+    if (!text || text === said || !(asked || inView())) return;
+    said = text;
+    el.live.textContent = text;
+  };
+  // after «Попробовать ещё раз» the focus follows the result — unless the visitor has moved it somewhere else meanwhile
+  const follow = (target) => {
+    if (!refocus) return;
+    refocus = false;
+    if ([el.retry, el.msgText, document.body, null].includes(document.activeElement)) target.focus({ preventScroll: true });
+  };
+  // the status line breaks only between its parts («Нижний Новгород · прогноз на 10 дней»), never inside one
+  const setStatus = (text) => {
+    el.status.textContent = '';
+    text.split(' · ').forEach((part, i) => {
+      if (i) el.status.append(' · ');
+      el.status.append(make('span', 'pogoda-card__part', part));
+    });
+  };
+  const seasonNow = () => cfg.seasons[String(monthOf(zoned(new Date(), cfg.tz).date))];
+  const setMessage = (season) => { el.book.dataset.preset = JSON.stringify({ message: cfg.messages[season === 'autumn' || season === 'spring' ? season : 'any'] }); };
+
+  /* ---------- storage ---------- */
+  const readCache = () => {
+    try {
+      const c = JSON.parse(localStorage.getItem(cfg.cacheKey) || 'null');
+      return c && typeof c === 'object' && isNum(c.t) && typeof c.day === 'string' && c.json && typeof c.json === 'object' ? c : null;
+    } catch (_) { return null; }
+  };
+  const writeCache = (entry) => {
+    try { localStorage.setItem(cfg.cacheKey, JSON.stringify(entry)); } catch (_) { /* full or blocked: the next visit asks again */ }
+  };
+
+  /* ---------- the request: a timeout, no cookies, no referrer ---------- */
+  const request = async () => {
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    let timer = 0;
+    const late = new Promise((_, reject) => { timer = setTimeout(() => { if (ctl) ctl.abort(); reject(new Error('timeout')); }, cfg.timeout); });
+    try {
+      const res = await Promise.race([fetch(cfg.url, { signal: ctl ? ctl.signal : undefined, credentials: 'omit', referrerPolicy: 'no-referrer' }), late]);
+      if (!res.ok) throw new Error(`http ${res.status}`);
+      const json = await Promise.race([res.json(), late]);
+      // only what the section reads is kept (and stored)
+      return json && typeof json === 'object'
+        ? { timezone: json.timezone, latitude: json.latitude, longitude: json.longitude, daily_units: json.daily_units, daily: json.daily, error: json.error }
+        : json;
+    } catch (e) {
+      if (e && e.name === 'AbortError') throw new Error('timeout');
+      if (e && e.name === 'SyntaxError') throw new Error('answer: not JSON');   // WebKit: a DOMException of that name
+      throw e instanceof Error && /^(timeout|http |answer)/.test(e.message) ? e : new Error('network');
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  /* ---------- drawing ---------- */
+  const label = (value) => {
+    const s = make('span');
+    s.append(deg(value), make('span', 'pogoda-day__deg', '°'));
+    return s;
+  };
+
+  const drawDays = (days, t, v) => {
+    const first = Math.max(0, t - cfg.past);
+    const list = days.slice(first, t + cfg.forecast);
+    const sc = scale(list, cfg);
+    el.plot.style.setProperty('--p0', String(sc.at(cfg.frost)));
+    el.plot.style.setProperty('--pb', String(sc.at(cfg.band)));
+    el.plot.style.setProperty('--pt', String(sc.at(cfg.threshold)));
+    const run = v.season === 'autumn' && v.run ? [Math.max(v.run[0], first), v.run[1]] : (v.season === 'spring' && v.from >= 0 ? [v.from, days.length - 1] : null);
+    const frag = document.createDocumentFragment();
+    list.forEach((d, k) => {
+      const i = first + k;
+      const snow = d.snow !== null && d.snow >= cfg.snowMin;
+      const frost = d.min <= cfg.frost;
+      const li = make('li', ['pogoda-day', i < t ? 'is-past' : '', i === t ? 'is-today' : '', d.mean <= cfg.threshold ? 'is-cold' : '',
+        frost ? 'is-frost' : '', snow ? 'is-snow' : '', run && i >= run[0] && i <= run[1] ? 'is-run' : '', i === v.from ? 'is-from' : ''].filter(Boolean).join(' '));
+      const lo = sc.at(d.min);
+      const hi = sc.at(d.max);
+      const mid = (lo + hi) / 2;
+      const half = Math.max(hi - lo, MIN_BAR) / 2;   // a day with min ≈ max still shows a short capsule
+      li.style.setProperty('--lo', String(lo));
+      li.style.setProperty('--hi', String(hi));
+      li.style.setProperty('--blo', String(Math.round((mid - half) * 10000) / 10000));
+      li.style.setProperty('--bhi', String(Math.round((mid + half) * 10000) / 10000));
+      li.style.setProperty('--mean', String(sc.at(d.mean)));
+      li.style.setProperty('--i', String(k));
+      // the plot part of the day: bar, mean, labels; the date row under it
+      const box = make('span', 'pogoda-day__plot');
+      const max = make('span', 'pogoda-day__max');
+      max.append(label(d.max));
+      const min = make('span', 'pogoda-day__min');
+      min.append(label(d.min));
+      box.append(make('span', 'pogoda-day__bar'), make('span', 'pogoda-day__dot'), max, min);
+      if (snow) { const flake = el.snow.cloneNode(true); flake.setAttribute('class', 'ic pogoda-snow pogoda-day__snow'); box.append(flake); }
+      const when = make('span', 'pogoda-day__date');
+      when.append(make('span', 'pogoda-day__wd', cfg.weekdays[weekday(d.date)]));
+      if (i === t) when.append(make('span', 'pogoda-day__now', T.today));   // in the weekday's place where there is room
+      when.append(make('span', 'pogoda-day__dn', String(Number(d.date.slice(8, 10)))));
+      box.setAttribute('aria-hidden', 'true');
+      when.setAttribute('aria-hidden', 'true');
+      li.append(box, when);
+      if (i < t) li.setAttribute('aria-hidden', 'true');   // the past days are the trend for the eye; the words say it
+      else {
+        let marks = frost ? T['sr-frost'] : '';
+        if (snow) marks += T['sr-snow'];
+        else if (d.precip !== null && d.precip >= cfg.precipMin) marks += fill(T['sr-precip'], { mm: Math.round(d.precip) });
+        const day = i === t ? fill(T['sr-today'], { date: dateText(d.date, cfg) }) : `${cap(cfg.weekdaysFull[weekday(d.date)])}, ${dateText(d.date, cfg)}`;
+        li.append(make('span', 'sr-only', fill(T['sr-day'], { day, min: temp(d.min), max: temp(d.max), mean: temp(d.mean), marks })));
+      }
+      frag.append(li);
+    });
+    el.plot.classList.remove('is-drawn');
+    el.list.textContent = '';
+    el.list.append(frag);
+    el.list.hidden = false;
+    // the bars grow in from the next frame (CSS transitions); with reduced motion they are simply there
+    if (reduced()) el.plot.classList.add('is-drawn');
+    else requestAnimationFrame(() => requestAnimationFrame(() => el.plot.classList.add('is-drawn')));
+  };
+
+  /* ---------- states ---------- */
+  const setLoading = () => {
+    root.dataset.state = 'loading';
+    setStatus(T['status-loading']);
+    el.msgText.textContent = T['msg-loading'];
+    el.msg.hidden = false;
+    // the retry button goes away while loading: the keyboard focus waits on the message instead of falling to the page
+    if (document.activeElement === el.retry) el.msgText.focus({ preventScroll: true });
+    el.retry.hidden = true;
+  };
+
+  const setError = (reason) => {
+    root.dataset.state = 'error';
+    root.dataset.tone = 'neutral';
+    delete root.dataset.verdict;
+    shownAt = 0;
+    setStatus(T['status-error']);
+    el.rule.hidden = false;
+    el.face.hidden = true;
+    el.list.hidden = true;
+    el.list.textContent = '';
+    el.updated.textContent = '';
+    el.msgText.textContent = reason === 'offline' ? T['msg-offline'] : T['msg-error'];
+    el.msg.hidden = false;
+    el.retry.hidden = false;
+    setMessage(seasonNow());
+    announce(`${T['status-error']}.`);
+    follow(el.retry);
+  };
+
+  // entry: { t: fetched at (ms), day: the Moscow day of fetching, json }; stale: an older forecast after a failure
+  const show = (entry, stale) => {
+    let days;
+    try { days = parse(entry.json, cfg); } catch (e) { root.dataset.pgError = e.message; return false; }
+    const today = zoned(new Date(), cfg.tz).date;
+    // a fresh answer: Open-Meteo's own «today» follows the past days; an old one: find today in it
+    const t = stale ? days.findIndex((d) => d.date === today) : cfg.past;
+    if (t < 0 || days.length - t < cfg.minDays) { root.dataset.pgError = 'days: today is missing'; return false; }
+    const v = verdict(days, t, cfg);
+    const words = describe(v, days, t, cfg);
+    root.dataset.state = stale ? 'stale' : 'ready';
+    root.dataset.tone = words.tone;
+    root.dataset.verdict = `${v.season}-${v.state}`;
+    const fetched = zoned(new Date(entry.t), cfg.tz);
+    setStatus(stale
+      ? fill(T['status-stale'], { when: `${dateText(fetched.date, cfg)}, ${fetched.time}` })
+      : fill(T['status-ready'], { n: count(days.length - t, cfg) }));
+    el.rule.hidden = true;
+    el.face.hidden = false;
+    el.title.textContent = words.title;
+    el.kick.textContent = words.kick;
+    el.kick.hidden = !words.kick;
+    el.chipText.textContent = words.chip;
+    el.chip.hidden = !words.chip;
+    el.why.textContent = words.why;
+    el.note.textContent = words.note;
+    el.note.hidden = !words.note;
+    el.book.dataset.preset = JSON.stringify({ message: words.message });
+    el.msg.hidden = true;
+    el.retry.hidden = true;
+    el.updated.textContent = stale
+      ? fill(T['updated-stale'], { when: `${dateText(fetched.date, cfg)}, ${fetched.time}` })
+      : fill(T.updated, { time: fetched.time });
+    drawDays(days, t, v);
+    shownAt = entry.t;
+    shownDay = today;
+    announce(words.live);
+    follow(el.verdict);
+    return true;
+  };
+
+  // quiet: a refresh of what is already on screen — no «loading», and a failure keeps the old forecast
+  const load = async ({ force = false, quiet = false } = {}) => {
+    if (busy) return;
+    busy = true;
+    const now = Date.now();
+    const day = zoned(new Date(now), cfg.tz).date;
+    const cached = readCache();
+    const age = cached ? now - cached.t : Infinity;
+    try {
+      if (!force && cached && cached.day === day && age >= 0 && age < cfg.cacheMinutes * 60000 && show(cached, false)) return;
+      if (typeof fetch !== 'function') throw new Error('no fetch');
+      if (navigator.onLine === false) throw new Error('offline');
+      if (!quiet) setLoading();
+      const json = await request();
+      parse(json, cfg);   // a broken answer is neither shown nor stored
+      const entry = { t: Date.now(), day, json };
+      if (!show(entry, false)) throw new Error(root.dataset.pgError || 'draw');
+      writeCache(entry);
+      delete root.dataset.pgError;
+    } catch (e) {
+      const reason = e && e.message ? e.message : 'network';
+      root.dataset.pgError = reason;
+      if (quiet && shownAt) return;   // keep the forecast on screen, try again at the next look
+      // an earlier forecast (up to STALE_HOURS old) is better than none: shown with its time
+      if (cached && age >= 0 && age < cfg.staleHours * 3600000 && show(cached, true)) return;
+      setError(reason);
+    } finally {
+      busy = false;
+      asked = false;
+    }
+  };
+
+  el.retry.addEventListener('click', () => {
+    asked = true;
+    refocus = document.activeElement === el.retry || document.activeElement === document.body;   // Safari: a clicked button takes no focus
+    load({ force: true });
+  });
+  addEventListener('online', () => { if (root.dataset.state === 'error') { asked = true; load({ force: true }); } });
+  // a tab left open: at the next look a forecast older than the cache time, or of yesterday, is refreshed quietly
+  const revisit = () => {
+    if (document.visibilityState === 'hidden' || !shownAt) return;
+    if (Date.now() - shownAt > cfg.cacheMinutes * 60000 || zoned(new Date(), cfg.tz).date !== shownDay) load({ quiet: true });
+  };
+  document.addEventListener('visibilitychange', revisit);
+  addEventListener('pageshow', (e) => { if (e.persisted) revisit(); });
+
+  const start = () => {
+    setMessage(seasonNow());
+    load();
+  };
+  if (!('IntersectionObserver' in window)) { start(); return; }
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some((en) => en.isIntersecting)) { io.disconnect(); start(); }
+  }, { rootMargin: '600px 0px' });
+  io.observe(root);
+})();
+
+/* ============================================================
+   «Что сказал мастер?» — the glossary page /slovar/ (markup and texts in build/slovar.py).
+   Instant search over the names, other names and texts: ё = е, hyphens and spaces do not matter, Russian
+   endings are forgiven («сайлентблоки»), a typo or a wrong keyboard layout still finds the word; filters by
+   system and by letter; deep links #<term> reveal the term and light it up; the call-back modal gets the term
+   (or the word that was not found) in its message. Only events: no loops, just two short debounces — the
+   screen-reader announcement and the ?q= in the address bar.
+   ============================================================ */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-gl]');
+  if (!root) return;
+  const G = window.G || {};
+  const $ = (s, r = root) => r.querySelector(s);
+  const $$ = (s, r = root) => Array.from(r.querySelectorAll(s));
+
+  const input = $('[data-gl-q]');
+  const form = $('[data-gl-form]');
+  const clearBtn = $('[data-gl-clear]');
+  const status = $('[data-gl-status]');
+  const live = $('[data-gl-live]');
+  const catBar = $('[data-gl-cats]');
+  const abcBar = $('[data-gl-abc]');
+  const empty = $('[data-gl-empty]');
+  const more = $('[data-gl-more]');
+  const list = $('.gl__list');
+  const bar = $('.gl-bar');
+  const header = document.querySelector('[data-header]');
+  const sections = $$('[data-gl-section]');
+  const chips = $$('[data-cat]', catBar);
+  const letterBtns = $$('[data-letter]', abcBar);
+  const ctas = $$('[data-gl-cta]', document);
+  const notes = $$('[data-gl-cta-note]', document);
+  if (!input || !form || !status || !list || !sections.length) return;
+  const narrow = matchMedia('(max-width: 1099px)');   // the search bar sticks on its own (slovar.css)
+  const MAX_Q = 80;
+  const MSG = 'Хочу записаться на диагностику';
+
+  /* ---------- text: lower case, ё = е, only letters and digits (and where each of them stood) ---------- */
+  const ALNUM = /[0-9a-zа-я]/;
+  const lower = (s) => {
+    let out = '';
+    for (let i = 0; i < s.length; i += 1) {
+      const c = s[i].toLowerCase();
+      out += c.length === 1 ? c : s[i];   // one character in, one out: positions stay comparable
+    }
+    return out.replace(/ё/g, 'е');
+  };
+  const squeeze = (s) => {
+    const low = lower(s);
+    let text = '';
+    const at = [];
+    for (let i = 0; i < low.length; i += 1) if (ALNUM.test(low[i])) { text += low[i]; at.push(i); }
+    return { text, at };
+  };
+  const words = (s) => lower(s).replace(/[^0-9a-zа-я]+/g, ' ').trim().split(' ').filter(Boolean);
+  // «что такое гур в автомобиле» → «гур»
+  const STOP = new Set(['что', 'такое', 'это', 'значит', 'означает', 'как', 'где', 'зачем', 'почему', 'какой', 'какая', 'какие',
+    'в', 'во', 'на', 'и', 'или', 'по', 'для', 'с', 'со', 'у', 'а', 'ли', 'же', 'не', 'мне', 'мастер', 'сказал', 'сказали', 'говорит',
+    'машина', 'машины', 'машине', 'автомобиль', 'автомобиля', 'автомобиле', 'авто', 'расшифровка']);
+  const tokens = (q) => { const all = words(q); const kept = all.filter((w) => !STOP.has(w)); return kept.length ? kept : all; };
+  // Russian endings: «сайлентблоки» finds «сайлентблок», «шаровые» — «шаровая», «колодок» — «колодки»
+  const variants = (w) => (w.length >= 6 ? [w, w.slice(0, -1), w.slice(0, -2)] : w.length === 5 ? [w, w.slice(0, -1)] : [w]);
+
+  /* ---------- a wrong keyboard layout: «cfqktyn» is «сайлент» ---------- */
+  const EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+  const RU = 'йцукенгшщзхъфывапролджэячсмитьбюё';
+  const SWAP = new Map([...EN].map((c, i) => [c, RU[i]]).concat([...RU].map((c, i) => [c, EN[i]])));
+  const swapLayout = (q) => Array.from(q.toLowerCase(), (c) => SWAP.get(c) || c).join('');
+
+  /* ---------- typos: optimal string alignment distance, stops as soon as it exceeds the limit ---------- */
+  const distance = (a, b, limit) => {
+    if (Math.abs(a.length - b.length) > limit) return limit + 1;
+    let before = null;
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i += 1) {
+      const cur = [i];
+      let best = i;
+      for (let j = 1; j <= b.length; j += 1) {
+        let v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (before && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, before[j - 2] + 1);
+        cur.push(v);
+        if (v < best) best = v;
+      }
+      if (best > limit) return limit + 1;
+      before = prev;
+      prev = cur;
+    }
+    return prev[b.length];
+  };
+  // the typed word against the start of a name word: «салентбл» still meets «сайлентблок»
+  const near = (w, word) => {
+    if (w.length < 4) return false;
+    const k = w.length <= 5 ? 1 : 2;
+    for (let n = Math.max(1, w.length - 1); n <= Math.min(word.length, w.length + 1); n += 1) {
+      if (distance(w, word.slice(0, n), k) <= k) return true;
+    }
+    return false;
+  };
+
+  /* ---------- the terms, read once from the page ---------- */
+  const catName = {};
+  sections.forEach((s) => { catName[s.dataset.glSection] = s.querySelector('.gl-cat__h').textContent.trim(); });
+  const terms = $$('.gl-term').map((el) => {
+    let refs = [];
+    try { refs = el.dataset.refs ? JSON.parse(el.dataset.refs) : []; } catch (_) { refs = []; }
+    const fields = $$('[data-f]', el).map((f) => {
+      const text = f.textContent;
+      return { el: f, name: f.dataset.f === 'n', text, sq: squeeze(text), marked: false };
+    });
+    const names = [...fields.filter((f) => f.name).map((f) => f.text), ...refs];
+    const nameWords = names.flatMap(words);
+    return {
+      el,
+      id: el.id,
+      cat: el.dataset.cat,
+      name: el.querySelector('.gl-term__name').textContent.trim(),
+      section: el.closest('[data-gl-section]'),
+      fields,
+      hay: squeeze([...fields.map((f) => f.text), ...refs, catName[el.dataset.cat] || ''].join(' ')).text,
+      namesHay: squeeze(names.join(' ')).text,
+      nameWords,
+      letters: (el.dataset.l || '').split(' ').filter(Boolean),
+    };
+  });
+  const byId = new Map(terms.map((t) => [t.id, t]));
+  const sectionIds = new Set(sections.map((s) => s.id));
+
+  /* ---------- matching ---------- */
+  // one or two letters are the start of a name («то» → «ТО», «ша» → «Шаровая опора»); longer words match anywhere in a
+  // name, another name or a cross-reference (inName), or anywhere in the entry (hitWord)
+  const inName = (t, w) => (w.length <= 2 ? t.nameWords.some((x) => x.startsWith(w)) : variants(w).some((v) => t.namesHay.includes(v)));
+  const hitWord = (t, w) => (w.length <= 2 ? inName(t, w) : variants(w).some((v) => t.hay.includes(v)));
+  const strict = (toks) => terms.filter((t) => toks.every((w) => hitWord(t, w)));
+  const named = (t, toks) => toks.every((w) => inName(t, w));
+  const fuzzy = (toks) => terms.filter((t) => toks.every((w) => hitWord(t, w) || t.nameWords.some((x) => near(w, x))));
+  const find = (q) => {
+    const toks = tokens(q);
+    if (!toks.length) return null;
+    let hits = strict(toks);
+    if (hits.length) {
+      // precision first: «ремень» shows the two terms called so; the thirteen that only mention it wait behind «ещё»
+      const best = hits.filter((t) => named(t, toks));
+      const rest = best.length ? hits.filter((t) => !best.includes(t)) : [];
+      return { hits: best.length ? best : hits, rest, toks, mode: 'exact' };
+    }
+    const alt = swapLayout(q);
+    const altToks = lower(alt) !== lower(q) ? tokens(alt) : [];
+    if (altToks.length) {
+      hits = strict(altToks);
+      if (hits.length) return { hits, toks: altToks, mode: 'layout', shown: alt.trim() };
+    }
+    hits = fuzzy(toks);
+    if (hits.length) return { hits, toks, mode: 'fuzzy' };
+    if (altToks.length) {
+      hits = fuzzy(altToks);
+      if (hits.length) return { hits, toks: altToks, mode: 'layout', shown: alt.trim() };
+    }
+    return { hits: [], toks, mode: 'none' };
+  };
+
+  /* ---------- highlight what was found ---------- */
+  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
+  const ranges = (f, toks) => {
+    const out = [];
+    toks.forEach((w) => {
+      if (w.length <= 2) {
+        if (!f.name) return;   // short words: only at the start of a word of a name
+        const low = lower(f.text);
+        for (let i = low.indexOf(w); i !== -1; i = low.indexOf(w, i + 1)) {
+          if (i === 0 || !ALNUM.test(low[i - 1])) out.push([i, i + w.length]);
+        }
+        return;
+      }
+      const v = variants(w).find((x) => f.sq.text.includes(x));
+      if (!v) return;
+      for (let i = f.sq.text.indexOf(v); i !== -1; i = f.sq.text.indexOf(v, i + v.length)) {
+        out.push([f.sq.at[i], f.sq.at[i + v.length - 1] + 1]);   // hyphens and spaces inside a match are marked too
+      }
+    });
+    return out.sort((a, b) => a[0] - b[0]);
+  };
+  const paint = (f, toks) => {
+    const found = toks ? ranges(f, toks) : [];
+    if (!found.length) {
+      if (f.marked) { f.el.textContent = f.text; f.marked = false; }
+      return;
+    }
+    let html = '';
+    let pos = 0;
+    found.forEach(([s, e]) => {
+      if (e <= pos) return;
+      const from = Math.max(s, pos);
+      html += `${esc(f.text.slice(pos, from))}<mark>${esc(f.text.slice(from, e))}</mark>`;
+      pos = e;
+    });
+    f.el.innerHTML = html + esc(f.text.slice(pos));
+    f.marked = true;
+  };
+
+  /* ---------- state and painting ---------- */
+  const state = { q: '', cat: '', letter: '', more: false };
+  let shown = terms;
+  let current = null;   // the term the call-back message is about
+  let lit = null;
+  const plural = (n, one, few, many) => {
+    const a = Math.abs(n) % 100;
+    const b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b === 1) return one;
+    return b >= 2 && b <= 4 ? few : many;
+  };
+  const termsWord = (n) => `${n} ${plural(n, 'термин', 'термина', 'терминов')}`;
+  const letterLabel = (L) => (L === 'latin' ? 'латиницей' : `на «${L.toUpperCase()}»`);
+  const setText = (el, text) => { if (el && el.textContent !== text) el.textContent = text; };
+  const letterFits = (L, cat) => terms.some((t) => t.letters.includes(L) && (!cat || t.cat === cat));
+
+  let liveTimer = 0;
+  const announce = (text) => {
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(() => { if (live) live.textContent = text; }, 450);
+  };
+
+  const syncTabStops = (buttons) => {
+    const usable = buttons.filter((b) => !b.disabled);
+    const stop = usable.find((b) => b.getAttribute('aria-pressed') === 'true') || usable[0];
+    buttons.forEach((b) => { b.tabIndex = b === stop ? 0 : -1; });
+  };
+
+  const defaults = new Map(ctas.map((a) => {
+    let message = MSG + '.';
+    try { message = JSON.parse(a.dataset.preset || '{}').message || message; } catch (_) { /* the default above */ }
+    return [a, message];
+  }));
+  const updateCta = () => {
+    const q = state.q.trim();
+    const single = shown.length === 1 && (q || state.letter) ? shown[0] : null;
+    const t = single || (current && !current.el.hidden ? current : null);
+    ctas.forEach((a) => {
+      let message = defaults.get(a);
+      if (a.dataset.glCta === 'query' && q) message = `${MSG}. Не нашлось в словаре на сайте: «${q}».`;
+      else if (t) message = `${MSG}. Интересует: «${t.name}» (из словаря автомеханика на сайте).`;
+      a.dataset.preset = JSON.stringify({ message });
+    });
+    notes.forEach((n) => {
+      n.hidden = !t;
+      if (t) setText(n, `В комментарий к звонку добавим: «${t.name}»`);
+    });
+  };
+
+  // the status line: what is on the screen and why
+  const statusFor = (result, hiddenRest) => {
+    if (!shown.length) return 'Ничего не нашлось';
+    if (result) {
+      let text = `Найдено: ${shown.length}`;
+      if (state.cat) text += ` в разделе «${catName[state.cat]}»`;
+      if (hiddenRest) text += ` · ещё ${hiddenRest} в текстах`;
+      if (result.mode === 'fuzzy') text += ' · похожие по написанию';
+      if (result.mode === 'layout') text += ` · раскладка: «${result.shown}»`;
+      return text;
+    }
+    if (state.letter) return `${termsWord(shown.length)} ${letterLabel(state.letter)}`;
+    if (state.cat) return `${catName[state.cat]}: ${termsWord(shown.length)}`;
+    return termsWord(terms.length);
+  };
+
+  const apply = () => {
+    const q = state.q.trim();
+    const result = q ? find(q) : null;
+    const inCat = (t) => !state.cat || t.cat === state.cat;
+    // what matches: every term for the word (named and mentioned), or the letter, or everything
+    const matches = result ? result.hits.concat(result.rest || [])
+      : state.letter ? terms.filter((t) => t.letters.includes(state.letter)) : terms;
+    // what is shown: the named ones first; the mentions too after «ещё», or when the system has no named one
+    const expand = !result || state.more || !result.hits.some(inCat);
+    const pick = new Set((expand ? matches : result.hits).map((t) => t.id));
+    shown = terms.filter((t) => pick.has(t.id) && inCat(t));
+    const hiddenRest = expand ? 0 : (result.rest || []).filter(inCat).length;
+    const marks = result && matches.length ? result.toks : null;
+    const on = new Set(shown.map((t) => t.id));
+    terms.forEach((t) => {
+      const visible = on.has(t.id);
+      if (t.el.hidden === visible) t.el.hidden = !visible;
+      if (visible) t.fields.forEach((f) => paint(f, marks));
+    });
+    const filtered = !!(result || state.letter || state.cat);
+    sections.forEach((s) => {
+      const key = s.dataset.glSection;
+      const n = shown.filter((t) => t.cat === key).length;
+      if (s.hidden !== (n === 0)) s.hidden = n === 0;
+      const count = s.querySelector('[data-gl-count]');
+      const total = Number(count.dataset.total);
+      setText(count, filtered && n !== total ? `${n} из ${total}` : termsWord(total));
+    });
+    // a system's count is every match in it, so a system with only mentions is not shown as empty
+    const perCat = new Map();
+    matches.forEach((t) => perCat.set(t.cat, (perCat.get(t.cat) || 0) + 1));
+    chips.forEach((b) => {
+      const key = b.dataset.cat;
+      const n = key ? perCat.get(key) || 0 : matches.length;
+      b.setAttribute('aria-pressed', String(key === state.cat));
+      b.classList.toggle('is-empty', n === 0);
+      setText(b.querySelector('[data-n]'), String(n));
+    });
+    letterBtns.forEach((b) => {
+      const L = b.dataset.letter;
+      b.setAttribute('aria-pressed', String(L === state.letter));
+      b.disabled = L !== state.letter && !letterFits(L, state.cat);
+    });
+    syncTabStops(chips);
+    syncTabStops(letterBtns);
+
+    const text = statusFor(result, hiddenRest);
+    setText(status, text);
+    if (more) {
+      more.hidden = !hiddenRest;
+      const label = hiddenRest ? `Ещё ${termsWord(hiddenRest)}, где упоминается «${q}»` : '';
+      if (more.dataset.label !== label) {
+        more.dataset.label = label;
+        more.innerHTML = label ? `<svg class="ic" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span>${esc(label)}</span>` : '';
+      }
+    }
+    root.classList.toggle('is-query', !!result);
+    root.classList.toggle('is-searching', !!(result || state.letter));
+    root.classList.toggle('is-empty', !shown.length);
+    if (empty) empty.hidden = shown.length > 0;
+    if (clearBtn) clearBtn.hidden = !input.value;
+    updateCta();
+    return text;
+  };
+
+  /* ---------- keep the list in sight after a filter changes ---------- */
+  // the bar sticks under the header on phones in portrait (slovar.css); elsewhere only the header covers the page.
+  // Heights, not positions: right after the list shrinks and the scroll is clamped, WebKit reports a sticky
+  // element's position from before the clamp (the header's bottom came back as −2046 px).
+  const barSticks = () => !!bar && getComputedStyle(bar).position === 'sticky';
+  const coverBottom = () => (header ? header.offsetHeight : 0) + (barSticks() ? bar.offsetHeight : 0);
+  const toListTop = (evenIfBelow) => {
+    requestAnimationFrame(() => {
+      const top = list.getBoundingClientRect().top;
+      const limit = coverBottom() + 12;
+      if (top < limit - 1 || (evenIfBelow && top > innerHeight * 0.75)) {
+        scrollTo({ top: Math.max(0, scrollY + top - limit), behavior: 'instant' });
+      }
+    });
+  };
+
+  /* ---------- the search in the address bar: /slovar/?q=граната ---------- */
+  let urlTimer = 0;
+  const syncUrl = () => {
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(() => {
+      try {
+        const u = new URL(location.href);
+        const q = state.q.trim();
+        if (q) u.searchParams.set('q', q); else u.searchParams.delete('q');
+        if (u.href !== location.href) history.replaceState(history.state, '', u.href);
+      } catch (_) { /* a sandboxed frame or too many updates: the address stays as it was */ }
+    }, 700);
+  };
+
+  /* ---------- deep links: /slovar/#grm, the index, «См. также» ---------- */
+  const targetOf = (id) => {
+    const t = byId.get(id);
+    if (t) return { el: t.el, term: t, hidden: t.el.hidden || t.section.hidden };
+    if (!sectionIds.has(id)) return null;
+    const el = document.getElementById(id);
+    return { el, term: null, hidden: el.hidden };
+  };
+  const clearFilters = () => {
+    state.q = '';
+    state.cat = '';
+    state.letter = '';
+    input.value = '';
+    syncUrl();
+    return apply();
+  };
+  // a filtered-out term must be visible before the browser (or this script) scrolls to it
+  const reveal = (id) => {
+    const target = targetOf(id);
+    if (target && target.hidden) clearFilters();
+    return target;
+  };
+  // the lamp flickers on when the term arrives on screen, not while a long smooth scroll is still carrying it there
+  let arrival = null;
+  const switchOn = (el) => {
+    el.classList.remove('is-lit');
+    void el.offsetWidth;   // restart the lamp when the same term is opened again
+    el.classList.add('is-lit');
+  };
+  const light = (t) => {
+    if (lit && lit !== t.el) lit.classList.remove('is-lit');
+    lit = t.el;
+    if (arrival) { arrival.disconnect(); arrival = null; }
+    if (!('IntersectionObserver' in window)) { switchOn(t.el); return; }
+    t.el.classList.remove('is-lit');
+    arrival = new IntersectionObserver((entries) => {
+      if (!entries.some((en) => en.isIntersecting)) return;
+      arrival.disconnect();
+      arrival = null;
+      switchOn(t.el);
+    }, { threshold: Math.min(0.9, (innerHeight * 0.5) / Math.max(1, t.el.offsetHeight)) });   // a tall term: half a screen of it
+    arrival.observe(t.el);
+  };
+  // scroll: 'smooth' after a click, 'instant' on load; without it only a term that was filtered out is scrolled to
+  const openHash = (scroll) => {
+    let id = '';
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (_) { return; }
+    const target = id ? reveal(id) : null;
+    if (!target) return;
+    if (scroll || target.hidden) {
+      target.el.scrollIntoView({ block: 'start', behavior: scroll === 'instant' || G.reducedMotion ? 'instant' : 'smooth' });
+    }
+    if (target.term) {
+      current = target.term;
+      light(target.term);
+      updateCta();
+      announce(`${target.term.name}.`);
+    }
+  };
+  addEventListener('hashchange', () => openHash(false));
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    let id = '';
+    try { id = decodeURIComponent(a.getAttribute('href').slice(1)); } catch (_) { return; }
+    if (!byId.has(id) && !sectionIds.has(id)) return;
+    reveal(id);
+    // the same hash again: the browser scrolls, but there is no hashchange to light the term
+    if (location.hash === `#${a.getAttribute('href').slice(1)}`) requestAnimationFrame(() => openHash(false));
+  });
+
+  /* ---------- search ---------- */
+  input.addEventListener('input', () => {
+    state.q = input.value.slice(0, MAX_Q);
+    state.more = false;
+    if (state.q.trim()) state.letter = '';
+    announce(apply());
+    toListTop(false);
+    syncUrl();
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !input.value) return;
+    e.preventDefault();
+    input.value = '';
+    state.q = '';
+    announce(apply());
+    syncUrl();
+  });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (shown.length === 1 && state.q.trim()) {   // Enter with one answer opens it
+      const id = shown[0].id;
+      if (location.hash === `#${id}`) openHash('smooth'); else location.hash = id;
+      return;
+    }
+    if (!G.canHover) input.blur();   // a phone: put the keyboard away and show the answers
+    toListTop(true);
+  });
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      state.q = '';
+      announce(apply());
+      syncUrl();
+      input.focus();
+    });
+  }
+
+  const reset = empty && empty.querySelector('[data-gl-reset]');
+  if (reset) {
+    reset.addEventListener('click', () => {
+      announce(clearFilters());
+      input.focus({ preventScroll: true });
+      toListTop(false);
+    });
+  }
+
+  if (more) {
+    more.addEventListener('click', () => {
+      const before = new Set(shown.map((t) => t.id));
+      state.more = true;
+      announce(apply());
+      // the mentions come in among the named terms: bring the first of them into view and give it the focus
+      const added = shown.find((t) => !before.has(t.id));
+      if (added) {
+        added.el.scrollIntoView({ block: 'start', behavior: 'instant' });
+        added.el.focus({ preventScroll: true });
+      }
+    });
+  }
+
+  /* ---------- systems and letters ---------- */
+  catBar.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cat]');
+    if (!b) return;
+    const key = b.dataset.cat;
+    state.cat = key && state.cat !== key ? key : '';   // the pressed system again shows every system
+    if (state.letter && !letterFits(state.letter, state.cat)) state.letter = '';
+    announce(apply());
+    toListTop(true);
+  });
+  abcBar.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-letter]');
+    if (!b || b.disabled) return;
+    const L = b.dataset.letter;
+    state.letter = state.letter === L ? '' : L;
+    if (state.letter && input.value) {
+      input.value = '';
+      state.q = '';
+      syncUrl();
+    }
+    announce(apply());
+    toListTop(true);
+  });
+  // a toolbar is one Tab stop; the arrows, Home and End move inside it
+  const rove = (group, buttons) => {
+    group.addEventListener('keydown', (e) => {
+      const usable = buttons.filter((b) => !b.disabled);
+      const i = usable.indexOf(document.activeElement);
+      if (i === -1) return;
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      const j = step ? (i + step + usable.length) % usable.length : e.key === 'Home' ? 0 : e.key === 'End' ? usable.length - 1 : -1;
+      if (j < 0) return;
+      e.preventDefault();
+      buttons.forEach((b) => { b.tabIndex = b === usable[j] ? 0 : -1; });
+      usable[j].focus();
+    });
+  };
+  rove(catBar, chips);
+  rove(abcBar, letterBtns);
+
+  /* ---------- how far the sticky search bar covers the list (anchors land below it) ---------- */
+  if (bar) {
+    const measure = () => root.style.setProperty('--gl-bar-h', `${barSticks() ? Math.round(bar.getBoundingClientRect().height) : 0}px`);
+    measure();
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(bar);
+    const short = matchMedia('(max-height: 500px)');
+    [narrow, short].forEach((mq) => { if (mq.addEventListener) mq.addEventListener('change', measure); else if (mq.addListener) mq.addListener(measure); });
+  }
+
+  /* ---------- start: ?q= from the address, then the term of the link ---------- */
+  const q0 = new URLSearchParams(location.search).get('q');
+  if (!input.value && q0) input.value = q0;
+  state.q = input.value.slice(0, MAX_Q);
+  apply();
+  if (location.hash) openHash('instant');
+  // back to the page from the history: the browser may have restored the field without an input event
+  addEventListener('pageshow', (e) => {
+    if (e.persisted && input.value.slice(0, MAX_Q) !== state.q) { state.q = input.value.slice(0, MAX_Q); apply(); }
+  });
+})();
+
+/* ============================================================
+   knizhka: «Моя машина» — the car's service book in this browser (/moya-mashina/, build/knizhka.py).
+   This file is the model, on every page: calendar dates, the VIN check, the next service from the owner's own
+   interval (km or months, whichever comes first, counted from the last entry marked «ТО»), the calendar file (.ics,
+   RFC 5545), the check of a saved or loaded book and the merge of two books; the storage (one localStorage key,
+   every access in try/catch); the request form's «Заполнить из «Моей машины»», shown once a car is saved.
+   The page itself is js/knizhka-ui.js. The pure part is G.knizhka: tests/knizhka_logic.cjs runs it in node.
+   Nothing leaves the browser.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = (window.G = window.G || {});
+  const KEY = 'garage.knizhka.v1';
+  const FORMAT = 'garage-knizhka';
+  const VERSION = 1;
+  const MAX_KM = 2000000;              // a bigger mileage is a typo
+  const MAX_ENTRIES = 2000;            // far beyond a car's life; keeps a copy under MAX_FILE
+  const MAX_FILE = 1024 * 1024;
+  const RATE_DAYS = 14;                // a daily average needs at least two weeks of driving after the service
+  const SOON = 0.9;                    // 90 % of an interval used: the gauge turns amber
+  const INTERVAL_KM = [100, 200000];
+  const INTERVAL_MONTHS = [1, 120];
+  const LEN = { brand: 40, model: 40, engine: 24, text: 600, note: 300 };
+  const ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/;   // safe in a CSS selector and in the calendar UID
+  const DAY = 86400000;
+  const NB = '\u00a0';
+
+  /* ---------- calendar dates as 'YYYY-MM-DD', counted in whole UTC days: no time zone or DST drift ---------- */
+  const pad = (n) => String(n).padStart(2, '0');
+  const daysIn = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();          // m: 1…12
+  const iso = (y, m, d) => `${String(y).padStart(4, '0')}-${pad(m)}-${pad(d)}`;
+  const parseDate = (s) => {
+    const m = typeof s === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(s) : null;
+    if (!m) return null;
+    const y = Number(m[1]); const mo = Number(m[2]); const d = Number(m[3]);
+    if (y < 1900 || y > 2199 || mo < 1 || mo > 12 || d < 1 || d > daysIn(y, mo)) return null;
+    return { y, m: mo, d };
+  };
+  const dayNum = (s) => { const p = parseDate(s); return p ? Date.UTC(p.y, p.m - 1, p.d) / DAY : NaN; };
+  const fromDayNum = (n) => { const t = new Date(n * DAY); return iso(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()); };
+  const addDays = (s, n) => fromDayNum(dayNum(s) + n);
+  const daysBetween = (a, b) => dayNum(b) - dayNum(a);
+  // Jan 31 + 1 month = Feb 28 (29 in a leap year): the day is clamped to the end of the month, as in a service book
+  const addMonths = (s, n) => {
+    const p = parseDate(s);
+    if (!p) return null;
+    const total = p.y * 12 + (p.m - 1) + n;
+    const y = Math.floor(total / 12);
+    const m = total - y * 12 + 1;
+    return iso(y, m, Math.min(p.d, daysIn(y, m)));
+  };
+  const localToday = (now = new Date()) => iso(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+  /* ---------- VIN: 17 Latin letters and digits without I, O, Q; spaces go, Cyrillic look-alikes become Latin ---------- */
+  const LOOKALIKE = { 'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P', 'С': 'C', 'Т': 'T', 'У': 'Y', 'Х': 'X' };
+  const normalizeVin = (raw) => String(raw == null ? '' : raw).toUpperCase()
+    .replace(/[\s\u00a0\u2000-\u200b\u202f\u2060\u2010-\u2015-]/g, '')
+    .replace(/[АВЕКМНОРСТУХ]/g, (c) => LOOKALIKE[c]);
+  const checkVin = (raw) => {
+    const value = normalizeVin(raw);
+    let error = null;
+    if (value) {
+      if (/[IOQ]/.test(value)) error = 'ioq';
+      else if (!/^[A-Z0-9]+$/.test(value)) error = 'chars';
+      else if (value.length !== 17) error = 'length';
+    }
+    return { value, error, length: value.length, fixed: /[АВЕКМНОРСТУХавекмнорстух]/.test(String(raw == null ? '' : raw)) };
+  };
+
+  /* ---------- numbers ---------- */
+  const fmtNum = (n) => String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
+  // an optional whole number typed by a person: null when empty, NaN when it is not a number in [lo, hi]
+  const parseWhole = (raw, lo, hi) => {
+    const s = String(raw == null ? '' : raw).replace(/[\s\u00a0\u202f]/g, '').replace(/(км|мес)\.?$/i, '');
+    if (!s) return null;
+    if (!/^\d{1,9}$/.test(s)) return NaN;
+    const n = Number(s);
+    return n >= lo && n <= hi ? n : NaN;
+  };
+  const parseKm = (raw) => parseWhole(raw, 0, MAX_KM);
+
+  /* ---------- the book ---------- */
+  const newId = () => {
+    let r = '';
+    try {
+      const a = new Uint32Array(2);
+      window.crypto.getRandomValues(a);
+      r = a[0].toString(36) + a[1].toString(36);
+    } catch (_) { r = Math.random().toString(36).slice(2, 12); }
+    return `${Date.now().toString(36)}-${r}`.slice(0, 40);
+  };
+  const emptyBook = () => ({ format: FORMAT, version: VERSION, id: '', car: null, reminder: { km: null, months: null }, entries: [] });
+  const hasData = (b) => !!(b.car || b.entries.length || b.reminder.km || b.reminder.months);
+  const isTo = (e) => e.works.indexOf('to') >= 0;
+  const newestFirst = (a, b) => dayNum(b.date) - dayNum(a.date)
+    || (b.km === null ? -1 : b.km) - (a.km === null ? -1 : a.km) || b.created - a.created;
+  const lastService = (entries) => entries.filter(isTo).sort(newestFirst)[0] || null;
+  // the highest mileage known (the passport or any entry) and the day it was read
+  const reading = (book) => {
+    const all = [];
+    if (book.car && book.car.km !== null) all.push({ km: book.car.km, date: book.car.kmDate });
+    book.entries.forEach((e) => { if (e.km !== null) all.push({ km: e.km, date: e.date }); });
+    all.sort((a, b) => b.km - a.km || (dayNum(b.date) || 0) - (dayNum(a.date) || 0));
+    return all[0] || null;
+  };
+
+  /* ---------- the next service: the owner's interval from the last «ТО», whichever limit comes first ----------
+     state: setup (no interval) | need-to (no entry marked «ТО») | no-km (only a km interval, the «ТО» has no km)
+            | ok | soon (≥ 90 % of a limit) | over (a limit reached) */
+  const forecast = (book, today) => {
+    const r = book.reminder || {};
+    const f = { state: 'setup', base: null, km: null, time: null, rate: null, date: null, by: null, noBaseKm: false, guess: false };
+    if (!r.km && !r.months) return f;
+    const base = lastService(book.entries);
+    if (!base) { f.state = 'need-to'; return f; }
+    f.base = { id: base.id, date: base.date, km: base.km };
+    if (r.km && base.km === null) f.noBaseKm = true;
+    if (r.km && base.km !== null) {
+      const now = reading(book);
+      const current = Math.max(now ? now.km : base.km, base.km);
+      const used = current - base.km;
+      f.km = { interval: r.km, from: base.km, due: base.km + r.km, current, used, left: base.km + r.km - current, frac: used / r.km, date: null };
+      const span = now && now.date ? daysBetween(base.date, now.date) : 0;
+      if (span >= RATE_DAYS && used > 0) {
+        f.rate = used / span;
+        if (f.km.left > 0) {
+          f.km.date = addDays(now.date, Math.ceil(f.km.left / f.rate));
+          // an old reading can put the estimate in the past: then it is «about now» and worth a fresh reading
+          if (daysBetween(today, f.km.date) < 0) { f.km.date = today; f.guess = true; }
+        }
+      }
+    }
+    if (r.months) {
+      const due = addMonths(base.date, r.months);
+      const total = daysBetween(base.date, due);
+      f.time = { months: r.months, from: base.date, due, left: daysBetween(today, due), passed: Math.max(0, daysBetween(base.date, today)), total, frac: 0 };
+      f.time.frac = total > 0 ? f.time.passed / total : 1;
+    }
+    const ends = [];
+    if (f.time) ends.push({ date: f.time.due, by: 'time' });
+    if (f.km && f.km.date) ends.push({ date: f.km.date, by: 'km' });
+    ends.sort((a, b) => dayNum(a.date) - dayNum(b.date));
+    if (ends.length) { f.date = ends[0].date; f.by = ends[0].by; }
+    const over = (f.km && f.km.left <= 0) || (f.time && f.time.left <= 0);
+    const worst = Math.max(f.km ? f.km.frac : 0, f.time ? f.time.frac : 0);
+    if (over) f.state = 'over';
+    else if (worst >= SOON || f.guess) f.state = 'soon';
+    else f.state = f.km || f.time ? 'ok' : 'no-km';
+    return f;
+  };
+
+  /* ---------- .ics (RFC 5545): CRLF, TEXT escaping, lines folded at 75 octets without cutting a letter ---------- */
+  const icsText = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r\n|\r|\n/g, '\\n');
+  const octets = (ch) => { const c = ch.codePointAt(0); return c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4; };
+  const tokenOctets = (tok) => { let n = 0; for (const ch of tok) n += octets(ch); return n; };
+  const icsFold = (line) => {
+    const out = [];
+    let cur = []; let size = 0;
+    (String(line).match(/\\[\s\S]|[\s\S]/gu) || []).forEach((tok) => {   // an escape («\,») is one token
+      const n = tokenOctets(tok);
+      if (size + n > 75) {
+        // a continuation line starts with one space; were the text's own space next, a careless reader would trim
+        // both and glue two words: the last letter moves down with it
+        const carry = /^\s/.test(tok) && cur.length > 1 ? [cur.pop()] : [];
+        out.push(cur.join(''));
+        cur = [' ', ...carry];
+        size = 1 + carry.reduce((s, x) => s + tokenOctets(x), 0);
+      }
+      cur.push(tok);
+      size += n;
+    });
+    out.push(cur.join(''));
+    return out;
+  };
+  const icsStamp = (d) => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  // an all-day event on the date; the alarm at 9:00 the day before (-PT15H from the day's midnight, as Apple Calendar
+  // writes «1 day before» for all-day events)
+  const buildIcs = (ev) => {
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//garage.team//Moya mashina//RU', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+      'BEGIN:VEVENT', `UID:${ev.uid}`, `DTSTAMP:${icsStamp(ev.stamp)}`,
+      `DTSTART;VALUE=DATE:${ev.date.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${addDays(ev.date, 1).replace(/-/g, '')}`,
+      `SUMMARY:${icsText(ev.summary)}`];
+    if (ev.description) lines.push(`DESCRIPTION:${icsText(ev.description)}`);
+    if (ev.url) lines.push(`URL:${ev.url}`);
+    lines.push('TRANSP:TRANSPARENT', 'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsText(ev.alarm || ev.summary)}`,
+      'TRIGGER:-PT15H', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR');
+    return lines.reduce((all, l) => all.concat(icsFold(l)), []).join('\r\n') + '\r\n';
+  };
+
+  /* ---------- a book from a file or the storage: every field checked, the broken ones dropped ---------- */
+  const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+  const oneLine = (v, max) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '');
+  const para = (v, max) => (typeof v === 'string'
+    ? v.replace(/\r\n?/g, '\n').replace(/[^\S\n]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim().slice(0, max) : '');
+  const whole = (v, lo, hi) => (typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi ? v : null);
+  const moment = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0);
+  const sanitizeCar = (c) => {
+    if (!isObj(c)) return null;
+    const brand = oneLine(c.brand, LEN.brand);
+    const model = oneLine(c.model, LEN.model);
+    if (!brand && !model) return null;
+    const vin = checkVin(typeof c.vin === 'string' ? c.vin : '');
+    const km = whole(c.km, 0, MAX_KM);
+    return { brand, model, year: whole(c.year, 1900, 2199), engine: oneLine(c.engine, LEN.engine), vin: vin.error ? '' : vin.value,
+      km, kmDate: km !== null && parseDate(c.kmDate) ? c.kmDate : null };
+  };
+  const sanitizeEntry = (e, keys) => {
+    if (!isObj(e) || !parseDate(e.date)) return null;
+    const works = keys.filter((k) => Array.isArray(e.works) && e.works.indexOf(k) >= 0);   // known marks, fixed order
+    const text = para(e.text, LEN.text);
+    if (!works.length && !text) return null;
+    return { id: typeof e.id === 'string' && ID.test(e.id) ? e.id : newId(), date: e.date, km: whole(e.km, 0, MAX_KM), works, text,
+      note: oneLine(e.note, LEN.note), created: moment(e.created), updated: moment(e.updated) };
+  };
+  // → { ok: true, book, dropped } | { ok: false, error: 'format' | 'newer' | 'big' }
+  const sanitizeBook = (obj, keys) => {
+    if (!isObj(obj) || obj.format !== FORMAT || !Number.isInteger(obj.version) || obj.version < 1) return { ok: false, error: 'format' };
+    if (obj.version > VERSION) return { ok: false, error: 'newer' };
+    if (obj.entries !== undefined && !Array.isArray(obj.entries)) return { ok: false, error: 'format' };
+    const list = obj.entries || [];
+    if (list.length > MAX_ENTRIES) return { ok: false, error: 'big' };
+    const seen = new Set();
+    const entries = [];
+    let dropped = 0;
+    list.forEach((e) => {
+      const s = sanitizeEntry(e, keys || []);
+      if (!s) { dropped += 1; return; }
+      while (seen.has(s.id)) s.id = newId();
+      seen.add(s.id);
+      entries.push(s);
+    });
+    const r = isObj(obj.reminder) ? obj.reminder : {};
+    return { ok: true, dropped, book: { format: FORMAT, version: VERSION, id: typeof obj.id === 'string' && ID.test(obj.id) ? obj.id : newId(),
+      car: sanitizeCar(obj.car), reminder: { km: whole(r.km, INTERVAL_KM[0], INTERVAL_KM[1]), months: whole(r.months, INTERVAL_MONTHS[0], INTERVAL_MONTHS[1]) },
+      entries } };
+  };
+  const serial = (book, now) => ({ format: FORMAT, version: VERSION, saved: new Date(now).toISOString(), id: book.id, car: book.car,
+    reminder: book.reminder, entries: book.entries });
+
+  /* ---------- merging a copy into the book: the same entry (id or content) once, the newer edit wins ---------- */
+  const sameCar = (a, b) => a.brand.toLowerCase() === b.brand.toLowerCase() && a.model.toLowerCase() === b.model.toLowerCase()
+    && (!a.vin || !b.vin || a.vin === b.vin);
+  const mergeCar = (a, b) => {
+    if (!a || !b) return a || b || null;
+    if (!sameCar(a, b)) return a;
+    const later = b.km !== null && (a.km === null || b.km > a.km);
+    return { ...a, year: a.year || b.year, engine: a.engine || b.engine, vin: a.vin || b.vin, km: later ? b.km : a.km, kmDate: later ? b.kmDate : a.kmDate };
+  };
+  const signature = (e) => [e.date, e.km === null ? '' : e.km, e.works.join('+'), e.text, e.note].join('|');
+  const mergeBooks = (cur, inc) => {
+    const entries = cur.entries.slice();
+    const at = new Map(entries.map((e, i) => [e.id, i]));
+    const sigs = new Set(entries.map(signature));
+    let added = 0; let updated = 0; let skipped = 0;
+    inc.entries.forEach((e) => {
+      if (at.has(e.id)) {
+        const i = at.get(e.id);
+        if (e.updated > entries[i].updated && signature(e) !== signature(entries[i])) {
+          sigs.delete(signature(entries[i]));
+          entries[i] = e;
+          sigs.add(signature(e));
+          updated += 1;
+        }
+        return;
+      }
+      if (sigs.has(signature(e))) return;                  // the same work entered on another device
+      if (entries.length >= MAX_ENTRIES) { skipped += 1; return; }
+      at.set(e.id, entries.length);
+      entries.push(e);
+      sigs.add(signature(e));
+      added += 1;
+    });
+    const reminder = cur.reminder.km || cur.reminder.months ? cur.reminder : inc.reminder;
+    return { book: { ...cur, id: cur.id || inc.id, car: mergeCar(cur.car, inc.car), reminder: { ...reminder }, entries }, added, updated, skipped };
+  };
+
+  /* ---------- storage: this browser only; the calls throw when storage is blocked (private modes, settings) ---------- */
+  const ls = () => window.localStorage;
+  const store = {
+    probe() {
+      try { ls().setItem(`${KEY}.probe`, '1'); ls().removeItem(`${KEY}.probe`); return true; } catch (_) { return false; }
+    },
+    read() {
+      let raw = null;
+      try { raw = ls().getItem(KEY); } catch (_) { return { status: 'off' }; }
+      if (raw === null) return { status: 'empty' };
+      try { return { status: 'ok', obj: JSON.parse(raw), raw }; } catch (_) { return { status: 'broken', raw }; }
+    },
+    write(obj) {
+      try { ls().setItem(KEY, JSON.stringify(obj)); return 'ok'; } catch (e) {
+        const full = e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22 || e.code === 1014);
+        return full ? 'full' : 'off';
+      }
+    },
+    // an unreadable saved book is set aside once before the first save over it
+    keep(raw) { try { ls().setItem(`${KEY}.broken`, raw); } catch (_) { /* no room for the copy: the save goes on */ } },
+    clear() {
+      try { ls().removeItem(KEY); ls().removeItem(`${KEY}.broken`); return 'ok'; } catch (_) { return 'off'; }
+    },
+  };
+
+  /* ---------- the car in words ---------- */
+  const carTitle = (c) => [c.brand, c.model].filter(Boolean).join(' ');
+  const engineText = (e) => (/^\d{1,2}([.,]\d{1,2})?$/.test(e) ? `${e.replace('.', ',')}${NB}л` : e);
+
+  /* ---------- the request form on any page: «Заполнить из «Моей машины»» (build/knizhka.py fill_button) ---------- */
+  const fillButtons = Array.from(document.querySelectorAll('[data-kn-fill]'));
+  const savedCar = () => {
+    const r = store.read();
+    if (r.status !== 'ok') return null;
+    const s = sanitizeBook(r.obj, []);
+    return s.ok ? s.book.car : null;
+  };
+  const syncFill = (car) => fillButtons.forEach((btn) => {
+    btn.hidden = !car;
+    const name = btn.querySelector('[data-kn-fill-car]');
+    if (name) name.textContent = car ? [carTitle(car), car.year].filter(Boolean).join(' · ') : '';
+  });
+  const fillRequest = (btn, car) => {
+    const form = btn.closest('form');
+    if (!form) return;
+    // form.js keeps the mode in a hidden field: '1' lists to choose from, '0' the car typed in; its toggle switches it
+    const mode = form.querySelector('input[name="request_part[select_car_type]"]');
+    const toggle = form.querySelector('[data-mode-toggle]');
+    if (mode && mode.value !== '0' && toggle) toggle.click();
+    const fields = [['#text_car_brand', car.brand], ['#text_car_model', car.model], ['#text_car_year', car.year ? String(car.year) : ''],
+      ['#text_car_type', car.engine ? engineText(car.engine) : ''], ['#car_vin', car.vin]];
+    fields.forEach(([sel, value]) => {
+      const f = form.querySelector(sel);
+      if (!f || !value) return;
+      f.value = value;
+      f.dispatchEvent(new Event('input', { bubbles: true }));   // clears a «fill in the field» mark of form.js
+    });
+    if (G.toast) G.toast(btn.dataset.knFill);
+    // with a mouse, straight to what is still empty (on a phone that would throw the keyboard up)
+    const empty = fields.slice(0, 4).map(([sel]) => form.querySelector(sel)).find((f) => f && !f.value.trim());
+    if (empty && G.canHover) empty.focus();
+  };
+  if (fillButtons.length) {
+    fillButtons.forEach((btn) => btn.addEventListener('click', () => {
+      const car = savedCar();
+      syncFill(car);
+      if (car) fillRequest(btn, car);
+    }));
+    syncFill(savedCar());
+    addEventListener('storage', (e) => { if (e.key === KEY || e.key === null) syncFill(savedCar()); });
+    addEventListener('pageshow', (e) => { if (e.persisted) syncFill(savedCar()); });
+  }
+
+  G.knizhka = {
+    KEY, FORMAT, VERSION, NB, LIMITS: { LEN, INTERVAL_KM, INTERVAL_MONTHS, MAX_ENTRIES, MAX_FILE, SOON },
+    parseDate, pad, addDays, addMonths, daysBetween, localToday, fmtNum, parseWhole, parseKm, oneLine, para,
+    normalizeVin, checkVin, newId, emptyBook, hasData, isTo, newestFirst, forecast, sanitizeBook, mergeBooks, serial,
+    icsText, icsFold, buildIcs, store, carTitle, engineText, syncFill,
+  };
+})();
+
+/* ============================================================
+   knizhka-ui: the page «Моя машина» (/moya-mashina/, build/knizhka.py; the model is js/knizhka.js):
+   · the first visit: the garage bay, «Завести книжку» rolls its shutter up and opens the passport;
+   · the passport as a steel plate with a mechanical odometer, a quick «Обновить пробег»;
+   · the next service: the owner's interval, two gauges (km, days), the estimated date, the calendar file,
+     «Записаться на ТО»;
+   · the log: add, edit, delete after a question, newest first by year; «Записаться» with the chosen works;
+   · the copy: save (.json), load (merge or replace), print, delete everything.
+   Every phrase comes from build/knizhka.py (data-kn-conf). Motion: transform and opacity only (knizhka.css).
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = window.G || {};
+  const K = G.knizhka;
+  if (!K) return;
+  const { KEY, NB, LIMITS: { LEN, INTERVAL_KM, INTERVAL_MONTHS, MAX_ENTRIES, MAX_FILE, SOON }, parseDate, pad, daysBetween, localToday,
+    fmtNum, parseWhole, parseKm, oneLine, para, checkVin, newId, emptyBook, hasData, isTo, newestFirst, forecast, sanitizeBook,
+    mergeBooks, serial, buildIcs, store, carTitle, engineText, syncFill } = K;
+
+  const root = document.querySelector('[data-knizhka]');
+  if (!root) return;
+  let conf = null;
+  try { conf = JSON.parse(root.dataset.knConf || ''); } catch (_) { conf = null; }
+  if (!conf || !conf.texts || !Array.isArray(conf.works)) return;
+  const T = conf.texts;
+  const KEYS = conf.works.map((w) => w.key);
+  const LABEL = {};
+  const PHRASE = {};
+  conf.works.forEach((w) => { LABEL[w.key] = w.label; PHRASE[w.key] = w.phrase; });
+  const t = (key, vars) => String(T[key] == null ? '' : T[key]).replace(/\{(\w+)\}/g, (m, k) => (vars && k in vars ? String(vars[k]) : m));
+  const plural = (n, forms) => {
+    const a = Math.abs(n) % 100; const b = a % 10;
+    return forms[a > 10 && a < 20 ? 2 : b === 1 ? 0 : b >= 2 && b <= 4 ? 1 : 2];
+  };
+  const count = (n, key) => `${fmtNum(n)}${NB}${plural(n, T[key])}`;
+  const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  const fmtDate = (s) => { const p = parseDate(s); return p ? `${pad(p.d)}.${pad(p.m)}.${p.y}` : ''; };
+  const fmtLong = (s) => { const p = parseDate(s); return p ? `${p.d}${NB}${MONTHS[p.m - 1]}${NB}${p.y}` : ''; };   // one piece
+  const toast = (msg, type) => { if (G.toast && msg) G.toast(msg, type); };
+  const $ = (sel, r = root) => r.querySelector(sel);
+  const $$ = (sel, r = root) => Array.from(r.querySelectorAll(sel));
+  // an element with a class and a text (textContent: whatever the visitor typed never becomes markup)
+  const node = (tag, cls, text) => Object.assign(document.createElement(tag), cls ? { className: cls } : {}, text !== undefined ? { textContent: text } : {});
+  const smooth = () => (G.reducedMotion ? 'auto' : 'smooth');
+  // «Kia Rio, 2017 г., 1,6 л» (+ «пробег 84 500 км»): the car line of a message
+  const carLine = (c, km) => {
+    if (!c) return '';
+    const parts = [carTitle(c)];
+    if (c.year) parts.push(`${c.year}${NB}г.`);
+    if (c.engine) parts.push(engineText(c.engine));
+    if (km && c.km !== null) parts.push(t('carKm', { km: fmtNum(c.km) }));
+    return parts.join(', ');
+  };
+  const pageUrl = () => { const c = document.querySelector('link[rel="canonical"]'); return c ? c.href : location.href.split('#')[0]; };
+
+  const el = {
+    alert: $('[data-kn-alert]'), start: $('[data-kn-start]'), intro: $('[data-kn-intro]'), desk: $('[data-kn-desk]'),
+    slotStart: $('[data-kn-slot="start"]'), slotBook: $('[data-kn-slot="book"]'), carForm: $('[data-kn-car-form]'),
+    plate: $('[data-kn-plate]'), name: $('[data-kn-name]'), nameHint: $('[data-kn-name-hint]'), year: $('[data-kn-year]'),
+    engine: $('[data-kn-engine]'), vin: $('[data-kn-vin]'), drums: $('[data-kn-drums]'), odoSr: $('[data-kn-odo-sr]'),
+    odoCap: $('[data-kn-odo-cap]'), odoOpen: $('[data-kn-odo-open]'), odoForm: $('[data-kn-odo-form]'),
+    next: $('[data-kn-next]'), rule: $('[data-kn-rule]'), ruleText: $('[data-kn-rule-text]'), main: $('[data-kn-main]'),
+    need: $('[data-kn-need]'), head: $('[data-kn-head]'), sub: $('[data-kn-sub]'), note: $('[data-kn-note]'), ics: $('[data-kn-ics]'),
+    icsNote: $('[data-kn-ics-note]'), interval: $('[data-kn-interval]'), intervalHead: $('[data-kn-interval-head]'),
+    intervalErr: $('[data-kn-interval-err]'), intervalCancel: $('[data-kn-interval-cancel]'),
+    list: $('[data-kn-list]'), empty: $('[data-kn-empty]'), count: $('[data-kn-count]'), add: $('[data-kn-add]'),
+    entryForm: $('[data-kn-entry-form]'), entryTitle: $('[data-kn-entry-title]'), sheet: $('[data-kn-sheet]'),
+  };
+  const cf = { brand: $('#kn-c-brand'), model: $('#kn-c-model'), year: $('#kn-c-year'), engine: $('#kn-c-engine'), vin: $('#kn-c-vin'),
+    km: $('#kn-c-km'), kmHint: $('[data-kn-km-hint]'), vinNote: $('[data-kn-vin-note]') };
+  const ef = { date: $('#kn-e-date'), km: $('#kn-e-km'), text: $('#kn-e-text'), note: $('#kn-e-note'), works: $$('input[name="works"]') };
+  const iKm = $('#kn-i-km');
+  const iMonths = $('#kn-i-months');
+  const oKm = $('#kn-o-km');
+  const bookWorks = $$('input[name="book-works"]');
+
+  let book = emptyBook();
+  let problem = '';        // '' | 'off' | 'full' | 'broken': the message over the book
+  let brokenRaw = null;    // an unreadable saved book, set aside before the first save over it
+  let carOpen = false;     // the passport form is open
+  let intervalOpen = false;
+  let editing = null;      // the id of the entry in the form, '' for a new one, null when the form is closed
+
+  /* ---------- errors next to the fields (components.css .field.is-error) ---------- */
+  const setErr = (input, msg) => {
+    const field = input.closest('.field');
+    const err = field ? field.querySelector('.field__error') : null;
+    if (err && msg) err.textContent = msg;
+    if (field) field.classList.toggle('is-error', !!msg);
+    if (input.matches('input, textarea, select, fieldset')) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  };
+  const clearErrs = (form) => form.querySelectorAll('.field').forEach((f) => {
+    f.classList.remove('is-error');
+    f.querySelectorAll('[aria-invalid]').forEach((x) => x.setAttribute('aria-invalid', 'false'));
+  });
+  // [[input, message]] → marks them, focuses the first; true when there was something to show
+  const showErrs = (bad) => {
+    bad.forEach(([input, msg]) => setErr(input, msg));
+    if (!bad.length) return false;
+    const first = bad[0][0];
+    const target = first.matches('fieldset') ? first.querySelector('input') : first;
+    if (target) { target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'center', behavior: smooth() }); }
+    return true;
+  };
+  [el.carForm, el.odoForm, el.entryForm].forEach((f) => { if (f && G.clearErrorsOnInput) G.clearErrorsOnInput(f); });
+  ef.works.forEach((c) => c.addEventListener('change', () => setErr(c.closest('fieldset'), '')));
+
+  /* ---------- load, save ---------- */
+  const load = () => {
+    const r = store.read();
+    if (r.status === 'off') return { book: emptyBook(), problem: 'off' };
+    if (r.status === 'empty') return { book: emptyBook(), problem: '' };
+    const s = r.status === 'ok' ? sanitizeBook(r.obj, KEYS) : { ok: false };
+    if (!s.ok) { brokenRaw = r.raw; return { book: emptyBook(), problem: 'broken' }; }
+    return { book: s.book, problem: '' };
+  };
+  const commit = (next, message, after) => {
+    book = next;
+    if (brokenRaw !== null) { store.keep(brokenRaw); brokenRaw = null; }
+    const res = store.write(serial(book, Date.now()));
+    problem = res === 'ok' ? '' : res;
+    render();
+    syncFill(book.car);
+    toast(message);
+    if (after) after();
+  };
+
+  /* ---------- rendering ---------- */
+  const renderAlert = () => {
+    const msg = { off: T.storeOff, full: T.storeFull, broken: T.storeBroken }[problem] || '';
+    if (el.alert.textContent !== msg) el.alert.textContent = msg;
+    el.alert.hidden = !msg;
+  };
+
+  const makeDrum = () => {
+    const d = node('span', 'kn-odo__d');
+    const s = node('span', 'kn-odo__s');
+    for (let k = 0; k < 10; k += 1) s.appendChild(node('span', '', String(k)));
+    d.appendChild(s);
+    return d;
+  };
+  // the mechanical odometer: one drum per digit (at least six), each rolls to its digit with transform
+  const setOdo = (km) => {
+    const digits = km === null ? '' : String(km);
+    const n = Math.max(6, digits.length);
+    let grew = false;
+    while (el.drums.children.length < n) { el.drums.insertBefore(makeDrum(), el.drums.firstChild); grew = true; }
+    while (el.drums.children.length > n) el.drums.removeChild(el.drums.firstChild);
+    if (grew) void el.drums.offsetWidth;   // new drums start at 0 and roll to their digit
+    const padded = digits.padStart(n, '0');
+    Array.from(el.drums.children).forEach((d, i) => {
+      d.style.setProperty('--n', km === null ? '0' : padded[i]);
+      d.style.setProperty('--i', String(n - 1 - i));
+      d.classList.toggle('is-lead', km === null || i < n - digits.length);
+    });
+  };
+  const renderVin = (vin) => {
+    el.vin.textContent = '';
+    el.vin.classList.toggle('is-empty', !vin);
+    if (!vin) { el.vin.textContent = T.none; return; }
+    // the three parts of a VIN (maker, description, serial) with gaps that do not get copied
+    [vin.slice(0, 3), vin.slice(3, 9), vin.slice(9)].forEach((part) => el.vin.appendChild(node('span', '', part)));
+  };
+  const renderPlate = () => {
+    const c = book.car;
+    el.plate.hidden = carOpen;
+    el.name.textContent = c ? carTitle(c) : T.noCar;
+    el.name.classList.toggle('is-empty', !c);
+    el.nameHint.hidden = !!c;
+    el.year.textContent = c && c.year ? String(c.year) : '—';
+    el.engine.textContent = c && c.engine ? engineText(c.engine) : '—';
+    renderVin(c ? c.vin : '');
+    const km = c ? c.km : null;
+    setOdo(km);
+    el.odoCap.textContent = km === null ? T.kmNone : t('kmAt', { date: fmtDate(c.kmDate) || '—' });
+    el.odoSr.textContent = km === null ? T.kmNone : t('kmSr', { km: fmtNum(km), date: fmtDate(c.kmDate) || '—' });
+    el.odoOpen.hidden = !c || !el.odoForm.hidden;
+  };
+
+  const ruleText = (r) => {
+    if (r.km && r.months) return t('rule', { km: fmtNum(r.km), months: count(r.months, 'pMonths') });
+    if (r.km) return t('ruleKm', { km: fmtNum(r.km) });
+    return r.months ? t('ruleMonths', { months: count(r.months, 'pMonths') }) : '';
+  };
+  const lastLine = (base) => [fmtDate(base.date), base.km === null ? '' : `${fmtNum(base.km)}${NB}км`].filter(Boolean).join(', ');
+  const setMeter = (kind, m) => {
+    const box = $(`[data-kn-meter="${kind}"]`);
+    const body = box.querySelector('[data-body]');
+    const none = box.querySelector('[data-none]');
+    body.hidden = !m.show;
+    none.hidden = m.show || !m.none;
+    none.textContent = m.none || '';
+    box.dataset.state = m.show ? m.state : 'none';
+    if (!m.show) return;
+    const frac = Math.min(1, Math.max(0, m.frac));
+    const track = box.querySelector('[data-track]');
+    box.querySelector('[data-pre]').textContent = m.pre;
+    box.querySelector('[data-val]').textContent = m.value;
+    box.querySelector('[data-a]').textContent = m.a;
+    box.querySelector('[data-b]').textContent = m.b;
+    track.style.setProperty('--f', frac.toFixed(4));
+    track.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+    track.setAttribute('aria-valuetext', m.text);
+  };
+  const meterState = (left, frac) => (left <= 0 ? 'over' : frac >= SOON ? 'soon' : 'ok');
+  // the big line of the card and the line under it
+  const headline = (f) => {
+    if (f.state === 'over') {
+      const why = [];
+      if (f.km && f.km.left < 0) why.push(t('subOverKm', { km: fmtNum(-f.km.left) }));
+      if (f.km && f.km.left === 0) why.push(T.subKmReached);
+      if (f.time && f.time.left < 0) why.push(t('subOverTime', { days: count(-f.time.left, 'pDays') }));
+      if (f.time && f.time.left === 0) why.push(T.subToday);
+      return { head: T.headOver, sub: why.join(' ') };
+    }
+    if (f.guess) return { head: T.headGuess, sub: '' };
+    if (f.date) {
+      return { head: t(f.state === 'soon' ? 'headSoon' : 'headOk', { date: fmtLong(f.date) }),
+        sub: t(f.time && f.km && f.km.date ? 'subBoth' : 'subOne', { by: f.by === 'km' ? T.byKm : T.byTime }) };
+    }
+    if (f.km) return { head: t('headKm', { km: fmtNum(f.km.left) }), sub: T.subNoDate };
+    return { head: T.headNoKm, sub: T.noBaseKm };
+  };
+  const renderNext = () => {
+    const today = localToday();
+    const f = forecast(book, today);
+    const r = book.reminder;
+    const setup = f.state === 'setup' || intervalOpen;
+    el.next.dataset.state = setup ? 'setup' : f.state;
+    el.rule.hidden = !(r.km || r.months) || intervalOpen;
+    el.ruleText.textContent = ruleText(r);
+    el.interval.hidden = !setup;
+    el.intervalCancel.hidden = !intervalOpen;
+    el.intervalHead.hidden = intervalOpen;
+    el.need.hidden = setup || f.state !== 'need-to';
+    el.main.hidden = setup || f.state === 'need-to';
+    if (el.main.hidden) return;
+
+    const { head, sub } = headline(f);
+    el.head.textContent = head;
+    el.sub.textContent = sub;
+    el.sub.hidden = !sub;
+
+    if (f.km) {
+      const k = f.km;
+      setMeter('km', { show: true, state: meterState(k.left, k.frac), frac: k.frac, pre: k.left > 0 ? T.left : k.left < 0 ? T.overKm : '',
+        value: k.left === 0 ? T.today : `${fmtNum(k.left)}${NB}км`, a: `${fmtNum(k.from)}${NB}км`, b: `${fmtNum(k.due)}${NB}км`,
+        text: t('meterKm', { used: fmtNum(Math.max(0, k.used)), all: fmtNum(k.interval) }) });
+    } else {
+      setMeter('km', { show: false, none: r.km ? (f.noBaseKm ? T.noBaseKm : '') : T.noKmInterval });
+    }
+    if (f.time) {
+      const d = f.time;
+      setMeter('time', { show: true, state: meterState(d.left, d.frac), frac: d.frac, pre: d.left > 0 ? T.left : d.left < 0 ? T.overTime : '',
+        value: d.left === 0 ? T.today : count(Math.abs(d.left), 'pDays'), a: fmtDate(d.from), b: fmtDate(d.due),
+        text: t('meterTime', { used: count(Math.min(d.passed, d.total), 'pDays'), all: count(d.total, 'pDays') }) });
+    } else {
+      setMeter('time', { show: false, none: T.noTimeInterval });
+    }
+
+    let note = '';
+    if (f.guess) note = T.noteGuess;
+    else if (f.rate && f.km && f.km.left > 0) note = t('noteRate', { km: fmtNum(Math.max(1, Math.round(f.rate))) });
+    else if (f.km && f.km.left > 0) note = T.noteNoRate;
+    el.note.textContent = note;
+    el.note.hidden = !note;
+
+    const canIcs = f.state !== 'over' && !!f.date && daysBetween(today, f.date) > 0;
+    el.ics.hidden = f.state === 'over';
+    el.ics.disabled = !canIcs;
+    el.icsNote.hidden = canIcs || f.state === 'over';
+    el.icsNote.textContent = T.icsNoDate;
+  };
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const svgUse = (name) => {   // an icon of the page's own sprite (build/knizhka.py _sprite)
+    const svg = document.createElementNS(SVG, 'svg');
+    const use = document.createElementNS(SVG, 'use');
+    [['class', 'ic'], ['aria-hidden', 'true'], ['focusable', 'false']].forEach(([k, v]) => svg.setAttribute(k, v));
+    use.setAttribute('href', `#kn-i-${name}`);
+    svg.appendChild(use);
+    return svg;
+  };
+  const toolButton = (act, icon, label, aria) => {   // «Изменить» / «Удалить» of an entry; the name says which entry
+    const b = Object.assign(node('button', 'kn-link'), { type: 'button' });
+    b.dataset.act = act;
+    b.setAttribute('aria-label', aria);
+    b.append(svgUse(icon), node('span', '', label));
+    return b;
+  };
+  const entryNode = (e) => {
+    const li = node('li', `kn-entry${isTo(e) ? ' is-to' : ''}${editing === e.id ? ' is-editing' : ''}`);
+    li.dataset.id = e.id;
+    li.tabIndex = -1;
+    const date = fmtDate(e.date);
+    const when = node('div', 'kn-entry__when');
+    const time = node('time', 'kn-entry__date', date);
+    time.dateTime = e.date;
+    when.append(time, node('span', 'kn-entry__km', e.km === null ? T.entryKmNone : `${fmtNum(e.km)}${NB}км`));
+    if (isTo(e)) {
+      const stamp = node('span', 'kn-stamp', T.stamp);
+      stamp.setAttribute('aria-hidden', 'true');
+      when.appendChild(stamp);
+    }
+    const body = node('div', 'kn-entry__body');
+    if (e.works.length) {
+      const tags = node('ul', 'kn-tags');
+      tags.setAttribute('aria-label', T.tagsAria);
+      e.works.forEach((k) => tags.appendChild(node('li', `kn-tag${k === 'to' ? ' kn-tag--to' : ''}`, LABEL[k] || k)));
+      body.appendChild(tags);
+    }
+    if (e.text) body.appendChild(node('p', 'kn-entry__text', e.text));
+    if (e.note) body.appendChild(node('p', 'kn-entry__note', e.note));
+    const tools = node('div', 'kn-entry__tools');
+    tools.append(toolButton('edit', 'pencil', T.edit, t('editAria', { date })), toolButton('remove', 'trash', T.remove, t('removeAria', { date })));
+    li.append(when, body, tools);
+    return li;
+  };
+  const renderLog = () => {
+    const sorted = book.entries.slice().sort(newestFirst);
+    el.list.textContent = '';
+    el.count.textContent = sorted.length ? count(sorted.length, 'pEntries') : '';
+    el.empty.hidden = sorted.length > 0 || editing !== null;
+    let year = ''; let ol = null;
+    sorted.forEach((e) => {
+      if (e.date.slice(0, 4) !== year) {
+        year = e.date.slice(0, 4);
+        const group = node('div', 'kn-year');
+        ol = node('ol', 'kn-entries');
+        group.append(node('h3', 'kn-year__y', year), ol);
+        el.list.appendChild(group);
+      }
+      ol.appendChild(entryNode(e));
+    });
+  };
+
+  const render = () => {
+    const has = hasData(book);
+    root.dataset.state = has ? 'book' : 'start';
+    el.start.hidden = has;
+    el.desk.hidden = !has;
+    const slot = has ? el.slotBook : el.slotStart;
+    if (el.carForm.parentNode !== slot) slot.appendChild(el.carForm);
+    el.carForm.hidden = !carOpen;
+    renderAlert();
+    if (!has) {
+      el.intro.hidden = carOpen;
+      el.start.classList.toggle('is-open', carOpen);
+      return;
+    }
+    renderPlate();
+    renderNext();
+    renderLog();
+  };
+
+  /* ---------- the passport ---------- */
+  const maxYear = () => new Date().getFullYear() + 1;
+  const kmHint = () => {
+    const c = book.car;
+    cf.kmHint.textContent = c && c.km !== null && c.kmDate ? t('kmHintAt', { date: fmtDate(c.kmDate) }) : T.kmHintNew;
+  };
+  const openCar = () => {
+    const c = book.car || { brand: '', model: '', year: null, engine: '', vin: '', km: null };
+    cf.brand.value = c.brand; cf.model.value = c.model; cf.year.value = c.year ? String(c.year) : '';
+    cf.engine.value = c.engine; cf.vin.value = c.vin; cf.km.value = c.km === null ? '' : String(c.km);
+    cf.vinNote.hidden = true;
+    kmHint();
+    clearErrs(el.carForm);
+    carOpen = true;
+    render();
+    (G.canHover ? cf.brand : $('#kn-c-title')).focus({ preventScroll: true });
+    el.carForm.scrollIntoView({ block: 'nearest', behavior: smooth() });
+  };
+  const closeCar = () => {
+    carOpen = false;
+    render();
+    const back = hasData(book) ? $('[data-kn-car-edit]') : $('[data-kn-go]');
+    if (back) back.focus({ preventScroll: true });
+  };
+  const vinMessage = (v) => (v.error === 'length' ? t('vinLength', { n: v.length }) : v.error === 'ioq' ? T.vinIoq : T.vinChars);
+  cf.vin.addEventListener('blur', () => {
+    const v = checkVin(cf.vin.value);
+    if (!cf.vin.value.trim()) { cf.vinNote.hidden = true; return; }
+    cf.vin.value = v.value;
+    cf.vinNote.hidden = !v.fixed;
+    setErr(cf.vin, v.error ? vinMessage(v) : '');
+  });
+  el.carForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const brand = oneLine(cf.brand.value, LEN.brand);
+    const model = oneLine(cf.model.value, LEN.model);
+    const yearRaw = cf.year.value.trim();
+    const year = yearRaw ? parseWhole(yearRaw, 1900, maxYear()) : null;
+    const vin = checkVin(cf.vin.value);
+    const km = parseKm(cf.km.value);
+    const bad = [];
+    if (!brand) bad.push([cf.brand, T.errBrand]);
+    if (!model) bad.push([cf.model, T.errModel]);
+    if (Number.isNaN(year) || (yearRaw && !/^\d{4}$/.test(yearRaw))) bad.push([cf.year, t('errYear', { max: maxYear() })]);
+    if (vin.error) bad.push([cf.vin, vinMessage(vin)]);
+    if (Number.isNaN(km)) bad.push([cf.km, T.errKm]);
+    if (showErrs(bad)) return;
+    const prev = book.car;
+    const today = localToday();
+    const kmDate = km === null ? null : (prev && prev.km === km && prev.kmDate ? prev.kmDate : today);
+    const car = { brand, model, year, engine: oneLine(cf.engine.value, LEN.engine), vin: vin.value, km, kmDate };
+    carOpen = false;
+    commit({ ...book, id: book.id || newId(), car }, T.carSaved, () => {
+      el.plate.focus({ preventScroll: true });
+      el.plate.scrollIntoView({ block: 'nearest', behavior: smooth() });
+    });
+  });
+  $('[data-kn-car-cancel]').addEventListener('click', closeCar);
+  $('[data-kn-car-edit]').addEventListener('click', openCar);
+  $('[data-kn-go]').addEventListener('click', openCar);
+
+  /* the mileage, quickly: never less than what is already written (a correction goes through the passport) */
+  const closeOdo = (focus) => {
+    el.odoForm.hidden = true;
+    el.odoOpen.hidden = !book.car;
+    clearErrs(el.odoForm);
+    if (focus) el.odoOpen.focus({ preventScroll: true });
+  };
+  el.odoOpen.addEventListener('click', () => {
+    el.odoForm.hidden = false;
+    el.odoOpen.hidden = true;
+    oKm.value = '';
+    oKm.focus();
+  });
+  $('[data-kn-odo-cancel]').addEventListener('click', () => closeOdo(true));
+  el.odoForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const c = book.car;
+    if (!c) { closeOdo(false); return; }
+    const km = parseKm(oKm.value);
+    if (km === null || Number.isNaN(km)) { showErrs([[oKm, T.errKm]]); return; }
+    if (c.km !== null && km < c.km) { showErrs([[oKm, t('errKmLess', { km: fmtNum(c.km) })]]); return; }
+    closeOdo(false);
+    commit({ ...book, car: { ...c, km, kmDate: localToday() } }, T.kmSaved, () => el.odoOpen.focus({ preventScroll: true }));
+  });
+
+  /* ---------- the interval ---------- */
+  const intervalError = (msg, input) => {
+    el.intervalErr.textContent = msg;
+    el.intervalErr.hidden = !msg;
+    [iKm, iMonths].forEach((i) => i.setAttribute('aria-invalid', msg && (!input || i === input) ? 'true' : 'false'));
+    if (msg && input) input.focus();
+  };
+  [iKm, iMonths].forEach((i) => i.addEventListener('input', () => intervalError('')));
+  $('[data-kn-interval-edit]').addEventListener('click', () => {
+    iKm.value = book.reminder.km ? String(book.reminder.km) : '';
+    iMonths.value = book.reminder.months ? String(book.reminder.months) : '';
+    intervalError('');
+    intervalOpen = true;
+    renderNext();
+    if (G.canHover) iKm.focus({ preventScroll: true });
+    el.interval.scrollIntoView({ block: 'nearest', behavior: smooth() });
+  });
+  el.intervalCancel.addEventListener('click', () => {
+    intervalOpen = false;
+    intervalError('');
+    renderNext();
+    $('[data-kn-interval-edit]').focus({ preventScroll: true });
+  });
+  el.interval.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const km = parseWhole(iKm.value, INTERVAL_KM[0], INTERVAL_KM[1]);
+    const months = parseWhole(iMonths.value, INTERVAL_MONTHS[0], INTERVAL_MONTHS[1]);
+    if (km === null && months === null) { intervalError(T.errInterval, iKm); return; }
+    if (Number.isNaN(km)) { intervalError(T.errIntervalKm, iKm); return; }
+    if (Number.isNaN(months)) { intervalError(T.errIntervalMonths, iMonths); return; }
+    intervalOpen = false;
+    commit({ ...book, id: book.id || newId(), reminder: { km, months } }, T.intervalSaved, () => {
+      // the form is gone: the focus goes to what it produced — the count, or the next step («Добавить запись о ТО»)
+      const target = el.main.hidden ? el.need : el.main;
+      (el.main.hidden ? el.need.querySelector('[data-kn-add-to]') : el.head).focus({ preventScroll: true });
+      target.scrollIntoView({ block: 'nearest', behavior: smooth() });
+    });
+  });
+
+  /* ---------- the log ---------- */
+  const markEditing = () => $$('.kn-entry', el.list).forEach((li) => li.classList.toggle('is-editing', li.dataset.id === editing));
+  const closeEntry = (focus) => {
+    editing = null;
+    el.entryForm.hidden = true;
+    el.add.setAttribute('aria-expanded', 'false');
+    el.empty.hidden = book.entries.length > 0;
+    markEditing();
+    if (focus) el.add.focus({ preventScroll: true });
+  };
+  const openEntry = (entry, preset) => {
+    if (!entry && book.entries.length >= MAX_ENTRIES) { toast(T.errFull, 'err'); return; }
+    editing = entry ? entry.id : '';
+    const today = localToday();
+    el.entryTitle.textContent = entry ? T.entryEdit : T.entryNew;
+    ef.date.max = today;
+    ef.date.value = entry ? entry.date : today;
+    const km = entry ? entry.km : (book.car ? book.car.km : null);
+    ef.km.value = km === null ? '' : String(km);
+    const works = entry ? entry.works : preset || [];
+    ef.works.forEach((c) => { c.checked = works.indexOf(c.value) >= 0; });
+    ef.text.value = entry ? entry.text : '';
+    ef.note.value = entry ? entry.note : '';
+    clearErrs(el.entryForm);
+    el.entryForm.hidden = false;
+    el.add.setAttribute('aria-expanded', 'true');
+    el.empty.hidden = true;
+    markEditing();
+    el.entryForm.scrollIntoView({ block: 'start', behavior: smooth() });
+    // with a mouse the cursor goes to the date; on a touch screen the title takes the focus (a screen reader starts
+    // there) and no keyboard jumps up over the form
+    (G.canHover ? ef.date : el.entryTitle).focus({ preventScroll: true });
+  };
+  // flash: the entry lights up once; move: the focus and the view go to it
+  const focusEntry = (id, flash, move = true) => {
+    const li = el.list.querySelector(`[data-id="${id}"]`);
+    if (!li) return;
+    if (flash) {
+      li.classList.add('is-new');
+      setTimeout(() => li.classList.remove('is-new'), 1800);
+    }
+    if (!move) return;
+    li.focus({ preventScroll: true });
+    li.scrollIntoView({ block: 'nearest', behavior: smooth() });
+  };
+  el.add.addEventListener('click', () => { if (editing !== null) closeEntry(true); else openEntry(null); });
+  $$('[data-kn-add-to]').forEach((b) => b.addEventListener('click', () => openEntry(null, ['to'])));
+  $('[data-kn-entry-cancel]').addEventListener('click', () => closeEntry(true));
+  el.entryForm.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const today = localToday();
+    const date = ef.date.value;
+    const km = parseKm(ef.km.value);
+    const works = ef.works.filter((c) => c.checked).map((c) => c.value);
+    const text = para(ef.text.value, LEN.text);
+    const bad = [];
+    if (!parseDate(date)) bad.push([ef.date, T.errDate]);
+    else if (date > today) bad.push([ef.date, T.errFuture]);
+    if (Number.isNaN(km)) bad.push([ef.km, T.errKm]);
+    if (!works.length && !text) bad.push([ef.works[0].closest('fieldset'), T.errWhat]);
+    if (showErrs(bad)) return;
+    const old = editing ? book.entries.find((e) => e.id === editing) : null;
+    const stamp = Date.now();
+    const entry = { id: old ? old.id : newId(), date, km, works, text, note: oneLine(ef.note.value, LEN.note),
+      created: old ? old.created : stamp, updated: stamp };
+    const entries = old ? book.entries.map((e) => (e.id === old.id ? entry : e)) : book.entries.concat(entry);
+    let car = book.car;
+    let message = old ? T.saved : T.added;
+    // a higher mileage in the log is the latest known one: the passport follows it
+    if (km !== null && car && (car.km === null || km > car.km)) {
+      car = { ...car, km, kmDate: date };
+      if (!old) message = T.addedKm;
+    }
+    const counting = (state) => ['setup', 'need-to'].indexOf(state) < 0;
+    const before = forecast(book, today).state;
+    closeEntry(false);
+    commit({ ...book, id: book.id || newId(), car, entries }, message, () => {
+      // the first «ТО» starts the count: that is what the visitor waits for, so the focus and the view go to the card
+      const first = !counting(before) && counting(forecast(book, today).state);
+      focusEntry(entry.id, true, !first);
+      if (first) {
+        el.head.focus({ preventScroll: true });
+        el.next.scrollIntoView({ block: 'start', behavior: smooth() });
+      }
+    });
+  });
+
+  /* ---------- the one confirm window (delete, delete everything, import) ---------- */
+  const dlg = document.getElementById('kn-dialog');
+  const ask = (o) => new Promise((resolve) => {
+    if (!dlg || typeof dlg.showModal !== 'function') {
+      resolve(window.confirm(`${o.title}\n\n${o.text}`) ? o.actions[0].value : null);
+      return;
+    }
+    if (dlg.open) { resolve(null); return; }
+    const opener = document.activeElement;
+    dlg.querySelector('#kn-dialog-title').textContent = o.title;
+    dlg.querySelector('#kn-dialog-text').textContent = o.text;
+    const box = dlg.querySelector('[data-kn-dialog-actions]');
+    box.textContent = '';
+    const cancel = Object.assign(node('button', 'btn btn--ghost', T.cancel), { type: 'button' });
+    cancel.setAttribute('data-close', '');   // core.js closes the dialog
+    box.appendChild(cancel);
+    o.actions.forEach((a) => {
+      const b = node('button', `btn ${a.kind === 'ghost' ? 'btn--ghost' : 'btn--primary'}${a.kind === 'danger' ? ' kn-btn-danger' : ''}`, a.label);
+      Object.assign(b, { type: 'button' }).dataset.knChoice = a.value;
+      box.appendChild(b);
+    });
+    let result = null;
+    const pick = (ev) => {
+      const b = ev.target.closest('[data-kn-choice]');
+      if (!b) return;
+      result = b.dataset.knChoice;
+      dlg.close();
+    };
+    dlg.addEventListener('click', pick);
+    dlg.addEventListener('close', () => {
+      dlg.removeEventListener('click', pick);
+      if (opener && typeof opener.focus === 'function' && document.contains(opener)) opener.focus({ preventScroll: true });
+      resolve(result);
+    }, { once: true });
+    dlg.showModal();
+    cancel.focus();
+  });
+
+  el.list.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('[data-act]');
+    if (!b) return;
+    const li = b.closest('.kn-entry');
+    const e = li ? book.entries.find((x) => x.id === li.dataset.id) : null;
+    if (!e) return;
+    if (b.dataset.act === 'edit') { openEntry(e); return; }
+    const date = fmtDate(e.date);
+    if (await ask({ title: T.delTitle, text: t('delText', { date }), actions: [{ value: 'yes', label: T.delOk, kind: 'danger' }] }) !== 'yes') return;
+    const sorted = book.entries.slice().sort(newestFirst);
+    const i = sorted.findIndex((x) => x.id === e.id);
+    const next = sorted[i + 1] || sorted[i - 1] || null;
+    if (editing === e.id) closeEntry(false);
+    commit({ ...book, entries: book.entries.filter((x) => x.id !== e.id) }, T.deleted, () => {
+      if (next) focusEntry(next.id, false);
+      else if (!el.desk.hidden) el.add.focus({ preventScroll: true });
+    });
+  });
+
+  /* ---------- the next service: calendar, «Записаться» ---------- */
+  const download = (text, type, name) => {   // a file made here: nothing is fetched or sent
+    if (!window.Blob || !window.URL || !URL.createObjectURL) return false;
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([text], { type })), download: name });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);   // a phone reads the file after its own dialog
+    return true;
+  };
+  el.ics.addEventListener('click', () => {
+    const today = localToday();
+    const f = forecast(book, today);
+    if (f.state === 'over' || !f.date || daysBetween(today, f.date) <= 0) { renderNext(); return; }
+    const car = book.car ? carTitle(book.car) : '';
+    const text = buildIcs({
+      // one reminder per service cycle: a new export after the same «ТО» replaces the event in the calendar
+      uid: `knizhka-${book.id || 'book'}-${f.base.id}@garage.team`,
+      stamp: new Date(),
+      date: f.date,
+      summary: car ? t('icsSummary', { car }) : T.icsSummaryNoCar,
+      description: t('icsDesc', { rule: ruleText(book.reminder), last: lastLine(f.base), phone: conf.phone }),
+      url: pageUrl(),
+      alarm: car ? t('icsAlarm', { car }) : T.icsSummaryNoCar,
+    });
+    if (download(text, 'text/calendar;charset=utf-8', T.icsFile)) toast(t('icsDone', { file: T.icsFile }));
+    else toast(T.noDownload, 'err');
+  });
+  const openCall = (works, withLast) => {
+    const c = book.car;
+    const parts = [works.length ? t('bookWorks', { works: works.map((k) => PHRASE[k] || k).join(', ') }) : T.bookNone];
+    if (c) parts.push(t('bookCar', { car: carLine(c, true) }));
+    const f = withLast ? forecast(book, localToday()) : null;
+    if (f && f.base) parts.push(t('bookLast', { last: lastLine(f.base) }));
+    if (G.openModal) G.openModal('call', { message: parts.join(' '), car: c ? carLine(c, false) : '', vin_code: c ? c.vin : '' });
+  };
+  $('[data-kn-book]').addEventListener('click', () => openCall(bookWorks.filter((c) => c.checked).map((c) => c.value), false));
+  $('[data-kn-book-to]').addEventListener('click', () => openCall(['to'], true));
+
+  /* ---------- the copy: save, load (merge or replace), delete everything, print ---------- */
+  $('[data-kn-export]').addEventListener('click', () => {
+    const name = t('jsonFile', { date: localToday() });
+    if (download(JSON.stringify(serial(book, Date.now()), null, 2), 'application/json;charset=utf-8', name)) toast(t('jsonDone', { file: name }));
+    else toast(T.noDownload, 'err');
+  });
+  const picker = $('[data-kn-file]');   // a hidden file field; the two «Загрузить из файла» buttons open it
+  $$('[data-kn-import]').forEach((b) => b.addEventListener('click', () => { picker.value = ''; picker.click(); }));
+  const readText = (file) => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    Object.assign(r, { onload: () => resolve(String(r.result)), onerror: () => reject(r.error) });
+    r.readAsText(file);
+  });
+  const settle = (next, message) => {
+    carOpen = false;
+    intervalOpen = false;
+    if (editing !== null) closeEntry(false);
+    commit(next, message, () => { if (!el.desk.hidden) el.plate.focus({ preventScroll: true }); root.scrollIntoView({ block: 'start', behavior: smooth() }); });
+  };
+  picker.addEventListener('change', async () => {
+    const file = picker.files && picker.files[0];
+    if (!file) return;
+    if (file.size > MAX_FILE) { toast(T.importLarge, 'err'); return; }
+    let raw = '';
+    try { raw = await readText(file); } catch (_) { toast(T.importRead, 'err'); return; }
+    let obj = null;
+    try { obj = JSON.parse(raw); } catch (_) { toast(T.importBroken, 'err'); return; }
+    const s = sanitizeBook(obj, KEYS);
+    if (!s.ok) { toast(T[`import_${s.error}`] || T.import_format, 'err'); return; }
+    const skipped = s.dropped ? ` ${t('importSkipped', { n: s.dropped })}` : '';
+    const loaded = t('importDone', { n: count(s.book.entries.length, 'pEntries') }) + skipped;
+    if (!hasData(book)) { settle(s.book, loaded); return; }
+    const what = `${s.book.car ? carTitle(s.book.car) : T.importNoCar}, ${count(s.book.entries.length, 'pEntries')}`;
+    const choice = await ask({ title: T.importTitle, text: t('importAsk', { what }),
+      actions: [{ value: 'replace', label: T.importReplace, kind: 'ghost' }, { value: 'merge', label: T.importMerge, kind: 'primary' }] });
+    if (choice === 'replace') settle(s.book, loaded);
+    else if (choice === 'merge') {
+      const m = mergeBooks(book, s.book);
+      settle(m.book, (m.added ? t('importMerged', { n: count(m.added, 'pEntries') }) : T.importNothing) + skipped);
+    }
+  });
+  $('[data-kn-wipe]').addEventListener('click', async () => {
+    if (await ask({ title: T.wipeTitle, text: T.wipeText, actions: [{ value: 'wipe', label: T.wipeOk, kind: 'danger' }] }) !== 'wipe') return;
+    const res = store.clear();
+    brokenRaw = null;
+    book = emptyBook();
+    carOpen = false;
+    intervalOpen = false;
+    closeEntry(false);
+    closeOdo(false);
+    bookWorks.forEach((c) => { c.checked = false; });
+    iKm.value = '';
+    iMonths.value = '';
+    problem = res === 'ok' ? '' : 'off';
+    render();
+    syncFill(null);
+    toast(T.wipeDone);
+    root.scrollIntoView({ block: 'start', behavior: smooth() });
+    $('[data-kn-go]').focus({ preventScroll: true });
+  });
+
+  // the print version: a plain sheet with the passport, the interval and the log in order of dates (knizhka.css @media print)
+  const buildPrint = () => {
+    const p = el.sheet;
+    p.textContent = '';
+    const c = book.car;
+    const today = localToday();
+    p.appendChild(node('p', 'kn-print__kicker', `${T.printTitle}`));
+    p.appendChild(node('h2', 'kn-print__car', c ? carTitle(c) : T.noCar));
+    const facts = [];
+    if (c && c.year) facts.push(`${c.year}${NB}г.`);
+    if (c && c.engine) facts.push(engineText(c.engine));
+    if (c && c.vin) facts.push(`VIN ${c.vin}`);
+    if (c && c.km !== null) facts.push(`${fmtNum(c.km)}${NB}км (${t('kmAt', { date: fmtDate(c.kmDate) || '—' })})`);
+    if (facts.length) p.appendChild(node('p', 'kn-print__facts', facts.join(' · ')));
+    const f = forecast(book, today);
+    if (book.reminder.km || book.reminder.months) p.appendChild(node('p', 'kn-print__line', t('printRule', { rule: ruleText(book.reminder) })));
+    if (['setup', 'need-to'].indexOf(f.state) < 0) {
+      // «Следующее ТО: Примерно 5 октября 2026, осталось 500 км / 224 дня» — the card's line and what is left
+      const left = [f.km && f.km.left > 0 ? `${fmtNum(f.km.left)}${NB}км` : '', f.time && f.time.left > 0 ? count(f.time.left, 'pDays') : '']
+        .filter(Boolean).join(' / ');
+      const text = [headline(f).head, f.state !== 'over' && left ? t('printLeft', { what: left }) : ''].filter(Boolean).join(', ');
+      p.appendChild(node('p', 'kn-print__line', t('printNext', { text })));
+    }
+    p.appendChild(node('h3', 'kn-print__h', T.printLog));
+    const rows = book.entries.slice().sort(newestFirst).reverse();
+    if (!rows.length) p.appendChild(node('p', 'kn-print__line', T.printEmpty));
+    else {
+      const table = node('table', 'kn-print__table');
+      const head = node('tr');
+      T.printCols.forEach((h) => head.appendChild(node('th', '', h)));
+      const thead = node('thead');
+      thead.appendChild(head);
+      const tbody = node('tbody');
+      rows.forEach((e) => {
+        const tr = node('tr');
+        const what = [e.works.map((k) => LABEL[k] || k).join(', '), e.text].filter(Boolean).join('. ');
+        [fmtDate(e.date), e.km === null ? '—' : fmtNum(e.km), what, e.note, ''].forEach((v) => tr.appendChild(node('td', '', v)));
+        tbody.appendChild(tr);
+      });
+      table.append(thead, tbody);
+      p.appendChild(table);
+    }
+    p.appendChild(node('p', 'kn-print__foot', t('printFoot', { date: fmtDate(today), url: pageUrl().replace(/^https?:\/\//, ''), phone: conf.phone })));
+  };
+  $('[data-kn-print]').addEventListener('click', () => { buildPrint(); window.print(); });
+  addEventListener('beforeprint', buildPrint);
+
+  // Escape in an open form works as its «Отмена» (the confirm window closes itself)
+  root.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape' || !ev.target.closest) return;
+    const form = ev.target.closest('form');
+    const cancel = form ? form.querySelector('[data-kn-car-cancel], [data-kn-entry-cancel], [data-kn-interval-cancel], [data-kn-odo-cancel]') : null;
+    if (cancel && !cancel.hidden) { ev.preventDefault(); cancel.click(); }
+  });
+
+  /* ---------- start ---------- */
+  const first = load();
+  book = first.book;
+  problem = first.problem || (store.probe() ? '' : 'off');
+  // another tab of this site changed the book
+  addEventListener('storage', (e) => {
+    if (e.key !== KEY && e.key !== null) return;
+    const next = load();
+    book = next.book;
+    problem = next.problem;
+    if (editing && !book.entries.some((x) => x.id === editing)) closeEntry(false);
+    render();
+    syncFill(book.car);
+  });
+  root.hidden = false;
+  render();
+})();
+
+/* ============================================================
+   vremya: «Когда удобно приехать?» — a wish for the day and the part of the day in the request form (step 2) and in
+   the call-back modal. data-vremya (build/vremya.py) holds the week of D.HOURS in minutes, the parts of the day and
+   the texts; the 14 days are counted here in Moscow time, and today's parts that are over are left out.
+   The choice is one line at the top of the text the backend already receives («Удобно приехать: пт, 2 октября,
+   утром (9–12)»): replaced when the choice changes, removed when it is cleared. Everything else in the text stays as
+   the visitor (or «Что стучит?», «Зима») wrote it, and a line edited by hand is the visitor's own text from then on.
+   Without JS the picker stays hidden and the form is as it was.
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = (window.G = window.G || {});
+  const TZ = 'Europe/Moscow';   // Nizhny Novgorod keeps Moscow time: UTC+3 all year, no daylight saving
+  const UTC_OFFSET = 180;       // minutes, for a browser without time zone data
+  const LIVE_DELAY = 450;       // arrow keys run through the days: the screen reader hears the line once they stop
+  const WEEKDAY = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+  const WD = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+  const WD_FULL = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье'];
+  const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  const MONTHS_SHORT = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  const STEP = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+
+  /* ---------- the Moscow calendar of a Date: { y, m (1–12), d, wd (0 = Monday), min (since midnight) } ----------
+     the approach of otkryto.js: Intl with the Moscow zone, UTC+3 arithmetic when the browser has no zone data */
+  let clock = null;
+  const moscow = (date) => {
+    try {
+      clock = clock || new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false });
+      const p = {};
+      clock.formatToParts(date).forEach((x) => { p[x.type] = x.value; });
+      // % 24: some engines say «24» at midnight
+      const now = { y: Number(p.year), m: Number(p.month), d: Number(p.day), wd: WEEKDAY[p.weekday], min: (Number(p.hour) % 24) * 60 + Number(p.minute) };
+      if (now.wd !== undefined && !p.dayPeriod && [now.y, now.m, now.d, now.min].every(Number.isFinite)) return now;
+    } catch (_) { /* no time zone data: UTC+3 below */ }
+    const t = new Date(date.getTime() + UTC_OFFSET * 60000);
+    return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate(), wd: (t.getUTCDay() + 6) % 7, min: t.getUTCHours() * 60 + t.getUTCMinutes() };
+  };
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const hm = (min) => (min % 60 ? Math.floor(min / 60) + ':' + pad(min % 60) : String(min / 60));   // 540 «9», 570 «9:30»
+  const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+
+  /* ---------- the logic of one picker, without the page (tests/vremya_cases.cjs runs it in node) ---------- */
+  const create = (conf) => {
+    const { week, parts, lead, t } = conf;
+    const TIME = '\\d{1,2}(?::\\d{2})?';
+    // exactly the line this script writes; anything else in the text belongs to the visitor
+    const shape = new RegExp(`^\\s*${escRe(t.prefix)} (${WD.join('|')}), (\\d{1,2}) (${MONTHS.join('|')})`
+      + `(?:, (?:(${parts.map((p) => escRe(p.word)).join('|')}) \\((${TIME})–(${TIME})\\)|(${escRe(t.any_line)})))?\\s*$`);
+
+    // the window of conf.days days from today: each day open / closed / late (today, every part over) with its parts
+    const days = (now) => {
+      const list = [];
+      for (let i = 0; i < conf.days; i += 1) {
+        const c = new Date(Date.UTC(now.y, now.m - 1, now.d + i));   // calendar arithmetic: months and years roll over
+        const day = { key: `${c.getUTCFullYear()}-${pad(c.getUTCMonth() + 1)}-${pad(c.getUTCDate())}`, y: c.getUTCFullYear(),
+          m: c.getUTCMonth() + 1, d: c.getUTCDate(), wd: (c.getUTCDay() + 6) % 7, offset: i, state: 'open', note: '', slots: [] };
+        const spec = (conf.closedDates || []).includes(day.key) ? null :
+          (conf.calendarThrough && day.key > conf.calendarThrough ? { note: 'График уточняется по телефону' } : week[day.wd]);
+        if (Array.isArray(spec)) {
+          // a part of the day is its window cut by the day's hours; today it is offered while `lead` minutes of it are left
+          day.slots = parts.map((p) => ({ key: p.key, word: p.word, title: p.title, from: Math.max(p.from, spec[0]), to: Math.min(p.to, spec[1]) }))
+            .filter((s) => s.to > s.from && (i > 0 || now.min <= s.to - lead));
+          if (i === 0 && !day.slots.length) day.state = 'late';
+        } else if (spec && spec.note) {
+          day.note = spec.note;   // a day with a note instead of hours («по предварительной записи»): only «Любое время»
+        } else {
+          day.state = 'closed';   // null: not in D.HOURS
+        }
+        list.push(day);
+      }
+      return list;
+    };
+
+    // what a day's chip shows and what a screen reader hears: «пятница, 2 октября, сегодня», «воскресенье, 4 октября, выходной»
+    const dayLabel = (day) => {
+      const when = day.offset === 0 ? t.today : day.offset === 1 ? t.tomorrow : '';
+      const why = day.state === 'closed' ? t.closed : day.state === 'late' ? t.late : day.note;
+      return { wd: WD[day.wd], num: pad(day.d), tag: day.state === 'closed' ? t.closed : when || MONTHS_SHORT[day.m - 1],
+        sr: [`${WD_FULL[day.wd]}, ${day.d} ${MONTHS[day.m - 1]}`, when, why].filter(Boolean).join(', ') };
+    };
+    // a part's chip: «Утром» over «9–12»; a screen reader hears «утром, с 9 до 12»
+    const partLabel = (slot) => {
+      const from = hm(slot.from);
+      const to = hm(slot.to);
+      return { title: slot.title, hours: `${from}–${to}`, sr: fill(t.part_sr, { word: slot.word, from, to }) };
+    };
+
+    const lineFor = (day, part) => {
+      const slot = day.slots.find((s) => s.key === part);
+      let line = `${t.prefix} ${WD[day.wd]}, ${day.d} ${MONTHS[day.m - 1]}`;
+      if (part === 'any') line += `, ${t.any_line}`;
+      else if (slot) line += `, ${slot.word} (${hm(slot.from)}–${hm(slot.to)})`;
+      return line;
+    };
+
+    const isLine = (l) => shape.test(l);
+    // the text with `line` at the top (or without any line of ours when `line` is empty); the rest stays as it was
+    const withLine = (text, line) => {
+      const rest = String(text == null ? '' : text).split('\n').filter((l) => !isLine(l)).join('\n');
+      // with a line and nothing else the text ends in a line break: a tap under it starts a new line, not our line
+      return line ? `${line}\n${rest}` : rest;
+    };
+
+    // the choice a line of ours in the text stands for: { date, part } | { invalid } | null when there is no such line
+    const parse = (text, list) => {
+      const lines = String(text == null ? '' : text).split('\n');
+      for (let i = 0; i < lines.length; i += 1) {
+        const m = shape.exec(lines[i]);
+        if (!m) continue;
+        const day = list.find((x) => WD[x.wd] === m[1] && x.d === Number(m[2]) && MONTHS[x.m - 1] === m[3]);
+        if (!day || day.state !== 'open') return { invalid: true };
+        if (m[7]) return { date: day.key, part: 'any' };
+        if (!m[4]) return { date: day.key, part: null };
+        const slot = day.slots.find((s) => s.word === m[4]);
+        if (!slot || hm(slot.from) !== m[5] || hm(slot.to) !== m[6]) return { invalid: true };
+        return { date: day.key, part: slot.key };
+      }
+      return null;
+    };
+
+    return { days, dayLabel, partLabel, lineFor, withLine, isLine, parse };
+  };
+
+  /* ---------- the picker on the page ---------- */
+  const valid = (c) => !!c && Array.isArray(c.week) && c.week.length === 7 && Array.isArray(c.parts) && c.parts.length > 0
+    && c.parts.every((p) => p && typeof p.key === 'string' && typeof p.word === 'string' && typeof p.title === 'string' && p.from < p.to)
+    && Number.isFinite(c.lead) && Number.isInteger(c.days) && c.days > 0 && !!c.t
+    && ['prefix', 'any', 'any_line', 'today', 'tomorrow', 'closed', 'late', 'part_sr', 'expired', 'cleared', 'where'].every((k) => typeof c.t[k] === 'string');
+  const same = (a, b) => (!a && !b) || (!!a && !!b && a.date === b.date && a.part === b.part);
+
+  const mount = (root, conf, field) => {
+    const api = create(conf);
+    const t = conf.t;
+    const $ = (s) => root.querySelector(s);
+    const daysBox = $('[data-vr-days]');
+    const partsBox = $('[data-vr-parts]');
+    const clearBtn = $('[data-vr-clear]');
+    const status = $('[data-vr-status]');
+    const lineOut = $('[data-vr-line]');
+    const live = $('[data-vr-live]');
+    const body = $('[data-vr-body]');
+    const toggle = $('[data-vr-toggle]');   // the modal's picker is folded: its question opens the days
+    if (!daysBox || !partsBox || !clearBtn || !status || !lineOut || !live || !body) return null;
+
+    let open = !toggle;
+    let list = [];
+    let key = '';
+    let sel = null;        // { date: 'YYYY-MM-DD', part: key | 'any' | null }
+    let writing = false;   // our own input event: nothing to read back
+    let liveTimer = 0;
+
+    const selDay = () => (sel ? list.find((d) => d.key === sel.date) : null);
+    const currentLine = () => { const day = selDay(); return day ? api.lineFor(day, sel.part) : ''; };
+
+    /* chips: buttons with the radio role (a named input would add a field to what the form posts) */
+    const radio = (cls, label) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = cls;
+      b.tabIndex = -1;
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.setAttribute('aria-label', label);
+      return b;
+    };
+    const span = (cls, text) => {
+      const s = document.createElement('span');
+      s.className = cls;
+      s.textContent = text;
+      s.setAttribute('aria-hidden', 'true');
+      return s;
+    };
+    const dayChip = (day) => {
+      const l = api.dayLabel(day);
+      const b = radio('vr-day', l.sr);
+      b.dataset.date = day.key;
+      if (day.offset === 0) b.classList.add('is-today');
+      if (day.state !== 'open') { b.disabled = true; b.classList.add('is-' + day.state); }
+      b.append(span('vr-day__wd', l.wd), ' ', span('vr-day__d', l.num), ' ', span('vr-day__tag', l.tag));   // spaces: copied text reads «пт 02 окт»
+      return b;
+    };
+    const partChip = (slot) => {
+      const l = api.partLabel(slot);
+      const b = radio('vr-part', l.sr);
+      b.dataset.part = slot.key;
+      b.append(span('vr-part__t', l.title), ' ', span('vr-part__h', l.hours));
+      return b;
+    };
+    const anyChip = () => {
+      const b = radio('vr-part vr-part--any', t.any);
+      b.dataset.part = 'any';
+      b.append(span('vr-part__t', t.any));
+      return b;
+    };
+
+    /* roving tabindex: one tab stop per group, on the checked chip or the first one that can be chosen */
+    const radios = (box) => Array.from(box.querySelectorAll('[role="radio"]'));
+    const paint = (box, attr, value) => {
+      const all = radios(box);
+      const on = all.find((b) => !b.disabled && b.dataset[attr] === value);
+      const stop = on || all.find((b) => !b.disabled);
+      all.forEach((b) => { b.setAttribute('aria-checked', String(b === on)); b.tabIndex = b === stop ? 0 : -1; });
+    };
+    const buildDays = () => { daysBox.textContent = ''; list.forEach((d) => daysBox.append(dayChip(d))); };
+    const buildParts = () => {
+      const day = selDay();
+      partsBox.textContent = '';
+      partsBox.hidden = !day;
+      if (!day) return;
+      [...day.slots.map(partChip), anyChip()].forEach((b, i) => {
+        b.style.setProperty('--i', String(i));   // the chips come in one after another (vremya.css)
+        partsBox.append(b);
+      });
+    };
+    const render = (dayChanged) => {
+      paint(daysBox, 'date', sel && sel.date);
+      if (dayChanged) buildParts();
+      paint(partsBox, 'part', sel && sel.part);
+    };
+    const showStatus = (expired) => {
+      const line = currentLine();
+      status.hidden = !line && !expired;
+      status.classList.toggle('is-warn', !line && !!expired);
+      lineOut.textContent = line || (expired ? t.expired : '');
+      clearBtn.hidden = !sel;
+      root.classList.toggle('is-set', !!sel);
+    };
+    const announce = (text, soon) => {
+      clearTimeout(liveTimer);
+      liveTimer = setTimeout(() => { live.textContent = text; }, soon ? 60 : LIVE_DELAY);
+    };
+
+    /* the text field: the line goes in, is replaced or comes out; an input event tells the form's own listeners.
+       A visitor typing in it (a choice taken back by the clock) keeps the caret: the change is above it, so the
+       caret keeps its distance from the end */
+    const write = () => {
+      const before = field.value;
+      const next = api.withLine(before, currentLine());
+      if (next === before) return;
+      const typing = document.activeElement === field;
+      const fromEnd = typing ? [before.length - field.selectionStart, before.length - field.selectionEnd] : null;
+      field.value = next;
+      if (fromEnd) field.setSelectionRange(Math.max(0, next.length - fromEnd[0]), Math.max(0, next.length - fromEnd[1]));
+      writing = true;
+      try { field.dispatchEvent(new Event('input', { bubbles: true })); } finally { writing = false; }
+    };
+
+    const choose = (next) => {
+      const dayChanged = (sel && sel.date) !== (next && next.date);
+      sel = next;
+      render(dayChanged);
+      write();
+      showStatus(false);
+      announce(sel ? `${t.where} ${currentLine()}` : t.cleared, !sel);
+    };
+    const focusChip = (box, attr, value) => {
+      const b = radios(box).find((x) => x.dataset[attr] === value);
+      if (!b) return;
+      b.focus({ preventScroll: true });
+      b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: G.reducedMotion ? 'auto' : 'smooth' });
+    };
+    const pickDay = (b, byKey) => {
+      const day = list.find((d) => d.key === b.dataset.date);
+      if (!day || day.state !== 'open') return;
+      // the part stays when the new day has it too: Saturday's evening is shorter, it is still the evening
+      const part = sel && (sel.part === 'any' || day.slots.some((s) => s.key === sel.part)) ? sel.part : null;
+      if (!same(sel, { date: day.key, part })) choose({ date: day.key, part });
+      if (byKey) focusChip(daysBox, 'date', day.key);
+    };
+    const pickPart = (b, byKey) => {
+      if (!sel) return;
+      if (sel.part !== b.dataset.part) choose({ date: sel.date, part: b.dataset.part });
+      if (byKey) focusChip(partsBox, 'part', b.dataset.part);
+    };
+
+    // arrows move and choose, as in a group of radio buttons; the closed days are stepped over
+    const onKey = (box, pick) => (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const items = radios(box).filter((b) => !b.disabled);
+      const i = items.indexOf(e.target);
+      if (i < 0) return;
+      let j;
+      if (e.key in STEP) j = (i + STEP[e.key] + items.length) % items.length;
+      else if (e.key === 'Home') j = 0;
+      else if (e.key === 'End') j = items.length - 1;
+      else return;
+      e.preventDefault();
+      pick(items[j], true);
+    };
+    daysBox.addEventListener('keydown', onKey(daysBox, pickDay));
+    partsBox.addEventListener('keydown', onKey(partsBox, pickPart));
+    daysBox.addEventListener('click', (e) => { const b = e.target.closest('.vr-day'); if (b && !b.disabled) pickDay(b, false); });
+    partsBox.addEventListener('click', (e) => { const b = e.target.closest('.vr-part'); if (b) pickPart(b, false); });
+    clearBtn.addEventListener('click', () => {
+      choose(null);
+      // the button hides itself: the keyboard focus goes to the days (to the question when they are folded)
+      const stop = open ? daysBox.querySelector('[tabindex="0"]') : toggle;
+      if (stop) stop.focus({ preventScroll: true });
+    });
+
+    const setOpen = (v) => {
+      open = v;
+      body.hidden = !v;
+      if (toggle) toggle.setAttribute('aria-expanded', String(v));
+      root.classList.toggle('is-open', v);
+    };
+    if (toggle) toggle.addEventListener('click', () => setOpen(!open));
+
+    // the text is the truth: a line removed or changed by hand clears the chips; a line of ours sets them
+    // (a form the browser restored after a reload); repair: a restored line for a day already gone is taken out
+    const sync = (repair) => {
+      const found = api.parse(field.value, list);
+      if (found && found.invalid && repair) field.value = api.withLine(field.value, '');
+      const next = found && !found.invalid ? found : null;
+      if (same(next, sel)) return;
+      const dayChanged = (sel && sel.date) !== (next && next.date);
+      sel = next;
+      render(dayChanged);
+      showStatus(false);
+    };
+    field.addEventListener('input', () => { if (!writing) sync(false); });
+
+    // the modal's form is reset when the dialog closes (form.js): the field empties itself, the chips follow
+    if (field.form) {
+      field.form.addEventListener('reset', () => {
+        clearTimeout(liveTimer);
+        live.textContent = '';
+        const dayChanged = !!sel;
+        sel = null;
+        render(dayChanged);
+        showStatus(false);
+        if (toggle) setOpen(false);
+      });
+    }
+
+    // a new day (midnight) or today's part that is over: the days are built again; a choice that is gone is taken back
+    const refresh = (now) => {
+      const next = api.days(now);
+      const k = next.map((d) => `${d.key}:${d.state}:${d.slots.map((s) => s.key).join('.')}`).join('|');
+      if (k === key) return;
+      key = k;
+      list = next;
+      const had = root.contains(document.activeElement) ? document.activeElement : null;
+      buildDays();
+      let expired = false;
+      const day = selDay();
+      if (sel && !(day && day.state === 'open' && (!sel.part || sel.part === 'any' || day.slots.some((s) => s.key === sel.part)))) {
+        sel = null;
+        expired = true;
+      }
+      render(true);
+      if (expired) { write(); announce(t.expired, true); }
+      showStatus(expired);
+      if (had && !root.contains(document.activeElement)) {
+        const stop = (had.dataset.part && partsBox.querySelector('[tabindex="0"]')) || daysBox.querySelector('[tabindex="0"]');
+        if (stop) stop.focus({ preventScroll: true });
+      }
+    };
+
+    return {
+      field,
+      ownText: () => api.withLine(field.value, ''),
+      start(now) {
+        refresh(now);
+        sync(true);
+        setOpen(open || !!sel);   // a choice restored with the form is shown open
+        root.hidden = false;
+      },
+      refresh,
+    };
+  };
+
+  /* ---------- start: every [data-vremya] with its text field; one minute clock for all ---------- */
+  const pickers = [];
+  G.vremya = {
+    create,
+    moscow,
+    // form.js, step 2: the text of the field without the picker's line (the line alone does not describe the task)
+    ownText: (el) => {
+      const p = pickers.find((x) => x.field === el);
+      return p ? p.ownText() : (el ? el.value : '');
+    },
+  };
+
+  // whatever goes wrong with one picker, it stays hidden and the form works as before; site.js goes on
+  const now = moscow(new Date());
+  document.querySelectorAll('[data-vremya]').forEach((root) => {
+    let conf = null;
+    try { conf = JSON.parse(root.dataset.vremya); } catch (_) { conf = null; }
+    const field = document.getElementById(root.dataset.vrFor || '');
+    if (!valid(conf) || !field || !('value' in field)) return;
+    try {
+      const p = mount(root, conf, field);
+      if (!p) return;
+      p.start(now);
+      pickers.push(p);
+    } catch (_) {
+      root.hidden = true;
+    }
+  });
+
+  if (pickers.length) {
+    let timer = 0;
+    const tick = () => {
+      clearTimeout(timer);
+      // next look right after the minute turns, and none while the tab is hidden
+      if (document.visibilityState !== 'hidden') timer = setTimeout(tick, 60000 - (Date.now() % 60000) + 200);
+      const at = moscow(new Date());
+      pickers.forEach((p) => { try { p.refresh(at); } catch (_) { /* this picker keeps its days; the next minute tries again */ } });
+    };
+    timer = setTimeout(tick, 60000 - (Date.now() % 60000) + 200);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') clearTimeout(timer); else tick(); });
+    addEventListener('pageshow', (e) => { if (e.persisted) tick(); });
+  }
+})();
+
+/* ============================================================
+   «Неон» (build/neon.py, neon.css)
+   1. The footer sign: dark until the strip comes into view, then it strikes on once and stays lit.
+   2. The 404 sign: the broken tube catches after its start-up (CSS); from then on it buzzes briefly every 6–15 s,
+      only while the sign is on screen and the tab is visible — between buzzes nothing runs at all.
+   Without JavaScript and with reduced motion every tube simply burns (the CSS default).
+   ============================================================ */
+(() => {
+  'use strict';
+  const G = window.G || {};
+  if (G.reducedMotion || !('IntersectionObserver' in window)) return;
+
+  /* ---------- 1. the footer sign ---------- */
+  // The observer's first report says where the sign is when the page opens: on screen (a short page, a reload at the
+  // bottom) it simply stays lit; below the fold it goes dark (unseen) and strikes on once it is well in view.
+  const strip = document.querySelector('[data-neon-sign]');
+  const stripSign = strip && strip.firstElementChild;
+  const ON_AT = 0.6;        // share of the sign that must be on screen
+  if (stripSign) {
+    let first = true;
+    const io = new IntersectionObserver((entries) => {
+      const en = entries[entries.length - 1];
+      if (first) {
+        first = false;
+        if (en.isIntersecting) io.disconnect(); else strip.classList.add('is-off');
+        return;
+      }
+      if (!en.isIntersecting || en.intersectionRatio < ON_AT - 0.05) return;
+      io.disconnect();
+      strip.classList.replace('is-off', 'is-on');
+    }, { threshold: ON_AT });
+    io.observe(stripSign);
+  }
+
+  /* ---------- 2. the broken tube of the 404 ---------- */
+  const scene = document.querySelector('[data-neon-404]');
+  const tube = scene && scene.querySelector('.neon-404__tube');
+  if (!tube) return;
+  const BUZZ = ['is-buzz-1', 'is-buzz-2', 'is-buzz-3'];
+  const PAUSE_MIN = 6000;   // ms between two buzzes…
+  const PAUSE_MAX = 15000;  // …at random, so it never beats like a clock
+  let steady = false;
+  let onScreen = false;
+  let timer = 0;
+
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = 0;
+    if (steady && onScreen && !document.hidden) timer = setTimeout(buzz, PAUSE_MIN + Math.random() * (PAUSE_MAX - PAUSE_MIN));
+  };
+  function buzz() {
+    timer = 0;
+    if (!onScreen || document.hidden) return;
+    // a buzz whose end was never reported (the tab was hidden at that moment): clear it and wait for the next one
+    if (BUZZ.some((c) => scene.classList.contains(c))) { scene.classList.remove(...BUZZ); schedule(); return; }
+    scene.classList.add(BUZZ[Math.floor(Math.random() * BUZZ.length)]);
+  }
+  const settle = () => {
+    if (steady) return;
+    steady = true;
+    scene.classList.add('is-steady');
+    schedule();
+  };
+
+  // the start-up flicker or a buzz is over (the event of the tube itself, not of its light on the wall)
+  tube.addEventListener('animationend', (e) => {
+    if (e.target !== tube) return;
+    if (!steady) { settle(); return; }
+    scene.classList.remove(...BUZZ);
+    schedule();
+  });
+  // in case animationend never comes (the page opened in a background tab): the start-up's own length, from the CSS
+  const cs = getComputedStyle(tube);
+  setTimeout(settle, (parseFloat(cs.animationDelay) + parseFloat(cs.animationDuration)) * 1000 + 250 || 6000);
+
+  new IntersectionObserver((entries) => {
+    onScreen = entries.some((en) => en.isIntersecting);
+    schedule();
+  }).observe(tube);
+  document.addEventListener('visibilitychange', schedule);
+})();
+
+/* ============================================================
+   «Фонарь по кирпичу» (fonar): the dark sections of the site are an old brick wall at night, and the mouse carries
+   a hand lamp along it — a soft warm pool that trails the cursor and shows brick and mortar inside it, a shade
+   warmer under the pendant over «Как у нас». The light goes out when the cursor leaves the wall or rests a while.
+   Hook: data-fonar on the sections (build/fonar.py, which also draws the wall tile); styles: fonar.css.
+   What keeps it cheap:
+     1. nothing at all without a mouse (hover + fine pointer) or with reduced motion: no layers, no listeners;
+     2. the lamp travels in legs: the script plans at most GAP-spaced legs from the pointer events, and each leg is
+        a pair of compositor animations (Web Animations, one start time) — the pool goes to the cursor and the wall
+        inside it goes the other way by exactly as much, so the bricks stay put on the page. The frames in between
+        are the compositor's: no script, no restyle, no re-layering. (A transform written every frame re-layers
+        the whole page in Chromium: measured, see notes/fishka-fonar.md.) No requestAnimationFrame loop at all;
+     3. when the cursor stops, the last leg runs out and nothing runs; over the first screen, a light section or the
+        form the script does nothing but store the cursor;
+     4. layout is read in one batch when the page changes size (ResizeObserver), never while the light moves;
+        the pointer and scroll handlers only store numbers; lights switch with opacity (CSS transitions).
+   ============================================================ */
+(() => {
+  'use strict';
+  const hosts = Array.from(document.querySelectorAll('[data-fonar]'));
+  if (!hosts.length || !('ResizeObserver' in window) || !Element.prototype.animate) return;
+  const fineMq = matchMedia('(hover: hover) and (pointer: fine)');    // the same queries as G.canHover / G.reducedMotion,
+  const calmMq = matchMedia('(prefers-reduced-motion: reduce)');      // but followed live (a mouse plugged in, a setting)
+
+  const DUR = 280;        // ms, one leg; a new leg starts from wherever the light is, so the lamp trails the hand
+  const EASE = 'cubic-bezier(0.22, 0.7, 0.35, 1)';   // quick start, long soft arrival
+  const GAP = 70;         // ms: legs are planned at most this often, the compositor draws every frame in between
+  const LEG = 320;        // px: the longest leg; a flick is chased in several legs (the wall is this much larger)
+  const IDLE = 2600;      // ms of stillness before the light goes out
+  const FADE = 1000;      // ms: the fade-out of .fonar__beam in fonar.css; its layers are kept that long
+  const PENDANT = '.svet-mini .svet-lamp__bulb';   // the lamp over «Как у нас» (build/svet.py) and its heading
+  const PENDANT_ON = '.svet-lit';                  // (.is-in once the heading has scrolled in and the lamp is on)
+
+  let zones = [];
+  let D = 0; let R = 0; let TW = 0; let TH = 0;       // diameter and radius of the light, size of the wall tile
+  let px = 0; let py = 0; let sx = 0; let sy = 0;     // the cursor (viewport px) and the scroll of the page
+  let pointer = false; let awake = false; let shining = false;
+  let lastMove = 0; let lastLeg = -1e9; let legTimer = 0; let idleTimer = 0; let running = false; let ro = null;
+  let leg = null;                                     // { p, q, clock }: the light's top-left on the page, from p to q
+
+  const div = (cls, parent) => { const n = document.createElement('div'); n.className = cls; parent.appendChild(n); return n; };
+  const find = (host, sel) => { try { return sel ? host.querySelector(sel) : null; } catch (_) { return null; } };
+  const T = (x, y) => `translate(${x}px, ${y}px)`;
+  // the colour the section is painted with («r, g, b»): its own background, or the page's where it has none
+  function ground(el) {
+    for (let n = el; n; n = n.parentElement) {
+      const m = getComputedStyle(n).backgroundColor.match(/[\d.]+/g);
+      if (m && (m.length < 4 || Number(m[3]) === 1)) return m.slice(0, 3).join(', ');
+    }
+    return '7, 8, 7';   // --black (the page always has a ground; this is only a fallback)
+  }
+
+  /* ---------- layers: created on the first run, removed when the mouse or the motion setting goes ---------- */
+  function build() {
+    zones = hosts.map((host) => {
+      const layer = div('fonar', host);            // absolutely placed, painted under everything (z-index −1): its
+      layer.setAttribute('aria-hidden', 'true');   // place in the markup does not matter, the end keeps :first-child
+      layer.style.setProperty('--fonar-ground', ground(host));   // rules of the section intact
+      const beam = div('fonar__beam', layer);
+      div('fonar__glow', beam);                    // the light and its ground, and the fall-off (the veil, last):
+      const wall = div('fonar__wall', beam);       // never restyled (fonar.css)
+      const bulb = host.querySelector(PENDANT);
+      const pool = bulb ? div('fonar__pool', beam) : null;
+      div('fonar__veil', beam);
+      host.classList.add('is-fonar');
+      // the layer is placed on its section: a section that is not positioned (the 404 block) is made the anchor,
+      // or the layer would stretch over the first screen from the top of the page
+      if (getComputedStyle(host).position === 'static') host.classList.add('is-fonar-anchor');
+      return { host, layer, beam, wall, pool, bulb, lamp: bulb && bulb.closest(PENDANT_ON), after: find(host, host.getAttribute('data-fonar-after')),
+        x: 0, y: 0, w: 0, h: 0, from: 0, wx: 0, wy: 0, pw: 0, ph: 0, lit: false, fading: 0, anims: [] };
+    });
+  }
+  function unbuild() {
+    zones.forEach((z) => { clearTimeout(z.fading); z.anims.forEach((a) => a.cancel()); z.layer.remove(); z.host.classList.remove('is-fonar', 'is-fonar-anchor'); });
+    zones = [];
+    leg = null;
+  }
+
+  /* ---------- geometry: one batched read (ResizeObserver runs it right after layout), then one write per wall ---------- */
+  function measure() {
+    if (!zones.length) return;
+    sx = scrollX; sy = scrollY;
+    D = zones[0].beam.offsetWidth; R = D / 2;
+    if (!TW) {   // the tile's size, as build/fonar.py wrote it into the wall's rule («408px 160px»)
+      const [w, h] = getComputedStyle(zones[0].wall).backgroundSize.split(' ').map(parseFloat);
+      TW = w > 0 ? w : 0; TH = h > 0 ? h : 0;
+    }
+    zones.forEach((z) => {
+      const r = z.layer.getBoundingClientRect();
+      z.x = r.left + sx; z.y = r.top + sy; z.w = r.width; z.h = r.height;
+      z.from = z.after ? Math.max(z.y, z.after.getBoundingClientRect().bottom + sy) : z.y;
+      if (z.bulb) {
+        const b = z.bulb.getBoundingClientRect();
+        z.wx = b.left + b.width / 2 + sx; z.wy = b.top + b.height / 2 + sy;
+        z.pw = z.pool.offsetWidth; z.ph = z.pool.offsetHeight;
+      }
+    });
+    // the wall covers the pool, one tile to lay it on the page grid and one leg of travel (see move())
+    const ww = `${Math.ceil(D + TW + LEG)}px`; const wh = `${Math.ceil(D + TH + LEG)}px`;
+    zones.forEach((z) => { if (z.wall.style.width !== ww || z.wall.style.height !== wh) { z.wall.style.width = ww; z.wall.style.height = wh; } });
+    if (shining) { lastLeg = -1e9; plan(); }   // the page moved under the lamp: a new leg from the new places
+  }
+
+  /* ---------- a leg: the pool goes from p to q, the wall inside it the other way, the warm patch with the wall ---------- */
+  function move(z, p, q, t0) {
+    // the wall's corner on the page grid of the tile, fixed for the whole leg: at both ends it is at or left of / above
+    // the pool's corner, and never more than a tile plus a leg away, which is what the wall's size allows for
+    const gx = Math.floor(Math.min(p[0], q[0]) / TW) * TW; const gy = Math.floor(Math.min(p[1], q[1]) / TH) * TH;
+    const opts = { duration: DUR, easing: EASE, fill: 'forwards' };
+    const next = [
+      z.beam.animate([{ transform: T(p[0] - z.x, p[1] - z.y) }, { transform: T(q[0] - z.x, q[1] - z.y) }], opts),
+      z.wall.animate([{ transform: T(gx - p[0], gy - p[1]) }, { transform: T(gx - q[0], gy - q[1]) }], opts),
+    ];
+    if (z.pool) {
+      const ox = Math.round(z.wx - z.pw / 2); const oy = Math.round(z.wy - z.ph * 0.2);
+      next.push(z.pool.animate([{ transform: T(ox - p[0], oy - p[1]) }, { transform: T(ox - q[0], oy - q[1]) }], opts));
+    }
+    // one start time for all of them: the pool and the wall move in step, frame by frame, on the compositor
+    if (t0 != null) next.forEach((a) => { a.startTime = t0; });
+    z.anims.forEach((a) => a.cancel());
+    z.anims = next;
+    return next[0];
+  }
+  function light(z, on) {
+    z.lit = on;
+    clearTimeout(z.fading);
+    z.fading = on ? 0 : setTimeout(() => { z.fading = 0; z.beam.classList.remove('is-live'); }, FADE);
+    if (on && z.pool) z.pool.hidden = !(z.lamp && z.lamp.classList.contains('is-in'));   // the pendant must be on
+    z.beam.classList.toggle('is-on', on);
+    if (on) z.beam.classList.add('is-live');
+  }
+  // where the light is now (its top-left on the page): the running leg's progress, no layout involved
+  function here() {
+    if (!leg) return null;
+    const k = leg.clock ? leg.clock.effect.getComputedTiming().progress : null;
+    const f = k == null ? 1 : k;
+    return [Math.round(leg.p[0] + (leg.q[0] - leg.p[0]) * f), Math.round(leg.p[1] + (leg.q[1] - leg.p[1]) * f)];
+  }
+  // is the cursor (viewport px) on the wall of some zone? Cached numbers only, no layout
+  const onWall = (x, y) => zones.some((z) => x + sx >= z.x && x + sx < z.x + z.w && y + sy >= z.from && y + sy < z.y + z.h);
+  const touches = (z, b) => b[1] + D > z.y && b[1] < z.y + z.h && b[0] + D > z.x && b[0] < z.x + z.w;
+
+  function step() {
+    legTimer = 0;
+    lastLeg = performance.now();
+    const on = pointer && awake && onWall(px, py);
+    const target = [Math.round(px + sx - R), Math.round(py + sy - R)];
+    const p = (shining && here()) || target;         // a dark lamp is switched on in the hand, it does not fly in
+    const dx = target[0] - p[0]; const dy = target[1] - p[1]; const dist = Math.hypot(dx, dy);
+    const q = dist > LEG ? [Math.round(p[0] + (dx * LEG) / dist), Math.round(p[1] + (dy * LEG) / dist)] : target;
+    const t0 = document.timeline ? document.timeline.currentTime : null;
+    let clock = null;
+    shining = false;
+    zones.forEach((z) => {
+      const want = on && (touches(z, p) || touches(z, q));
+      if (want || z.lit || z.fading) { const a = move(z, p, q, t0); clock = clock || a; }   // a fading light follows too
+      if (want !== z.lit) light(z, want);
+      if (want) shining = true;
+    });
+    leg = { p, q, clock };
+    if (shining && dist > LEG) plan();   // still far behind the hand: the next leg
+    else armIdle();
+  }
+  // plan a leg now, or as soon as GAP has passed since the last one (one timer at most)
+  function plan() {
+    if (legTimer || !running || !D || !TW || !TH) return;
+    const wait = GAP - (performance.now() - lastLeg);
+    if (wait <= 0) step(); else legTimer = setTimeout(step, wait);
+  }
+
+  /* the light goes out after IDLE ms of stillness; one timer, re-armed only after the last leg */
+  function armIdle() {
+    if (idleTimer || !shining) return;
+    idleTimer = setTimeout(checkIdle, Math.max(40, IDLE - (performance.now() - lastMove)));
+  }
+  function checkIdle() {
+    idleTimer = 0;
+    const rest = IDLE - (performance.now() - lastMove);
+    if (rest > 40) { idleTimer = setTimeout(checkIdle, rest); return; }
+    awake = false;
+    plan();
+  }
+
+  /* ---------- input: the handlers only store numbers, and plan a leg only when the wall is concerned ---------- */
+  const fading = () => zones.some((z) => z.fading);
+  function stir() {
+    lastMove = performance.now();
+    awake = true;
+    // over the first screen, the paper sections or the form nothing is lit and nothing fades: nothing to do
+    if (shining || onWall(px, py) || fading()) plan();
+  }
+  function onMove(e) {
+    if (e.pointerType === 'touch') return;
+    // browsers send a move at the same spot when the page scrolls under a still cursor: that is not the hand moving
+    // (the scroll handler takes care of it), and it must not keep the light awake
+    if (pointer && e.clientX === px && e.clientY === py) return;
+    px = e.clientX; py = e.clientY;
+    pointer = true;
+    stir();
+  }
+  function onScroll() {
+    sx = scrollX; sy = scrollY;
+    if (pointer) stir();                      // the wall slides past the lamp: that is movement too
+  }
+  function onLeave() { pointer = false; if (shining) plan(); }
+  function onOut(e) { if (!e.relatedTarget) onLeave(); }                            // out of the window
+  function onOver(e) { if (e.target && e.target.tagName === 'IFRAME') onLeave(); }  // into the map: no more moves here
+  function onHide() { if (document.hidden) onLeave(); }
+
+  function start() {
+    if (running) return;
+    running = true;
+    if (!zones.length) build();
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerout', onOut, { passive: true });
+    document.addEventListener('pointerover', onOver, { passive: true });
+    document.addEventListener('visibilitychange', onHide);
+    addEventListener('scroll', onScroll, { passive: true });
+    ro = new ResizeObserver(measure);           // fires once right away, then whenever the page or a zone changes size
+    ro.observe(document.body);
+    zones.forEach((z) => ro.observe(z.host));
+  }
+  function stop() {
+    if (!running) return;
+    running = false;
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerout', onOut);
+    document.removeEventListener('pointerover', onOver);
+    document.removeEventListener('visibilitychange', onHide);
+    removeEventListener('scroll', onScroll);
+    if (ro) { ro.disconnect(); ro = null; }
+    clearTimeout(legTimer); legTimer = 0;
+    clearTimeout(idleTimer); idleTimer = 0;
+    pointer = false; awake = false; shining = false;
+    unbuild();
+  }
+  const sync = () => (fineMq.matches && !calmMq.matches ? start() : stop());
+  [fineMq, calmMq].forEach((mq) => { if (mq.addEventListener) mq.addEventListener('change', sync); else mq.addListener(sync); });
+  sync();
 })();
