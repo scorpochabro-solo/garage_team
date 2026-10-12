@@ -340,7 +340,7 @@ def _chart() -> str:
             <button class="btn btn--ghost btn--sm pogoda-plot__retry" type="button" data-pg-retry hidden>{esc(TEXTS["retry"])}</button>
           </div>
         </div>
-        <p class="pogoda-chart__src">{line}<span data-pg-updated></span></p>
+        <p class="pogoda-chart__src" data-pg-source hidden>{line}<span data-pg-updated></span></p>
       </figure>"""
 
 
