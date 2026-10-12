@@ -130,3 +130,9 @@
    minus the stage padding (components.css) ---------- */
 .lightbox__img { max-height: calc(100dvh - 8rem); }
 @media (max-width: 720px) { .lightbox__img { max-height: calc(100dvh - 9rem - env(safe-area-inset-bottom)); } }
+/* Shorter brick reveals and a clean steel edge for the workshop gallery. */
+#inside .arch { --arch-ring: 7px; --arch-pad: 12px; }
+#inside .arch__win { border-radius: 42% 42% 0 0 / 28% 28% 0 0; }
+#inside .arch__wall { opacity: 0.45; }
+#inside .arch__bars { display: none; }
+#inside .arch__veil { opacity: 0.08; }

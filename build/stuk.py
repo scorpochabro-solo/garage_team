@@ -620,6 +620,7 @@ def stuk_section():
         <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-live></p>
       </div>
     </div>
+    <p class="stuk__more"><a class="link-arrow link-arrow--inline" href="/slovar/">Непонятное слово в ответе? Словарь автомеханика {icon("arrow")}</a></p>
     {_fallback()}
   </div>
 </section>"""

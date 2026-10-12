@@ -12,16 +12,6 @@
    "blurb": "Проводка, генератор, стартер, фары, ксенон, лампы"
   },
   {
-   "key": "body",
-   "name": "Кузовной ремонт",
-   "href": "/services/kuzovnoj-remont.html",
-   "x": 90,
-   "y": 37,
-   "side": "left",
-   "icon": "body",
-   "blurb": "Рихтовка, замена элементов, геометрия, покраска"
-  },
-  {
    "key": "climate",
    "name": "Климат",
    "href": "/services/zapravka-i-remont-avtokondicionerov.html",
@@ -30,36 +20,6 @@
    "side": "left",
    "icon": "ac",
    "blurb": "Заправка и ремонт кондиционера, печка, фильтры"
-  },
-  {
-   "key": "glass",
-   "name": "Вклейка стекол",
-   "href": "/services/kuzovnoj-remont.html",
-   "x": 32,
-   "y": 9,
-   "side": "left",
-   "icon": "glass",
-   "blurb": "Замена и вклейка лобовых и боковых стёкол"
-  },
-  {
-   "key": "inspection",
-   "name": "Техосмотр",
-   "href": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-   "x": 50,
-   "y": 8,
-   "side": "left",
-   "icon": "inspection",
-   "blurb": "Подготовка к техосмотру: диагностика и ремонт"
-  },
-  {
-   "key": "vinyl",
-   "name": "Брендирование",
-   "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "x": 28,
-   "y": 33,
-   "side": "left",
-   "icon": "vinyl",
-   "blurb": "Оклейка, покраска, стайлинг транспорта"
   },
   {
    "key": "headlight",
@@ -180,16 +140,6 @@
    "side": "right",
    "icon": "alignment",
    "blurb": "Регулировка углов установки колёс"
-  },
-  {
-   "key": "parts",
-   "name": "Автозапчасти",
-   "href": "/services/avtozapcasti.html",
-   "x": 14,
-   "y": 70,
-   "side": "bottom",
-   "icon": "parts",
-   "blurb": "В наличии и под заказ, оригинал и аналоги"
   },
   {
    "key": "equipment",

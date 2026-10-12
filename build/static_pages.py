@@ -2,7 +2,7 @@
 """Static pages: about, contacts, payment, delivery, parts, catalogs, search, call/*, registration, agreement, reviews, 404."""
 import re
 
-from . import arki, otkryto, schema
+from . import arki, knizhka, neon, otkryto, schema, slovar
 from . import data as D
 from .icons import icon
 from .layout import (document, page_hero, phone_aside, contact_card, green_note, reviews_section,
@@ -37,8 +37,8 @@ def _facts_card():
     <li><span>Работаем с</span><span>{D.FOUNDED} г.</span></li>
     <li><span>Направлений услуг</span><span>{len(D.CATEGORIES)}</span></li>
     <li><span>Видов работ</span><span>{len(D.SERVICES)}</span></li>
-    <li><span>Гарантия на работы</span><span>до 360 дней*</span></li>
-    <li><span>Коммерческая техника</span><span>до 5,5 т</span></li>
+    <li><span>Гарантия на работы</span><span>1 год</span></li>
+    <li><span>Специализация</span><span>премиальные автомобили</span></li>
   </ul>
 </div>"""
 
@@ -63,7 +63,7 @@ def render_contacts():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
     hero = page_hero("Контакты", [("Главная", "/"), ("Контакты", None)], eyebrow="Как нас найти", aside=phone_aside("Заказать звонок"), mark_icon="steering",
-                     lead=f"{esc(D.ADDRESS_FULL)}. Автосервис и магазин запчастей «Гараж».")
+                     lead=f"{esc(D.ADDRESS_FULL)}. Автосервис Garage Team.")
     body = f"""{hero}
 <section class="wrap page-grid">
   <div class="stack" style="--gap:2.5rem">
@@ -77,10 +77,6 @@ def render_contacts():
     <div class="reveal" id="hours">
       <div class="block-title"><span class="tag-num">// часы</span><h2 class="h3">Часы работы автосервиса</h2></div>
       {otkryto.schedule(D.HOURS, big=True)}
-    </div>
-    <div class="reveal">
-      <div class="block-title"><span class="tag-num">// магазин</span><h2 class="h3">Магазин запчастей</h2></div>
-      {otkryto.schedule(D.SHOP_HOURS, label="Часы работы магазина по дням недели", holidays=False, big=True)}
     </div>
     <div class="find">
       {arki.door()}
@@ -103,9 +99,9 @@ def render_oplata():
     body = f"""{hero}
 <section class="wrap page-grid">
   <article class="prose reveal">{rest}</article>
-  {_side(f'<a class="card card--link" href="/delivery.html"><div class="card__icon">{icon("parts")}</div><b class="h4">Доставка запчастей</b><p class="muted" style="margin-top:.4rem;font-size:.9rem">Бесплатно при заказе от 5000 ₽, по городу — 300 ₽.</p></a>')}
+  {_side()}
 </section>
-{request_section("Оставить заявку на запчасти или услуги автосервиса")}"""
+{request_section("Оставить заявку")}"""
     return document(P["oplata"]["title"], P["oplata"]["meta_description"], "/oplata.html", body, body_class="page-oplata")
 
 
@@ -320,13 +316,21 @@ def render_otzyvy():
     return document(title, desc, "/otzyvy.html", body, body_class="page-reviews")
 
 
+def render_moya_mashina():
+    crumbs = [("Главная", "/"), (knizhka.H1, None)]
+    hero = page_hero(knizhka.H1, crumbs, eyebrow=knizhka.EYEBROW, lead=esc(knizhka.LEAD), aside=phone_aside("Заказать звонок"),
+                     mark_icon="inspection", title_html=knizhka.h1_html())
+    title, desc = D.page_meta(knizhka.SEO_KEY, knizhka.TITLE, knizhka.DESCRIPTION)
+    body = f"{hero}\n{knizhka.body()}\n{request_section('Оставить заявку')}"
+    return document(title, desc, knizhka.PATH, body, body_class="page-knizhka",
+                    jsonld=schema.dump(schema.breadcrumbs(crumbs, D.SITE_URL + knizhka.PATH)))
+
+
 def render_404():
-    body = f"""<section class="wrap notfound">
-  <div class="notfound__code" aria-hidden="true">404</div>
-  <h1 class="h2" style="margin-top:1rem">Страница не найдена</h1>
+    body = neon.notfound(f"""<h1 class="h2" id="notfound-title" style="margin-top:1rem">Страница не найдена</h1>
   <p class="lead" style="margin:1rem auto 0">Возможно, адрес изменился. Загляните в услуги или позвоните нам — поможем.</p>
   <div class="notfound__actions"><a class="btn btn--primary" href="/">На главную</a><a class="btn btn--ghost is-on-dark" href="/services.html">Все услуги</a><a class="btn btn--ghost is-on-dark" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a></div>
-</section>"""
+""")
     return document("Страница не найдена | Гараж", "Страница не найдена.", "/404.html", body, body_class="page-404", noindex=True)
 
 
@@ -334,14 +338,11 @@ PAGES = {
     "/about/": render_about,
     "/contacts/": render_contacts,
     "/oplata.html": render_oplata,
-    "/delivery.html": render_delivery,
-    "/avtozapchasti/": render_avtozapchasti,
-    "/cats/": render_cats,
-    "/search/": render_search,
     "/call/request/": render_call_request,
     "/call/manager/": render_call_manager,
-    "/registration/": render_registration,
     "/page/soglashenie/": render_soglashenie,
     "/otzyvy.html": render_otzyvy,
+    "/slovar/": slovar.render,
+    knizhka.PATH: render_moya_mashina,
     "/404.html": render_404,
 }

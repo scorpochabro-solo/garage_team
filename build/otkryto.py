@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date
 
 from . import data as D
 from .icons import icon
@@ -32,6 +33,14 @@ _ADDRESS = re.compile(r"^(\d{6}), г\. ([^,]+), (.+)$")   # «603155, г. Ниж
 
 ROUTE_URL = f"https://yandex.ru/maps/?rtext=~{D.COORDS[0]}%2C{D.COORDS[1]}&rtt=auto"   # by car from where you are
 HOLIDAYS = "В праздничные дни график может отличаться — уточняйте по телефону."
+CALENDAR = json.loads((D.DATA / "working_calendar.json").read_text(encoding="utf-8"))
+date.fromisoformat(CALENDAR["valid_through"])
+for _closed_date in CALENDAR["closed_dates"]:
+    date.fromisoformat(_closed_date)
+
+
+def calendar_config() -> dict:
+    return {"closedDates": CALENDAR["closed_dates"], "calendarThrough": CALENDAR["valid_through"]}
 VCARD_FILE = "garage.vcf"
 COPY_DONE = "Адрес скопирован"
 VCARD_DONE = f"Откройте файл {VCARD_FILE}, чтобы добавить «{D.BRAND}» в\u00a0контакты"   # no line break after «в»
@@ -87,7 +96,7 @@ def compact(hours: list[tuple[str, str]], sep: str = " · ", lower: bool = False
 
 def _data(hours: list[tuple[str, str]]) -> str:
     """data-oc: the week for otkryto.js"""
-    return esc(json.dumps({"week": week(hours)}, ensure_ascii=False, separators=(",", ":")))
+    return esc(json.dumps({"week": week(hours), **calendar_config()}, ensure_ascii=False, separators=(",", ":")))
 
 
 _DOT = '<i class="oc__dot" aria-hidden="true"></i>'
@@ -195,8 +204,7 @@ def vcard_lines() -> list[str]:
         raise ValueError(f"адрес для vCard: {D.ADDRESS_FULL!r}")
     postcode, city, street = m.groups()
     lat, lon = D.COORDS
-    note = (f"Автосервис: {compact(D.HOURS, ', ', lower=True)}\n"
-            f"Магазин запчастей: {compact(D.SHOP_HOURS, ', ', lower=True)}")
+    note = f"Автосервис: {compact(D.HOURS, ', ', lower=True)}\nСуббота и воскресенье — выходные"
     props = [
         "BEGIN:VCARD",
         "VERSION:3.0",

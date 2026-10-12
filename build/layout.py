@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Page shell and shared blocks: head, header, footer, modals, request form, reviews, CTA."""
 from . import data as D
-from . import otkryto
+from . import fonar, knizhka, neon, otkryto, shtorka, vremya
 from .icons import icon, sprite, icon_for_href
 
 esc = D.esc
@@ -51,6 +51,7 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 <link rel="preload" href="/assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/unbounded-latin.woff2" as="font" type="font/woff2" crossorigin>
+{shtorka.head()}
 <link rel="stylesheet" href="/assets/css/site.css{_version('css')}">
 {ld}
 </head>
@@ -60,6 +61,7 @@ def document(title, description, path, body, body_class="", og_image=None, jsonl
 {topline()}
 {header()}
 {mobile_menu()}
+{shtorka.markup()}
 <main id="main">
 {body}
 </main>
@@ -81,14 +83,13 @@ def topline():
     <a class="topline__item topline__item--mail" href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
     <span class="topline__spacer"></span>
     <a class="topline__item" href="{D.VK_URL}" target="_blank" rel="noopener">{icon('vk')} Подпишитесь на нас</a>
-    <button class="topline__item" type="button" data-modal="login">{icon('user')} Вход в личный кабинет</button>
-    <a class="topline__item" href="/avtozapchasti/" id="cart-link" data-count="0" title="Корзина запчастей">{icon('cart')} Корзина</a>
+    <a class="topline__item" href="/moya-mashina/">{icon('user')} Моя машина</a>
   </div>
 </div>"""
 
 
 def header():
-    nav = "".join(f'<a class="nav__link" href="{h}">{esc(n)}</a>' for n, h in D.NAV)
+    nav = "".join(f'<a class="nav__link" href="{h}"><span class="nav__label">{esc(n)}</span></a>' for n, h in D.NAV)
     return f"""<header class="site-header" data-header>
   <div class="wrap site-header__in">
     <a class="logo" href="/" aria-label="Гараж — на главную"><img src="/assets/logo/logo.svg" width="133" height="48" alt="Garage Team — автосервис «Гараж» в Нижнем Новгороде"></a>
@@ -113,8 +114,7 @@ def mobile_menu():
     <span>{icon('pin')} {esc(D.ADDRESS_SHORT)}</span>
     <a href="mailto:{D.EMAIL}">{icon('mail')} {D.EMAIL}</a>
     <a href="{D.VK_URL}" target="_blank" rel="noopener">{icon('vk')} Мы ВКонтакте</a>
-    <button type="button" data-modal="login">{icon('user')} Вход в личный кабинет</button>
-    <a href="/avtozapchasti/">{icon('cart')} Корзина</a>
+    <a href="/moya-mashina/">{icon('user')} Моя машина</a>
   </div>
   <div class="mobile-menu__cta">
     <a class="btn btn--primary" href="/call/request/">{icon('check')} Оставить заявку</a>
@@ -136,17 +136,19 @@ def footer():
     cats = "".join(f'<a href="{c["href"]}">{esc(c["name"])}</a>' for c in D.CATEGORIES[:10])
     hours = "".join(f"<span>{icon('clock')}<span>{esc(d)}: {esc(h)}</span></span>" for d, h in D.HOURS)
     return f"""<footer class="site-footer">
+  {neon.footer_sign()}
   <div class="footer__watermark" aria-hidden="true">ГАРАЖ</div>
   <div class="wrap site-footer__in">
     <div class="footer__grid">
       <div class="footer__brand">
         <a class="logo logo--footer" href="/"><img src="/assets/logo/logo.svg" width="221" height="80" alt="Garage Team — автосервис «Гараж»" loading="lazy"></a>
         <p class="footer__slogan mono" lang="en">{esc(D.SLOGAN_EN)}</p>
-        <p>{esc(D.COMPANY)}<br>{esc(D.COMPANY_LINE_2)}<br>Автосервис и магазин запчастей в Нижнем Новгороде с {D.FOUNDED} года.</p>
+        <p>{esc(D.COMPANY)}<br>{esc(D.COMPANY_LINE_2)}<br>Ремонт и обслуживание премиальных автомобилей с {D.FOUNDED} года.</p>
         <div class="footer__social">
           <a href="{D.VK_URL}" target="_blank" rel="noopener" aria-label="ВКонтакте">{icon('vk')}</a>
           <a href="{D.FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">{icon('facebook')}</a>
         </div>
+        {knizhka.footer_link()}
       </div>
       <div>
         <div class="footer__title">Разделы</div>
@@ -154,7 +156,7 @@ def footer():
       </div>
       <div>
         <div class="footer__title">Услуги</div>
-        <div class="footer__links">{cats}<a href="/services.html"><b>Все {len(D.CATEGORIES)} направлений →</b></a></div>
+        <div class="footer__links">{cats}<a href="/services.html"><b>Все направления услуг →</b></a></div>
       </div>
       <div>
         <div class="footer__title">Звоните по телефонам горячей линии</div>
@@ -176,7 +178,7 @@ def footer():
 
 # ---------- modals ----------
 def modals():
-    return call_modal() + login_modal() + lightbox()
+    return call_modal() + lightbox()
 
 
 def call_modal():
@@ -193,6 +195,7 @@ def call_modal():
           <div class="field"><label class="field__label" for="call-car">Для автомобиля</label><input class="input" id="call-car" name="car" type="text" placeholder="Марка, модель, год"></div>
           <div class="field"><label class="field__label" for="call-vin">VIN</label><input class="input" id="call-vin" name="vin_code" type="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697"></div>
           <div class="field span-2"><label class="field__label" for="call-msg">Комментарий</label><textarea class="textarea" id="call-msg" name="message" rows="3"></textarea></div>
+          {vremya.in_modal()}
           <div class="field span-2"><label class="check"><input type="checkbox" name="agree" value="1" required><span class="check__box">{icon('check')}</span><span>Соглашаюсь с <a href="/page/soglashenie/" target="_blank">пользовательским соглашением</a> и обработкой персональных данных</span></label></div>
         </div>
         <input type="hidden" name="send" value="1">
@@ -215,7 +218,7 @@ def login_modal():
     <form data-simple-form data-redirect="1" action="/login/popup" method="post" novalidate data-success-text="Вы вошли в личный кабинет" data-error-text="Не удалось войти. Проверьте телефон и пароль">
       <div data-body>
         <h2 class="modal__title" id="modal-login-title">Вход в личный кабинет</h2>
-        <p class="modal__lead">Для входа введите мобильный и пароль. Или <a href="/registration/">зарегистрируйтесь</a>, если у вас ещё нет учётной записи.</p>
+        <p class="modal__lead">Личный кабинет будет доступен после подключения онлайн-книжки. Пока можно вести черновик в разделе <a href="/moya-mashina/">«Моя машина»</a>.</p>
         <div class="form-grid">
           <div class="field">
             <label class="field__label" for="login-phone">Мобильный телефон <span class="req">*</span></label>
@@ -233,7 +236,7 @@ def login_modal():
           <label class="check"><input type="checkbox" name="agree" value="1" required checked><span class="check__box">{icon('check')}</span><span>Подтверждаю, что с <a href="/page/soglashenie/" target="_blank">Пользовательским соглашением</a> ознакомлен и согласен</span></label>
         </div>
         <input type="hidden" name="send" value="1">
-        <div class="rq__actions"><a class="btn btn--ghost" href="/registration/">Регистрация</a><button class="btn btn--primary" type="submit">{icon('user')} Войти</button></div>
+        <div class="rq__actions"><a class="btn btn--ghost" href="/moya-mashina/">Моя машина</a><button class="btn btn--primary" type="submit">{icon('user')} Войти</button></div>
       </div>
       <div class="form-success" data-success>
         <div class="form-success__icon">{icon('check')}</div>
@@ -268,7 +271,7 @@ def page_hero(title, crumb_items, eyebrow=None, lead=None, aside=None, mark_icon
     ld = f'<p class="lead page-hero__lead">{lead}</p>' if lead else ""
     aside_html = f'<div class="page-hero__aside">{aside}</div>' if aside else ""
     mark = f'<div class="page-hero__mark" aria-hidden="true">{icon(mark_icon)}</div>' if mark_icon else ""
-    return f"""<section class="page-hero">
+    return fonar.mark(f"""<section class="page-hero">
   {mark}
   <div class="wrap page-hero__in">
     <div>
@@ -279,7 +282,7 @@ def page_hero(title, crumb_items, eyebrow=None, lead=None, aside=None, mark_icon
     </div>
     {aside_html}
   </div>
-</section>"""
+</section>""")
 
 
 def phone_aside(cta_label="Записаться на приём", preset=None):
@@ -294,7 +297,7 @@ def contact_card(shop=False):
     return f"""<div class="contact-card">
   <div class="contact-card__label">{label}</div>
   <a class="contact-card__phone" href="tel:{D.PHONE_TEL}"><small>звоните</small>{esc(D.PHONE)}</a>
-  <div class="contact-card__hours">Пн–Пт {esc(hours[0][1])} · Сб {esc(hours[1][1])}<br>{esc(D.ADDRESS_SHORT)}</div>
+  <div class="contact-card__hours">{esc(otkryto.compact(D.HOURS))}<br>Сб–Вс — выходные<br>{esc(D.ADDRESS_SHORT)}</div>
   <button class="btn btn--white btn--sm" type="button" data-modal="call">{icon('phone')} Заказать звонок</button>
 </div>"""
 
@@ -363,7 +366,7 @@ def request_section(title="Оставить запрос", section_id="request",
     <div class="request__side reveal">
       <p class="eyebrow">// Заявка онлайн</p>
       <h2 class="h2 sec-head__title" id="{section_id}-title">{esc(title)}</h2>
-      <p class="lead">Подберём запчасти и запишем на ремонт. Три коротких шага — и менеджер свяжется с вами в рабочие часы.</p>
+      <p class="lead">Опишите задачу и автомобиль — менеджер свяжется с вами в рабочие часы. Время приёма подтверждаем по телефону.</p>
       <p class="muted" style="margin-top:1.2rem;max-width:44ch">{esc(D.SITE.get('request_fallback', ''))}</p>
       <a class="request__phone" href="tel:{D.PHONE_TEL}"><small>звоните</small>{esc(D.PHONE)}</a>
       <div class="request__social"><span>Подпишитесь на нас</span><a href="{D.VK_URL}" target="_blank" rel="noopener" aria-label="ВКонтакте">{icon('vk')}</a><a href="{D.FB_URL}" target="_blank" rel="noopener" aria-label="Facebook">{icon('facebook')}</a></div>
@@ -374,6 +377,7 @@ def request_section(title="Оставить запрос", section_id="request",
 
       <div class="rq__panel is-active" data-panel="1">
         <div class="rq__title"><span>Ваш автомобиль</span><button class="rq__switch" type="button" data-mode-toggle>Не нашли свой автомобиль?</button></div>
+        {knizhka.fill_button()}
         <div data-mode="select">
           <div class="form-grid form-grid--2">
             <div class="field"><label class="field__label" for="tecdoc_car_brand">Марка автомобиля <span class="req">*</span></label><select class="select" id="tecdoc_car_brand" name="request_part[tecdoc_car_brand]"><option value="-1">Выберите марку</option>{brands}</select><span class="field__error">Укажите марку автомобиля</span></div>
@@ -392,7 +396,7 @@ def request_section(title="Оставить запрос", section_id="request",
         </div>
         <div class="form-grid" style="margin-top:1.1rem">
           <div class="field"><label class="field__label" for="car_vin">VIN-код</label><input class="input" id="car_vin" name="request_part[car_vin]" type="text" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="17" placeholder="Например: 2C4GJ453XYR693697" autocapitalize="characters"><span class="field__hint">17 символов с таблички в проёме двери или в СТС. <button class="btn btn--text" type="button" data-vin-help style="font-size:.8rem">Я не знаю, что такое VIN-код</button></span>
-          <p class="form-note" data-vin-help-text hidden>VIN — уникальный идентификационный номер автомобиля из 17 знаков. По нему мы подбираем запчасти точно под вашу комплектацию. Найти его можно в свидетельстве о регистрации (СТС), ПТС или на табличке под лобовым стеклом. Если VIN под рукой нет — просто пропустите это поле.</p></div>
+          <p class="form-note" data-vin-help-text hidden>VIN — идентификационный номер автомобиля из 17 знаков. Если укажете его, номер придёт менеджеру вместе с заявкой. Найти VIN можно в СТС, ПТС или на табличке автомобиля. Если VIN под рукой нет — пропустите это поле.</p></div>
         </div>
         <div class="rq__actions"><button class="btn btn--primary" type="button" data-next>Вперёд {icon('arrow')}</button></div>
       </div>
@@ -408,6 +412,7 @@ def request_section(title="Оставить запрос", section_id="request",
         </div>
         <button class="btn btn--ghost btn--sm" type="button" data-add-part>{icon('plus')} Добавить запчасть</button>
         <div class="field" style="margin-top:1.1rem"><label class="field__label" for="request_what">Или опишите задачу для автосервиса</label><textarea class="textarea" id="request_what" name="request_part[what]" rows="3" placeholder="Например: стук в передней подвеске, нужна диагностика и замена"></textarea></div>
+        {vremya.in_form()}
         <div class="rq__actions"><button class="btn btn--ghost" type="button" data-prev>{icon('arrow-left')} Назад</button><button class="btn btn--primary" type="button" data-next>Вперёд {icon('arrow')}</button></div>
       </div>
 

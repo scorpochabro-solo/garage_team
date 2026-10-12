@@ -86,7 +86,7 @@
 
   /* ---------- drawing: SVG transforms by data-t, the same strings as transforms() in build/shiny.py ---------- */
   const view = {
-    ground: +svg.dataset.ground, top: +svg.dataset.top, side: +svg.dataset.side, front: +svg.dataset.front,
+    ground: +svg.dataset.ground, top: +svg.dataset.top, side: +svg.dataset.side, newSide: +svg.dataset.newSide, front: +svg.dataset.front,
     min: +svg.dataset.min, bar: svg.dataset.bar.split(' ').map(Number),
   };
   const parts = {};
@@ -101,8 +101,8 @@
   const draw = (g) => {
     const ra = g.odA / 2 * g.s; const rb = g.odB / 2 * g.s;
     const put = (name, value) => { if (parts[name]) parts[name].setAttribute('transform', value); };
-    put('tyre-b', `translate(${view.side} ${f3(view.ground - rb)}) scale(${f3(rb / 100)})`);
-    put('rim-b', `translate(${view.side} ${f3(view.ground - rb)}) scale(${f3(g.rimB / 2 * g.s / 100)})`);
+    put('tyre-b', `translate(${view.newSide} ${f3(view.ground - rb)}) scale(${f3(rb / 100)})`);
+    put('rim-b', `translate(${view.newSide} ${f3(view.ground - rb)}) scale(${f3(g.rimB / 2 * g.s / 100)})`);
     put('tyre-a', `translate(${view.side} ${f3(view.ground - ra)}) scale(${f3(ra / 100)})`);
     put('rim-a', `translate(${view.side} ${f3(view.ground - ra)}) scale(${f3(g.rimA / 2 * g.s / 100)})`);
     put('front-b', `translate(${view.front} ${view.ground}) scale(${f3(g.wB * g.s)} ${f3(g.odB * g.s)})`);

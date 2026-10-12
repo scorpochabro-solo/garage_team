@@ -56,6 +56,7 @@
     const cells = $$('.zima-mini__bar i');
     const book = $('[data-zima-book]');
     const add = $('[data-zima-add]');
+    const nextEl = $('[data-zima-next]');
     const hintTitle = titleEl ? titleEl.textContent : '';
     const hintText = textEl ? textEl.textContent : '';
 
@@ -120,6 +121,7 @@
       const list = visible();
       const total = list.length || 1;
       const left = list.filter((li) => !done(li));
+      if (nextEl) nextEl.textContent = left.length ? `В заявку попадёт: ${left.length} ${plural(left.length, 'пункт', 'пункта', 'пунктов')} для проверки.` : 'Все пункты отмечены. Можно обсудить дополнительные вопросы с мастером.';
       const n = total - left.length;
       const ready = n === total;
       const pct = Math.round((n / total) * 100);
@@ -138,8 +140,8 @@
       // status: what is left, three names at most so the card keeps its height
       if (titleEl && textEl) {
         if (ready) {
-          titleEl.textContent = 'Машина готова к зиме';
-          textEl.textContent = 'Все пункты отмечены — можно встречать зиму спокойно.';
+          titleEl.textContent = 'Все пункты отмечены';
+          textEl.textContent = 'Вы прошли свой список проверки. Если остались вопросы по машине, обсудите их с мастером.';
         } else if (n === 0) {
           titleEl.textContent = hintTitle;
           textEl.textContent = hintText;

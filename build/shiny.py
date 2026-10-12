@@ -34,11 +34,12 @@ LIMIT = 3.0                             # % of the diameter: the usual rule of t
 METER = 6.0                             # the deviation scale runs from −6 % to +6 %
 
 # drawing, in viewBox units: side view of both wheels on one ground line, front view (tread) to the right of it
-VIEW_W, VIEW_H = 440, 330
+VIEW_W, VIEW_H = 720, 330
 GROUND = 298
 TOP = 30                                # the band above is kept for the «вид сбоку / вид спереди» labels
 SIDE_X = 146
-FRONT_X = 360
+NEW_X = 436
+FRONT_X = 638
 SCALE_MIN_MM = 700                      # the scale changes only for wheels taller than this (rounded up to 100 мм)
 BAR_X, BAR_Y = 16, 317                  # 100 мм scale bar under the ground line; its label is HTML, right of the bar
 
@@ -62,7 +63,7 @@ TEXTS = {
     "head-less": "Колесо меньше на",
     "head-same": "Диаметр не меняется",
     "same": "Размеры одинаковые — диаметр колеса, клиренс и спидометр не изменятся.",
-    "ok": f"Разница в пределах 3{NBSP}% — обычно такую замену считают допустимой.",
+    "ok": f"Разница в пределах 3{NBSP}%. Проверьте размер по данным производителя автомобиля.",
     "over": f"Разница больше 3{NBSP}% — это заметно.",
     "over-more": "Спидометр будет показывать меньше реальной скорости, а колесо может задевать подкрылок или детали подвески.",
     "over-less": "Спидометр будет показывать больше реальной скорости, а клиренс уменьшится.",
@@ -184,8 +185,8 @@ def transforms(now: tuple, new: tuple) -> dict:
     ra, rb = od_a / 200 * s, od_b / 200 * s                   # tyre radius, viewBox units
     rim_a, rim_b = rim(now[2]) / 200 * s, rim(new[2]) / 200 * s
     return {
-        "tyre-b": f"translate({SIDE_X} {_f(GROUND - rb)}) scale({_f(rb / 100)})",
-        "rim-b": f"translate({SIDE_X} {_f(GROUND - rb)}) scale({_f(rim_b / 100)})",
+        "tyre-b": f"translate({NEW_X} {_f(GROUND - rb)}) scale({_f(rb / 100)})",
+        "rim-b": f"translate({NEW_X} {_f(GROUND - rb)}) scale({_f(rim_b / 100)})",
         "tyre-a": f"translate({SIDE_X} {_f(GROUND - ra)}) scale({_f(ra / 100)})",
         "rim-a": f"translate({SIDE_X} {_f(GROUND - ra)}) scale({_f(rim_a / 100)})",
         "front-b": f"translate({FRONT_X} {GROUND}) scale({_f(new[0] * s)} {_f(od_b / 100 * s)})",
@@ -208,7 +209,7 @@ def _svg(now: tuple, new: tuple) -> str:
     def part(cls, name, inner):
         return f'<g class="{cls}" data-t="{name}" transform="{t[name]}">{inner}</g>'
 
-    data = (f'data-ground="{GROUND}" data-top="{TOP}" data-side="{SIDE_X}" data-front="{FRONT_X}" '
+    data = (f'data-ground="{GROUND}" data-top="{TOP}" data-side="{SIDE_X}" data-new-side="{NEW_X}" data-front="{FRONT_X}" '
             f'data-min="{SCALE_MIN_MM}" data-bar="{BAR_X} {BAR_Y}"')
     return (f'<svg class="shiny-svg" viewBox="0 0 {VIEW_W} {VIEW_H}" {data} aria-hidden="true" focusable="false">'
             f'<defs><pattern id="shiny-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
@@ -219,12 +220,14 @@ def _svg(now: tuple, new: tuple) -> str:
             + part("shiny-svg__rim", "rim-b", f'<circle r="100"/><circle class="shiny-svg__lip" r="88"/>{spokes}'
                                               f'<circle class="shiny-svg__hub" r="19"/>{lugs}<circle class="shiny-svg__bore" r="5.5"/>')
             + part("shiny-svg__front", "front-b", unit_rect + grooves)
-            + part("shiny-svg__ghost", "tyre-a", '<circle r="100"/>')
-            + part("shiny-svg__ghost shiny-svg__ghost--rim", "rim-a", '<circle r="100"/>')
+            + part("shiny-svg__tyre shiny-svg__tyre--now", "tyre-a", '<circle r="100"/><circle class="shiny-svg__tread" r="93"/>')
+            + part("shiny-svg__rim shiny-svg__rim--now", "rim-a", f'<circle r="100"/><circle class="shiny-svg__lip" r="88"/>{spokes}<circle class="shiny-svg__hub" r="19"/>{lugs}')
             + part("shiny-svg__ghost", "front-a", unit_rect)
             + f'<rect class="shiny-svg__earth" x="8" y="{GROUND}" width="{VIEW_W - 16}" height="7"/>'
             + f'<line class="shiny-svg__floor" x1="8" y1="{GROUND}" x2="{VIEW_W - 8}" y2="{GROUND}"/>'
             + f'<path class="shiny-svg__bar" data-t="bar" transform="{t["bar"]}" d="M0 -3V3M0 0H1M1 -3V3"/>'
+            + f'<text class="shiny-svg__label" x="{SIDE_X}" y="20" text-anchor="middle">Сейчас</text>'
+            + f'<text class="shiny-svg__label shiny-svg__label--new" x="{NEW_X}" y="20" text-anchor="middle">Новый размер</text>'
             + "</svg>")
 
 

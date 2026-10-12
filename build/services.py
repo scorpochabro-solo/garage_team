@@ -12,7 +12,7 @@ from .layout import (document, page_hero, phone_aside, contact_card, side_index,
                      reviews_section, request_section)
 
 esc = D.esc
-FLAGS = ["Любые марки", "Гарантия до 360 дней*", "Запчасти в наличии и под заказ", "Коммерческая техника до 5,5 т"]
+FLAGS = ["Премиальные автомобили", "Гарантия 1 год", "Запчасти от проверенных поставщиков", "Работаем с 2016 года"]
 # Cover photos are generated illustrations, not shots of the workshop: the label says so to the visitor.
 PHOTO_LABEL = "иллюстрация"
 # main column: full width minus gutters below the 1000px breakpoint, up to 1000px next to the sidebar
@@ -82,8 +82,8 @@ def render_services_index():
       <a class="link-arrow link-arrow--inline cat-card__more" href="{c['href']}">Подробнее {icon('arrow')}</a>
     </article>""")
     total = len(D.SERVICES)
-    lead = (f"{len(D.CATEGORIES)} направлений и {total} видов работ: от компьютерной диагностики до кузовного ремонта и хранения шин. "
-            "Сервис и ремонт любых марок, обслуживание коммерческой техники до 5,5 тонн.")
+    lead = (f"{len(D.CATEGORIES)} {D.plural(len(D.CATEGORIES), 'направление', 'направления', 'направлений')} и {total} {D.plural(total, 'вид', 'вида', 'видов')} работ: диагностика, ремонт, плановое ТО и хранение шин. "
+            "Обслуживаем премиальные автомобили; работаем с запчастями от проверенных поставщиков.")
     hero = page_hero(D.PAGE_SEO.get("services", {}).get("h1", "Наши услуги"), [("Главная", "/"), ("Услуги", None)], eyebrow="Автосервис Гараж", lead=lead,
                      aside=phone_aside("Записаться на приём"), mark_icon="maintenance")
     body = f"""{hero}

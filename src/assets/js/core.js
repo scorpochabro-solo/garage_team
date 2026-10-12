@@ -198,15 +198,18 @@
   G.postForm = async (form) => {
     const body = new FormData(form);
     const action = form.getAttribute('action') || location.pathname;
-    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json, text/html' }, credentials: 'same-origin' });
+    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' }, credentials: 'same-origin' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const ct = res.headers.get('content-type') || '';
     if (ct.includes('json')) {
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
+      if (!data || typeof data !== 'object') throw new Error('invalid_response');
       if (data && (data.error || data.success === false)) throw new Error(data.error || 'server');
+      const created = data.data || data;
+      if (data.success !== true && !(created && (typeof created.id === 'string' || typeof created.id === 'number'))) throw new Error('invalid_response');
       return data;
     }
-    return {};
+    throw new Error('invalid_response');
   };
 
   /* ---------- copyright year ---------- */

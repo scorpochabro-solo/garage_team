@@ -32,8 +32,15 @@
 
   /* ---------- status: { state: open | soon | closed | note, word, rest, brief } ----------
      rest goes after the word in the contacts and the menu; brief is the shorter form for the header's top line */
-  const status = (week, now) => {
-    const today = week[now.day];
+  const status = (week, now, calendar = {}) => {
+    const specAt = (offset) => {
+      const weekday = (now.day + offset) % 7;
+      if (!now.iso) return week[weekday];
+      const iso = new Date(Date.parse(now.iso + 'T00:00:00Z') + offset * 86400000).toISOString().slice(0, 10);
+      if (calendar.calendarThrough && iso > calendar.calendarThrough) return { note: 'график уточняйте по телефону' };
+      return (calendar.closedDates || []).includes(iso) ? null : week[weekday];
+    };
+    const today = specAt(0);
     if (Array.isArray(today)) {
       const opens = today[0];
       const closes = today[1];
@@ -46,9 +53,9 @@
     } else if (today && today.note) {
       return { state: 'note', word: 'Сегодня', rest: today.note, brief: today.note };
     }
-    for (let k = 1; k <= 7; k += 1) {
+    for (let k = 1; k <= 31; k += 1) {
       const d = (now.day + k) % 7;
-      const next = week[d];
+      const next = specAt(k);
       if (Array.isArray(next)) {
         const at = hm(next[0]);
         return k === 1
@@ -71,12 +78,14 @@
   const widgets = [];
   document.querySelectorAll('[data-oc]').forEach((el) => {
     let week = null;
-    try { week = JSON.parse(el.dataset.oc).week; } catch (_) { week = null; }
-    if (Array.isArray(week) && week.length === 7) widgets.push({ el, week, brief: el.hasAttribute('data-oc-brief'), key: '' });
+    let calendar = {};
+    try { calendar = JSON.parse(el.dataset.oc); week = calendar.week; } catch (_) { week = null; }
+    if (Array.isArray(week) && week.length === 7) widgets.push({ el, week, calendar, brief: el.hasAttribute('data-oc-brief'), key: '' });
   });
 
   const paint = (w, now) => {
-    const s = status(w.week, now);
+    const iso = new Date(Date.now() + UTC_OFFSET * 60000).toISOString().slice(0, 10);
+    const s = status(w.week, { ...now, iso }, w.calendar);
     const rest = w.brief ? s.brief : s.rest;
     const key = [s.state, s.word, rest, now.day].join('|');
     if (key === w.key) return;   // a minute tick that changes nothing touches nothing

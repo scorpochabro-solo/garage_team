@@ -119,7 +119,7 @@ table { border-collapse: collapse; width: 100%; }
 .is-offscreen, .is-offscreen * { animation-play-state: paused !important; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
-  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
 }
 
 /* prose (static page content) */

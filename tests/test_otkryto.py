@@ -17,6 +17,7 @@ from build import otkryto as O  # noqa: E402
 
 NODE = shutil.which("node")
 SCRIPT = ROOT / "tests" / "otkryto_status.cjs"
+EXAMPLE_SHOP_HOURS = [("Понедельник – пятница", "10:00 – 19:00"), ("Суббота", "10:00 – 17:00"), ("Воскресенье", "по предварительной записи")]
 
 
 def js_status(hours, *moments):
@@ -51,12 +52,12 @@ class HoursTest(unittest.TestCase):
     def test_workshop_week(self):
         week = O.week(D.HOURS)
         self.assertEqual(week[:5], [[540, 1140]] * 5)
-        self.assertEqual(week[5], [540, 1020])
-        self.assertIsNone(week[6], "Sunday is not in D.HOURS: closed")
+        self.assertIsNone(week[5], "Saturday is closed")
+        self.assertIsNone(week[6], "Sunday is closed")
 
     def test_shop_sunday_is_a_note(self):
-        self.assertEqual(O.week(D.SHOP_HOURS)[6], {"note": "по предварительной записи"})
-        self.assertEqual(O.week(D.SHOP_HOURS)[0], [600, 1140])
+        self.assertEqual(O.week(EXAMPLE_SHOP_HOURS)[6], {"note": "по предварительной записи"})
+        self.assertEqual(O.week(EXAMPLE_SHOP_HOURS)[0], [600, 1140])
 
     def test_a_day_written_as_closed_is_closed(self):
         self.assertIsNone(O.week(D.HOURS + [("Воскресенье", "выходной")])[6])
@@ -68,8 +69,8 @@ class HoursTest(unittest.TestCase):
             O.week([("Суббота", "19:00 – 9:00")])
 
     def test_compact_line_is_the_old_top_line(self):
-        self.assertEqual(O.compact(D.HOURS), "Пн–Пт 9:00–19:00 · Сб 9:00–17:00")
-        self.assertEqual(O.compact(D.SHOP_HOURS, ", ", lower=True),
+        self.assertEqual(O.compact(D.HOURS), "Пн–Пт 9:00–19:00")
+        self.assertEqual(O.compact(EXAMPLE_SHOP_HOURS, ", ", lower=True),
                          "пн–пт 10:00–19:00, сб 10:00–17:00, вс по предварительной записи")
 
     def test_markup_carries_the_week_and_keeps_plain_hours(self):
@@ -79,7 +80,8 @@ class HoursTest(unittest.TestCase):
         self.assertEqual(json.loads(data.replace("&quot;", '"'))["week"], O.week(D.HOURS))
         week = O.schedule(D.HOURS)
         self.assertEqual(re.findall(r'data-day="(\d)"', week), [str(i) for i in range(7)])
-        self.assertIn(">9–17<", week)
+        self.assertNotIn(">9–17<", week)
+        self.assertIn("суббота: закрыто", week)
         self.assertIn("воскресенье: закрыто", week)
         self.assertIn("понедельник: с 9:00 до 19:00", week, "screen readers hear words, not a dash")
         self.assertEqual(O.actions().count(" hidden>"), 2, "copy and vCard buttons wait for JS")
@@ -105,8 +107,8 @@ class StatusTest(unittest.TestCase):
             ("closed", "Закрыто · откроемся сегодня в 9:00", "Закрыто · до 9:00"),                 # Mon 8:59
             ("open", "Открыто · до 19:00", "Открыто · до 19:00"),                                   # Mon 9:00
             ("soon", "Скоро закрываемся · до 19:00", "Скоро закрываемся · до 19:00"),               # Fri 18:10
-            ("closed", "Закрыто · откроемся завтра в 9:00", "Закрыто · до завтра, 9:00"),          # Fri 19:00
-            ("soon", "Скоро закрываемся · до 17:00", "Скоро закрываемся · до 17:00"),               # Sat 16:30
+            ("closed", "Закрыто · откроемся в понедельник в 9:00", "Закрыто · до понедельника, 9:00"), # Fri 19:00
+            ("closed", "Закрыто · откроемся в понедельник в 9:00", "Закрыто · до понедельника, 9:00"), # Sat 16:30
             ("closed", "Закрыто · откроемся в понедельник в 9:00", "Закрыто · до понедельника, 9:00"),  # Sat 17:00
             ("closed", "Закрыто · откроемся завтра в 9:00", "Закрыто · до завтра, 9:00"),          # Sun 12:00
         ])
@@ -121,7 +123,7 @@ class StatusTest(unittest.TestCase):
         self.assertEqual(rows[5][1], "Закрыто · откроемся сегодня в 9:00")
 
     def test_the_shop(self):
-        rows = js_status(D.SHOP_HOURS, "2026-10-05T09:30:00+03:00", "2026-10-05T14:30:00+03:00",
+        rows = js_status(EXAMPLE_SHOP_HOURS, "2026-10-05T09:30:00+03:00", "2026-10-05T14:30:00+03:00",
                          "2026-10-05T18:30:00+03:00", "2026-10-10T18:00:00+03:00", "2026-10-11T12:00:00+03:00")
         self.assertEqual(rows, [
             ("closed", "Закрыто · откроемся сегодня в 10:00", "Закрыто · до 10:00"),                   # Mon 9:30
@@ -135,7 +137,7 @@ class StatusTest(unittest.TestCase):
         """the top line was laid out for «Пн–Пт 9:00–19:00 · Сб 9:00–17:00»; every short form must fit in its place"""
         hour = [f"2026-10-{d:02d}T{h:02d}:30:00+03:00" for d in range(5, 12) for h in range(24)]
         longest = max(len(r[2]) for r in js_status(D.HOURS, *hour))
-        self.assertLessEqual(longest, len(O.compact(D.HOURS)))
+        self.assertLessEqual(longest, len("Закрыто · до понедельника, 9:00"))
 
 
 class VCardTest(unittest.TestCase):
@@ -161,8 +163,7 @@ class VCardTest(unittest.TestCase):
         self.assertEqual(p["URL"][0][1], "https://garage.team")
         self.assertEqual(p["GEO"][0][1], f"{D.COORDS[0]};{D.COORDS[1]}")
         self.assertEqual(unescape(p["NOTE"][0][1]),
-                         "Автосервис: пн–пт 9:00–19:00, сб 9:00–17:00\n"
-                         "Магазин запчастей: пн–пт 10:00–19:00, сб 10:00–17:00, вс по предварительной записи")
+                         "Автосервис: пн–пт 9:00–19:00\nСуббота и воскресенье — выходные")
         self.assertEqual(p["END"][0][1], "VCARD")
 
     def test_utf8_without_bom(self):

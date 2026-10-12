@@ -14,7 +14,7 @@ DIST = ROOT / "dist"
 
 SITE = json.loads((DATA / "site.json").read_text(encoding="utf-8"))
 # titles of the pages that are not services: keys of site.json → pages plus the pages whose text lives in the code
-PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy"})
+PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy", "slovar", "moya_mashina"})
 _SERVICES = json.loads((DATA / "services.json").read_text(encoding="utf-8"))
 DESCR = json.loads((DATA / "descriptions.json").read_text(encoding="utf-8"))
 HOTSPOTS = json.loads((DATA / "hotspots.json").read_text(encoding="utf-8"))["items"]
@@ -97,46 +97,52 @@ PHONE_TEL = "+78314161677"
 EMAIL = "info@garage.team"
 ADDRESS_SHORT = "Н. Новгород, ул. Красная слобода, 9"
 ADDRESS_FULL = "603155, г. Нижний Новгород, ул. Красная слобода, 9"
-HOURS = [("Понедельник – пятница", "9:00 – 19:00"), ("Суббота", "9:00 – 17:00")]
-SHOP_HOURS = [("Понедельник – пятница", "10:00 – 19:00"), ("Суббота", "10:00 – 17:00"), ("Воскресенье", "по предварительной записи")]
+HOURS = [("Понедельник – пятница", "9:00 – 19:00"), ("Суббота", "выходной"), ("Воскресенье", "выходной")]
+SHOP_HOURS = HOURS
 VK_URL = "https://vk.com/garagebest"
 FB_URL = ("https://www.facebook.com/%D0%90%D0%B2%D1%82%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81-%D0%B3%D0%B0%D1%80%D0%B0%D0%B6-"
           "wwwgarageteam-1811807572418855/?ref=bookmarks")
 COORDS = (56.328949, 44.027199)
-FOUNDED = 2011
-COPYRIGHT_FROM = 2011
+FOUNDED = 2016
+COPYRIGHT_FROM = 2016
 COMPANY = "ООО «Гараж»"
-COMPANY_LINE_2 = "Сеть магазинов запчастей «Гараж»"
-SLOGAN_EN = "Complete car care since 2011"
+COMPANY_LINE_2 = "Автосервис Garage Team"
+SLOGAN_EN = "Complete car care since 2016"
+WARRANTY = "Гарантия 1 год на все выполненные работы"
+PREMIUM_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Porsche", "Lexus", "Land Rover", "Bentley", "Rolls-Royce", "Ferrari", "Tesla", "Zeekr", "Li Auto", "Genesis", "Lamborghini", "Voyah"]
 # content hashes of dist/assets/css/site.css and js/site.js, filled by build.py before the pages are rendered
 ASSET_VERSION = {"css": "", "js": ""}
 
 NAV = [
     ("Услуги", "/services.html"),
-    ("Автозапчасти", "/avtozapchasti/"),
+    ("Моя машина", "/moya-mashina/"),
     ("Оплата", "/oplata.html"),
     ("О компании", "/about/"),
     ("Контакты", "/contacts/"),
 ]
 FOOTER_LINKS = [
     ("Все услуги", "/services.html"),
-    ("Автозапчасти", "/avtozapchasti/"),
-    ("Каталоги запчастей", "/cats/"),
-    ("Поиск по номеру", "/search/"),
-    ("Доставка", "/delivery.html"),
+    ("Моя машина", "/moya-mashina/"),
     ("Оплата", "/oplata.html"),
     ("О компании", "/about/"),
     ("Отзывы", "/otzyvy.html"),
+    ("Словарь автомеханика", "/slovar/"),
     ("Контакты", "/contacts/"),
     ("Оставить заявку", "/call/request/"),
     ("Звонок менеджеру", "/call/manager/"),
-    ("Регистрация", "/registration/"),
     ("Пользовательское соглашение", "/page/soglashenie/"),
 ]
 
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+
+def plural(n, one, few, many):
+    n = abs(n) % 100
+    if 11 <= n <= 19:
+        return many
+    return one if n % 10 == 1 else few if n % 10 in (2, 3, 4) else many
 
 
 # ---------- base path (GitHub Pages project sites live under /<repo>/) ----------

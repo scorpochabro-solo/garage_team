@@ -154,7 +154,13 @@ def zima_section():
   <div class="wrap">
     <div class="sec-head reveal">
       <div><p class="eyebrow">// Сезонный чек-лист</p><h2 class="h2 sec-head__title" id="zima-title">Готова ли машина<br>к зиме?</h2></div>
-      <p class="sec-head__aside">Десять пунктов, которые обычно проверяют перед холодами. Отметьте то, что уже в порядке, а остальное одним нажатием добавьте в заявку.</p>
+      <p class="sec-head__aside">Выберите тип двигателя и отметьте то, что уже проверили. Не уверены в состоянии узла — оставьте пункт без галочки: добавим его в заявку на проверку.</p>
+    </div>
+    <div class="zima-guide">
+      <span><b>01</b> Выберите бензин или дизель</span>
+      <span><b>02</b> Отметьте проверенные пункты</span>
+      <span><b>03</b> Отправьте оставшиеся на проверку</span>
+      <a class="link-arrow" href="#pogoda">Когда менять резину? {icon('arrow')}</a>
     </div>
     <div class="zima is-empty" data-zima>
       <div class="zima__gauge reveal">
@@ -197,6 +203,7 @@ def zima_section():
         <button class="btn btn--primary zima__book" type="button" data-modal="call" data-preset="{preset}" data-zima-book>{icon('phone')} <span>Записаться на подготовку к&nbsp;зиме</span></button>
         <a class="btn btn--ghost zima__add" href="#request" data-zima-add>{icon('plus')} <span>Добавить в заявку</span></a>
         <p class="zima__store">Отметки сохраняются только в этом браузере</p>
+        <p class="zima__next" data-zima-next aria-live="polite"></p>
       </div>
     </div>
   </div>

@@ -108,7 +108,8 @@ def staff(content: dict) -> str:
         return ""
     team = {t["name"]: t for t in D.SITE.get("team", [])}
     cards = "".join(
-        f'<figure class="svc-staff__card"><img src="{D.img(team[n]["photo"])}" alt="{esc(n)}, {esc(team[n]["position"])}" width="96" height="96" loading="lazy" decoding="async">'
+        f'<figure class="svc-staff__card">' +
+        (f'<img src="{D.img(team[n]["photo"])}" alt="{esc(n)}, {esc(team[n]["position"])}" width="96" height="96" loading="lazy" decoding="async">' if team[n].get("photo") else '') +
         f'<figcaption><b>{esc(n)}</b><span>{esc(team[n]["position"])}</span></figcaption></figure>'
         for n in names)
     return f"""<div class="svc-staff reveal">

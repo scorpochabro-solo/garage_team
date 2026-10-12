@@ -105,7 +105,7 @@
    },
    {
     "q": "Что делать, если на техосмотре регулировка фар не соответствует требованиям?",
-    "a": "Отрегулировать фары по норме и проверить, держат ли они положение: иногда причина в сломанном регуляторе или неисправном корректоре. После этого можно снова пройти <a href=\"/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html\">техосмотр</a>."
+    "a": "Отрегулировать фары по норме и проверить, держат ли они положение: иногда причина в сломанном регуляторе или неисправном корректоре. После этого можно снова пройти техосмотр."
    },
    {
     "q": "Где сделать регулировку фар в Нижнем Новгороде?",
@@ -115,11 +115,9 @@
  },
  "related": [
   "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
-  "/services/remont-elektrooborudovania-avtomobila/zamena-lampocek-osvesenia.html",
-  "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-  "/services/remont-elektrooborudovania-avtomobila/ustanovka-ksenona.html"
+  "/services/remont-elektrooborudovania-avtomobila/zamena-lampocek-osvesenia.html"
  ],
  "staff": [
-  "Юрий Андреев"
+  "Александр Логинов"
  ]
 }
