@@ -1,0 +1,50 @@
+{
+ "slug": "remont-dizela__remont-dizelnogo-dvigatela",
+ "path": "/services/remont-dizela/remont-dizelnogo-dvigatela.html",
+ "h1": "Ремонт дизельного двигателя",
+ "region": "47",
+ "collected": "2026-09-23",
+ "seeds": [],
+ "alts": [
+  {
+   "phrase": "капитальный ремонт дизельного двигателя",
+   "total": 5,
+   "results": [
+    {
+     "phrase": "капитальный ремонт дизельных двигателей",
+     "count": 5
+    },
+    {
+     "phrase": "дизельный двигатель после капитального ремонта",
+     "count": 3
+    }
+   ],
+   "associations": [
+    {
+     "phrase": "сажевый фильтр на дизеле что это",
+     "count": 4
+    },
+    {
+     "phrase": "свеча накаливания дизель",
+     "count": 88
+    },
+    {
+     "phrase": "топливный фильтр для дизеля",
+     "count": 35
+    },
+    {
+     "phrase": "мотоблок дизель",
+     "count": 98
+    },
+    {
+     "phrase": "фильтр масляный газель дизель",
+     "count": 30
+    },
+    {
+     "phrase": "масляный фильтр газ 3309 дизель д245",
+     "count": 9
+    }
+   ]
+  }
+ ]
+}

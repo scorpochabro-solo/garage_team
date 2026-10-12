@@ -1,0 +1,184 @@
+/* ============================================================
+   «Что стучит?» — symptom helper on the home page (build/stuk.py, stuk.js)
+   Questions on the left, the answer on the right; one column below 1100px,
+   where an answered question folds into its head so the answer stays near.
+   ============================================================ */
+.stuk [hidden] { display: none !important; }   /* the chips and buttons below set their own display */
+.stuk__app { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 1rem + 2.2vw, 3.5rem); align-items: start; }
+.stuk__steps { display: grid; gap: 2rem; min-width: 0; }
+.stuk__out { position: sticky; top: calc(var(--header-h) + 1.25rem); min-width: 0; }
+/* without JavaScript the questions cannot work: the <noscript> list replaces them */
+@media (scripting: none) { .stuk__app { display: none; } .stuk .reveal { opacity: 1; transform: none; } }
+
+/* ---------- questions ---------- */
+.stuk-q__head { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.8rem; margin-bottom: 1.1rem; }
+.stuk-q__n { width: 28px; height: 28px; display: grid; place-items: center; flex: none; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-3); box-shadow: inset 0 0 0 1px var(--line-2); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.stuk-q.is-current .stuk-q__n { background: var(--green); color: #fff; box-shadow: none; }
+.stuk-q.is-done .stuk-q__n { background: rgba(var(--green-bright-rgb), 0.16); color: var(--accent); box-shadow: none; }
+.stuk-q__title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+.stuk-q__opt { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.stuk-q__val, .stuk-q__edit { display: none; }
+.stuk-q__wait { padding: 0.95rem 1.1rem; font-size: 0.92rem; color: var(--text-3); box-shadow: inset 0 0 0 1px var(--line); background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.025) 0 8px, transparent 8px 16px); }
+
+/* symptoms: the look of the service list next to the car scheme, numbered like it */
+.stuk-syms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.stuk-sym { position: relative; display: flex; align-items: center; gap: 0.75rem; min-height: 60px; padding: 0.55rem 0.75rem; text-align: left; font-weight: 600; font-size: 0.92rem; line-height: 1.2; color: var(--gray-300); background: rgba(255,255,255,0.03); box-shadow: inset 0 0 0 1px var(--line); transition: color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease), opacity var(--dur) var(--ease); }
+.stuk-sym__ic { width: 38px; height: 38px; display: grid; place-items: center; flex: none; color: var(--accent); background: rgba(var(--green-bright-rgb), 0.08); transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.stuk-sym__ic .ic { width: 22px; height: 22px; }
+.stuk-sym__n { position: absolute; top: -7px; left: 10px; padding: 0 4px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; line-height: 1.1; color: var(--text-3); background: var(--black); transition: color var(--dur) var(--ease); }
+.stuk-sym:hover { color: #fff; box-shadow: inset 0 0 0 1px var(--line-2); background: rgba(255,255,255,0.05); }
+.stuk-sym:hover .stuk-sym__ic { background: rgba(var(--green-bright-rgb), 0.16); }
+.stuk-sym[aria-pressed="true"] { color: #fff; box-shadow: inset 0 0 0 1px var(--accent); background: rgba(var(--green-bright-rgb), 0.08); }
+.stuk-sym[aria-pressed="true"] .stuk-sym__ic { background: var(--green); color: #fff; }
+.stuk-sym[aria-pressed="true"] .stuk-sym__n { color: var(--accent); }
+.stuk.has-s .stuk-sym[aria-pressed="false"]:not(:hover):not(:focus-visible) { opacity: 0.55; }
+.stuk-sym:active { transform: translateY(1px); }
+
+/* context and place chips */
+.stuk-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.stuk-chip { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 44px; padding: 0.55rem 1rem; text-align: left; font-weight: 600; font-size: 0.92rem; line-height: 1.2; color: var(--text-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); transition: color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+.stuk-chip:hover, .stuk-chip.is-hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
+.stuk-chip[aria-pressed="true"] { color: #fff; background: var(--green); box-shadow: none; }
+.stuk-chip:active { transform: translateY(1px); }
+.stuk-chip__sw { width: 14px; height: 14px; flex: none; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
+.stuk-chip[aria-pressed="true"] .stuk-chip__sw { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.75); }
+.stuk-chips.is-in .stuk-chip { animation: stuk-in 0.4s var(--ease) both; animation-delay: calc(var(--i, 0) * 35ms); }
+@keyframes stuk-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* ---------- where: a top view of the car, front to the left ---------- */
+/* the place buttons stand next to the car, in the order of the car from its front */
+.stuk-where { display: grid; grid-template-columns: minmax(0, 440px) minmax(8.5rem, auto); align-items: center; gap: 1rem 1.5rem; }
+.stuk-zones { flex-direction: column; align-items: stretch; }
+.stuk-car { min-width: 0; }
+.stuk-car__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.stuk-car__body, .stuk-car__mirror { fill: var(--ink-800); stroke: rgba(255,255,255,0.26); stroke-width: 1.5; stroke-linejoin: round; }
+.stuk-car__glass { fill: rgba(255,255,255,0.045); stroke: rgba(255,255,255,0.16); stroke-width: 1.2; }
+.stuk-car__line { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 1.2; stroke-linecap: round; }
+.stuk-car__wheel { fill: #1c1f1c; stroke: rgba(255,255,255,0.3); stroke-width: 1.5; }
+.stuk-car__area { fill: transparent; stroke: transparent; stroke-width: 1.5; }
+.stuk-car__edge { fill: none; stroke: transparent; stroke-width: 3; stroke-linecap: round; }
+.stuk-car__floor { fill: transparent; stroke: rgba(255,255,255,0.13); stroke-width: 1.2; stroke-dasharray: 4 5; }
+.stuk-car__pipe { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 1.5; stroke-dasharray: 5 4; stroke-linecap: round; }
+.stuk-car__hit { fill: transparent; pointer-events: none; }
+.stuk-car__hit.is-on { pointer-events: all; cursor: pointer; }
+.stuk-car__svg * { transition: fill var(--dur) var(--ease), stroke var(--dur) var(--ease); }
+/* a place you can pick is tinted; hovered and chosen places light up in the brand green */
+.stuk-car__wheel.is-on, .stuk-car__area.is-on { fill: rgba(var(--green-bright-rgb), 0.07); stroke: rgba(var(--green-bright-rgb), 0.45); }
+.stuk-car__edge.is-on { stroke: rgba(var(--green-bright-rgb), 0.3); }
+.stuk-car__floor.is-on, .stuk-car__pipe.is-on { stroke: rgba(var(--green-bright-rgb), 0.5); }
+.stuk-car__wheel.is-hover, .stuk-car__area.is-hover { fill: rgba(var(--green-bright-rgb), 0.16); stroke: var(--green-bright); }
+.stuk-car__edge.is-hover { stroke: var(--green-bright); }
+.stuk-car__floor.is-hover { fill: rgba(var(--green-bright-rgb), 0.08); stroke: var(--green-bright); }
+.stuk-car__pipe.is-hover { stroke: var(--green-bright); }
+.stuk-car__wheel.is-sel, .stuk-car__area.is-sel { fill: rgba(var(--green-bright-rgb), 0.28); stroke: var(--green-bright); }
+.stuk-car__edge.is-sel { stroke: var(--green-bright); }
+.stuk-car__floor.is-sel { fill: rgba(var(--green-bright-rgb), 0.14); stroke: var(--green-bright); stroke-dasharray: none; }
+.stuk-car__pipe.is-sel { stroke: var(--green-bright); stroke-dasharray: none; }
+
+/* ---------- the answer ---------- */
+.stuk-out { position: relative; container-type: inline-size; padding: clamp(1.4rem, 1rem + 1.3vw, 2.25rem); background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2); }
+.stuk-out::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--green); transform: scaleY(0); transform-origin: top; transition: transform var(--dur-slow) var(--ease); }
+.stuk-out.is-on::before { transform: scaleY(1); }
+.stuk-out__label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.stuk-out__label--muted { margin-top: 1.9rem; color: var(--text-3); }
+.stuk-out__title { margin-top: 0.7rem; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem); letter-spacing: -0.01em; line-height: 1.25; text-wrap: balance; }
+.stuk-out__text { margin-top: 0.7rem; max-width: 46ch; font-size: 0.95rem; color: var(--text-2); text-wrap: pretty; }
+.stuk-presets { margin-top: 0.6rem; border-top: 1px solid var(--line); }
+.stuk-preset { display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 50px; padding: 0.6rem 0; text-align: left; font-weight: 600; font-size: 0.95rem; color: var(--text); border-bottom: 1px solid var(--line); transition: color var(--dur) var(--ease); }
+.stuk-preset .ic { flex: none; color: var(--accent); transition: transform var(--dur) var(--ease); }
+.stuk-preset:hover { color: var(--accent); }
+.stuk-preset:hover .ic { transform: translateX(4px); }
+
+.stuk-res__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 1rem; margin: -0.6rem 0 0; }
+.stuk-res__head > * { white-space: nowrap; }
+.stuk-reset { display: inline-flex; align-items: center; gap: 0.45em; min-height: 44px; margin-right: -0.25rem; padding: 0 0.25rem; font-size: 0.85rem; font-weight: 600; color: var(--text-2); transition: color var(--dur) var(--ease); }
+.stuk-reset .ic { width: 1.1em; height: 1.1em; color: var(--accent); }
+.stuk-reset:hover { color: var(--text); }
+.stuk-res__title { margin-top: 0.25rem; font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem); line-height: 1.25; letter-spacing: -0.015em; }
+.stuk-res__title:focus { outline: none; }
+.stuk-res__title:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.stuk-res__lead { margin-top: 0.7rem; color: var(--text-2); font-size: 0.95rem; max-width: 46ch; text-wrap: pretty; }
+.stuk-res__next { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; color: var(--accent); }
+.stuk-res__next .ic { flex: none; }
+.stuk-causes { margin-top: 1.1rem; }
+.stuk-cause { display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); gap: 0 0.8rem; padding: 0.9rem 0; border-top: 1px solid var(--line); animation: stuk-in 0.45s var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }
+/* the title and the page to read on one row; under the text when the panel is narrow */
+.stuk-cause__b { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t a" "x x"; align-items: baseline; gap: 0 1rem; }
+.stuk-cause__t { grid-area: t; }
+.stuk-cause__a { grid-area: a; }
+.stuk-cause__x { grid-area: x; }
+@container (max-width: 540px) { .stuk-cause__b { grid-template-columns: minmax(0, 1fr); grid-template-areas: "t" "x" "a"; } }
+.stuk-cause__n { padding-top: 0.2rem; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; color: var(--accent); }
+.stuk-cause__n .ic { width: 20px; height: 20px; }
+.stuk-cause__t { font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; line-height: 1.3; }
+.stuk-cause__tag { display: inline-block; margin-left: 0.4rem; padding: 0.15em 0.5em; vertical-align: 0.15em; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: rgba(var(--green-bright-rgb), 0.1); }
+.stuk-cause__x { margin-top: 0.3rem; font-size: 0.92rem; line-height: 1.5; color: var(--text-2); text-wrap: pretty; }
+.stuk-cause__a { display: inline-flex; align-items: center; justify-self: start; gap: 0.4em; font-size: 0.86rem; font-weight: 700; line-height: 1.3; color: var(--accent); }
+@container (max-width: 540px) { .stuk-cause__a { margin-top: 0.4rem; } }
+.stuk-cause__a .ic { width: 1em; height: 1em; transition: transform var(--dur) var(--ease); }
+.stuk-cause__a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.stuk-cause__a:hover .ic { transform: translate(2px, -2px); }
+@media (pointer: coarse) { .stuk-cause__a { min-height: 44px; } }
+@container (max-width: 540px) { @media (pointer: coarse) { .stuk-cause__a { margin: 0.1rem 0 -0.6rem; } } }
+.stuk-res__note { display: flex; gap: 0.6rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.86rem; line-height: 1.5; color: var(--text-3); }
+.stuk-res__note .ic { flex: none; width: 1.2em; height: 1.2em; margin-top: 0.1em; color: var(--text-2); }
+.stuk-res__note a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+/* touch: the link inside the sentence gets a 44px-high hit area without moving the text (see .review__who a) */
+@media (pointer: coarse) { .stuk-res__note a { padding-block: 13px; margin-block: -13px; } }
+.stuk-res__msg { margin-top: 1.1rem; padding: 0.9rem 1rem; background: rgba(255,255,255,0.025); box-shadow: inset 0 0 0 1px var(--line); border-left: 3px solid var(--green); }
+.stuk-res__msg-label { font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.stuk-res__msg-text { margin-top: 0.35rem; font-size: 0.92rem; line-height: 1.5; color: var(--text); }
+.stuk-res__cta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.2rem; }
+.stuk-res__cta .btn { flex: 1 1 auto; }   /* side by side when they fit, one per row when not */
+.stuk-res__cta .btn--ghost { --btn-bg: var(--ink-800); }
+/* the narrowest phones (320–360px): «Записаться на диагностику» is wider than the panel, the label wraps instead */
+@container (max-width: 300px) { .stuk-res__cta .btn { height: auto; min-height: var(--h); padding-block: 0.7em; white-space: normal; line-height: 1.25; text-align: center; } }
+
+/* a note the helper puts into the request form when the form is not on the description step yet */
+.stuk-rq-note { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 1.4rem; padding: 0.75rem 0.95rem; font-size: 0.9rem; color: var(--text); background: rgba(var(--green-bright-rgb), 0.08); box-shadow: inset 0 0 0 1px rgba(var(--green-bright-rgb), 0.35); animation: stuk-in 0.45s var(--ease) both; }
+.stuk-rq-note .ic { flex: none; color: var(--accent); }
+
+/* ---------- no JavaScript ---------- */
+.stuk-fallback__lead { max-width: 60ch; color: var(--text-2); }
+.stuk-fallback__lead a { color: var(--accent); white-space: nowrap; }
+.stuk-fallback__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 2.5rem; margin-top: 1.5rem; }
+.stuk-fallback__list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.3rem 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line); }
+.stuk-fallback__list span { font-weight: 600; }
+.stuk-fallback__list a { display: inline-flex; align-items: center; gap: 0.4em; min-height: 44px; font-size: 0.9rem; font-weight: 700; color: var(--accent); }
+
+/* ---------- one column: tablets and phones ---------- */
+@media (max-width: 1099px) {
+  .stuk__app { grid-template-columns: minmax(0, 1fr); }
+  /* folded questions stand together; an open one keeps its distance */
+  .stuk__steps { gap: 0.6rem; }
+  .stuk-q:not(:first-child):not(.is-done), .stuk-q.is-editing:not(:first-child) { margin-top: 0.9rem; }
+  .stuk-res__next--ask { display: none; }   /* the question is right above the panel */
+  /* «Начать заново» moves under the buttons: after reading the answer, not squeezed next to its label */
+  .stuk-out__res { display: flex; flex-direction: column; }
+  .stuk-res__head { display: contents; }
+  .stuk-reset { order: 10; align-self: center; margin: 0.9rem 0 -0.6rem; padding: 0 0.75rem; }
+  .stuk__out { position: static; }
+  /* an answered question folds into one row: number, question, answer and «Изменить» */
+  .stuk-q.is-done:not(.is-editing) .stuk-q__head { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; grid-template-areas: "n t e" "n v e"; align-items: center; gap: 0.1rem 0.8rem; margin: 0; padding: 0.55rem 0.4rem 0.55rem 0.75rem; background: rgba(255,255,255,0.03); box-shadow: inset 0 0 0 1px var(--line); }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__n { grid-area: n; }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__title { grid-area: t; font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__val { grid-area: v; display: block; font-weight: 700; color: #fff; line-height: 1.3; }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__edit { grid-area: e; display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.6rem; font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__opt { display: none; }
+  .stuk-q.is-done:not(.is-editing) .stuk-q__body { display: none; }
+  .stuk.has-s .stuk-sym[aria-pressed="false"]:not(:hover):not(:focus-visible) { opacity: 1; }
+  .stuk-where { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .stuk-car { width: 100%; max-width: 420px; }
+  .stuk-zones { flex-direction: row; }
+}
+@media (max-width: 1099px) and (min-width: 641px) { .stuk-syms { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .stuk-syms { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .stuk-sym { min-height: 56px; gap: 0.6rem; padding: 0.5rem 0.6rem; font-size: 0.88rem; }
+  .stuk-sym__ic { width: 34px; height: 34px; }
+  .stuk-sym__ic .ic { width: 20px; height: 20px; }
+  .stuk-chip { padding: 0.5rem 0.85rem; font-size: 0.9rem; }
+  .stuk-out .stuk-out__label { letter-spacing: 0.12em; }
+  .stuk-cause { grid-template-columns: 1.75rem minmax(0, 1fr); gap: 0 0.55rem; }
+  .stuk-fallback__list { grid-template-columns: minmax(0, 1fr); }
+}

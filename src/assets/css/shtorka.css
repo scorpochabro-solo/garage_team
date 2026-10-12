@@ -1,0 +1,151 @@
+/* ============================================================
+   shtorka: «Рольворота между страницами» — a steel roller shutter between pages
+   A cross-document view transition: the shutter rolls down over the content area of the page being left and rolls
+   back up over the new one. The top line, the header and the phone call bar keep their place (own snapshots, painted
+   over the shutter), like a shutter moving inside the gate portal under the sign.
+   Markup and the head script: build/shtorka.py, js/shtorka.js. Only transform and opacity are animated.
+   ============================================================ */
+
+/* ---------- opt-in: both pages carry it. Not with reduced motion; not without JS, which names the transition ---------- */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  @view-transition { navigation: auto; }
+}
+
+/* the chrome: its own snapshots, so it neither rolls nor blinks when the page underneath changes */
+.topline { view-transition-name: site-topline; }
+.site-header { view-transition-name: site-header; }
+.mobile-bar { view-transition-name: site-callbar; }
+
+/* ---------- the shutter ----------
+   A real element on every page, shown only while an incoming «shtorka» transition is captured and running (the head
+   script adds the type in `pagereveal`): its live snapshot is what rolls. The rest of the time display: none.
+   The head script sets top and bottom to the content area of the new page; the values here are the same edges for a
+   page opened at its top. z-index -1: the shutter is painted before the chrome, so its snapshot goes under it. */
+.shtorka { display: none; }
+:root:active-view-transition-type(shtorka) .shtorka {
+  --pitch: clamp(22px, 1.1rem + 1.2vh, 30px);   /* one slat */
+  display: block; position: fixed; left: 0; right: 0; z-index: -1;
+  top: calc(var(--topline-h) + var(--header-h)); bottom: 0;
+  pointer-events: none; contain: layout size style;
+  view-transition-name: shtorka;
+  background:
+    /* further from the light, lower to the floor: darker */
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.28)),
+    /* the slat ends run in the guide rails at both sides */
+    linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0 9px, rgba(255, 255, 255, 0.07) 9px 10px, rgba(0, 0, 0, 0.3) 10px, rgba(0, 0, 0, 0) 26px,
+      rgba(0, 0, 0, 0) calc(100% - 26px), rgba(0, 0, 0, 0.3) calc(100% - 10px), rgba(255, 255, 255, 0.07) calc(100% - 10px) calc(100% - 9px), rgba(0, 0, 0, 0.7) calc(100% - 9px)),
+    /* a soft sheen across the curtain */
+    linear-gradient(100deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.028) 55%, rgba(255, 255, 255, 0) 78%),
+    /* each slat is rolled steel: a narrow bright crest under the joint, then the face turns away from the light */
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 8%, rgba(255, 255, 255, 0.075) 15%, rgba(255, 255, 255, 0) 30%) 0 100% / 100% var(--pitch) repeat-y,
+    /* the slats (vorota.css), counted from the bottom bar up */
+    var(--slat-soft) 0 100% / 100% var(--pitch) repeat-y,
+    var(--slat) 0 100% / 100% var(--pitch) repeat-y;
+  background-color: #1d201e;
+}
+/* the top slats sit right under the header when the shutter is down: its edge shades them, the green of the sign and
+   the header line falls on them (only visible near the end of the drop, when that part comes out of the box) */
+:root:active-view-transition-type(shtorka) .shtorka::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 160px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0) 14px),
+    radial-gradient(60% 160px at 50% 0, rgba(var(--green-bright-rgb), 0.09), rgba(var(--green-bright-rgb), 0));
+}
+/* phones: the curtain stops on the call bar (the head script measures it; this is its height from footer.css) */
+@media (max-width: 640px) {
+  :root:active-view-transition-type(shtorka) .shtorka { bottom: calc(46px + 1.2rem + 1px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* the bottom bar: a steel lip, the green hazard band (as on the gate in «Ворота»), the rubber seal */
+.shtorka__bar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%) 0 3px / 100% 11px no-repeat,
+    linear-gradient(180deg, #8a908c 0 1px, #4d524f 1px 2px, #2c302d 2px 3px) 0 0 / 100% 3px no-repeat,
+    repeating-linear-gradient(-45deg, var(--green) 0 7px, #101211 7px 14px) 0 3px / 100% 11px no-repeat,
+    linear-gradient(180deg, #1d201e, #0c0d0c 55%, #040504) 0 14px / 100% 6px no-repeat;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.55), 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+/* the lock in the middle of the bar */
+.shtorka__bar::before {
+  content: ""; position: absolute; left: 50%; top: 3px; width: 36px; height: 11px; margin-left: -18px; border-radius: 2px;
+  background:
+    radial-gradient(circle at 50% 50%, #d2d6d3 0 1.5px, #5d625e 2px 3px, rgba(0, 0, 0, 0) 3.5px),
+    linear-gradient(180deg, #4a4f4b, #262927 55%, #151716);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+/* the lip catches the light of the header: bright right under it, dim down at the floor (in step with the roll) */
+.shtorka__bar::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, rgba(160, 255, 205, 0) 4%, rgba(190, 255, 220, 0.85) 30%, rgba(210, 255, 230, 0.95) 50%, rgba(190, 255, 220, 0.85) 70%, rgba(160, 255, 205, 0) 96%);
+  animation: shtorka-lip var(--shtorka-t) linear both;
+}
+
+/* ---------- the timeline: 560 ms in all ----------
+   0–36 %  the curtain drops over the old page, gathering speed; 36–43 % it hits the floor and the slats rattle 2 px;
+   at 43 % the pages swap behind the closed shutter; 43–100 % the motor rolls it up over the new page, quick off the
+   mark and easing into the box. Content comes back from the bottom up.
+   Set on :root for good, not only while the transition runs: an inherited value that changes on :root makes the
+   browser restyle every element of the page, on the new page's first frame and again at the end. */
+:root {
+  --shtorka-t: 560ms;
+  --shtorka-swap: calc(var(--shtorka-t) * 0.43);
+}
+:root:active-view-transition-type(shtorka)::view-transition-group(root) { animation: none; }
+:root:active-view-transition-type(shtorka)::view-transition-old(root) { animation: shtorka-cut 0s linear var(--shtorka-swap) both; }
+:root:active-view-transition-type(shtorka)::view-transition-new(root) { animation: shtorka-show 0s linear var(--shtorka-swap) both; }
+
+:root:active-view-transition-type(shtorka)::view-transition-group(shtorka) { animation: none; overflow: clip; }
+:root:active-view-transition-type(shtorka)::view-transition-old(shtorka) { display: none; }
+:root:active-view-transition-type(shtorka)::view-transition-new(shtorka) { animation: shtorka-roll var(--shtorka-t) linear both; }
+
+/* the chrome stays where the new page has it and only cross-fades its contents (the active menu item, the burger).
+   The header's frosted glass is not part of its snapshot, so it gets an opaque ground; so does the top line, which
+   may have had no snapshot on a scrolled old page. The call bar is nearly opaque itself, and it has to fade in
+   softly when the old page hid it behind the open menu. */
+:root:active-view-transition-type(shtorka)::view-transition-group(site-topline) { animation: none; background: var(--black); }
+:root:active-view-transition-type(shtorka)::view-transition-group(site-header) { animation: none; background: var(--ink-900); }
+:root:active-view-transition-type(shtorka)::view-transition-group(site-callbar) { animation: none; }
+:root:active-view-transition-type(shtorka)::view-transition-old(site-topline),
+:root:active-view-transition-type(shtorka)::view-transition-old(site-header),
+:root:active-view-transition-type(shtorka)::view-transition-old(site-callbar) { animation: shtorka-fade-out 180ms ease both; }
+:root:active-view-transition-type(shtorka)::view-transition-new(site-topline),
+:root:active-view-transition-type(shtorka)::view-transition-new(site-header),
+:root:active-view-transition-type(shtorka)::view-transition-new(site-callbar) { animation: shtorka-fade-in 180ms ease both; }
+
+@keyframes shtorka-roll {
+  0% { transform: translateY(-100%); animation-timing-function: cubic-bezier(0.42, 0.05, 0.78, 0.42); }
+  36% { transform: translateY(0); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  39.5% { transform: translateY(-2px); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.3); }
+  43% { transform: translateY(0); animation-timing-function: cubic-bezier(0.32, 0.06, 0.2, 1); }
+  100% { transform: translateY(-100%); }
+}
+@keyframes shtorka-lip {
+  0% { opacity: 1; animation-timing-function: cubic-bezier(0.42, 0.05, 0.78, 0.42); }
+  36%, 43% { opacity: 0.2; animation-timing-function: cubic-bezier(0.32, 0.06, 0.2, 1); }
+  100% { opacity: 1; }
+}
+@keyframes shtorka-cut { to { opacity: 0; } }
+@keyframes shtorka-show { from { opacity: 0; } }
+@keyframes shtorka-fade-out { to { opacity: 0; } }
+@keyframes shtorka-fade-in { from { opacity: 0; } }
+
+/* ---------- back: the same shutter the other way, rising from the floor and sinking back ---------- */
+:root:active-view-transition-type(shtorka-back) .shtorka { background-position: 0 0; }
+/* the leading edge is far from the header here: no light from it on the slats under the bar */
+:root:active-view-transition-type(shtorka-back) .shtorka::before { content: none; }
+:root:active-view-transition-type(shtorka-back) .shtorka__bar { top: 0; bottom: auto; transform: scaleY(-1); }
+:root:active-view-transition-type(shtorka-back) .shtorka__bar::after { animation-name: shtorka-lip-back; }
+:root:active-view-transition-type(shtorka-back)::view-transition-new(shtorka) { animation-name: shtorka-roll-back; }
+@keyframes shtorka-roll-back {
+  0% { transform: translateY(100%); animation-timing-function: cubic-bezier(0.42, 0.05, 0.78, 0.42); }
+  36% { transform: translateY(0); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  39.5% { transform: translateY(2px); animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.3); }
+  43% { transform: translateY(0); animation-timing-function: cubic-bezier(0.32, 0.06, 0.2, 1); }
+  100% { transform: translateY(100%); }
+}
+@keyframes shtorka-lip-back {
+  0% { opacity: 0.2; animation-timing-function: cubic-bezier(0.42, 0.05, 0.78, 0.42); }
+  36%, 43% { opacity: 1; animation-timing-function: cubic-bezier(0.32, 0.06, 0.2, 1); }
+  100% { opacity: 0.2; }
+}

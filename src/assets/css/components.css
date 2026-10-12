@@ -18,6 +18,7 @@
 .btn--sm { --h: 42px; --px: 1.1em; font-size: 0.86rem; --chamfer: 8px; }
 .btn--lg { --h: 62px; --px: 1.9em; font-size: 1.02rem; --chamfer: 12px; }
 .btn--block { width: 100%; }
+@media (pointer: coarse) { .btn--sm { --h: 44px; } }   /* Apple's minimum tap target */
 
 .btn--primary { background: var(--green); color: #fff; }
 .btn--primary::after {
@@ -45,6 +46,7 @@
 
 /* arrow link */
 .link-arrow { display: inline-flex; align-items: center; gap: 0.5em; font-weight: 700; color: var(--text); }
+@media (pointer: coarse) { .link-arrow, .btn--text { min-height: 44px; } }   /* text-style controls: 44px tap area on touch */
 .link-arrow .ic { transition: transform var(--dur) var(--ease); color: var(--accent); }
 .link-arrow:hover .ic { transform: translate(3px, -3px); }
 .link-arrow--inline:hover .ic { transform: translateX(4px); }
@@ -116,7 +118,7 @@
 .radio-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .radio { position: relative; }
 .radio input { position: absolute; opacity: 0; inset: 0; }
-.radio span { display: inline-flex; padding: 0.6em 1em; font-weight: 600; font-size: 0.9rem; box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); cursor: pointer; transition: all var(--dur) var(--ease); }
+.radio span { display: inline-flex; align-items: center; min-height: 44px; padding: 0.6em 1em; font-weight: 600; font-size: 0.9rem; box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); cursor: pointer; transition: all var(--dur) var(--ease); }
 .radio input:checked + span { background: var(--green); color: #fff; box-shadow: none; }
 .radio input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .form-grid { display: grid; gap: 1.1rem 1.25rem; }
@@ -138,7 +140,20 @@
 .price-table .price { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--accent); white-space: nowrap; letter-spacing: -0.01em; }
 .price-table .price--muted { color: var(--text-3); font-family: var(--font-text); font-weight: 500; font-size: 0.9rem; }
 .price-table th:not(:first-child), .price-table td:not(:first-child) { text-align: right; padding-right: 0; padding-left: 1rem; }
-@media (max-width: 560px) { .price-table { font-size: 0.9rem; } .price-table .price { font-size: 0.95rem; } }
+/* phones: each row stacks — the work name across the full width, the prices under it with their column names
+   (data-label from build/services.py); the header row stays for screen readers only */
+@media (max-width: 560px) {
+  .price-table { display: block; font-size: 0.95rem; }
+  .price-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .price-table tbody { display: block; }
+  .price-table tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: 0.45rem 1rem; padding: 0.95rem 0; border-bottom: 1px solid var(--line); }
+  .price-table tr:first-child { padding-top: 0.2rem; }
+  .price-table tr:last-child { border-bottom: 0; }
+  .price-table td, .price-table th:not(:first-child), .price-table td:not(:first-child) { display: block; padding: 0; border: 0; text-align: left; }
+  .price-table td:first-child { grid-column: 1 / -1; overflow-wrap: break-word; }
+  .price-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 0.2rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+  .price-table .price { font-size: 1.05rem; }
+}
 
 /* ---------- modal ---------- */
 .modal { border: 0; padding: 0; background: transparent; max-width: min(100% - 2rem, 560px); width: 100%; color: var(--text); margin: auto; }
@@ -147,7 +162,7 @@
 @keyframes modal-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } }
 .modal__panel { position: relative; background: var(--ink-800); box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-lg); padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
 .modal__panel::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 4px; background: repeating-linear-gradient(-45deg, var(--green) 0 10px, transparent 10px 20px); }
-.modal__close { position: absolute; top: 0.9rem; right: 0.9rem; width: 40px; height: 40px; display: grid; place-items: center; color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); transition: all var(--dur) var(--ease); }
+.modal__close { position: absolute; top: 0.9rem; right: 0.9rem; width: 44px; height: 44px; display: grid; place-items: center; color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); transition: all var(--dur) var(--ease); }
 .modal__close:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--accent); }
 .modal__title { font-size: var(--fs-h3); text-transform: uppercase; letter-spacing: -0.02em; margin: 0.5rem 3rem 0.5rem 0; }
 .modal__lead { color: var(--text-2); margin-bottom: 1.5rem; font-size: 0.95rem; }
@@ -162,14 +177,15 @@
 .lightbox__btn { position: absolute; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; display: grid; place-items: center; color: #fff; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); transition: all var(--dur) var(--ease); }
 .lightbox__btn:hover { background: var(--green); box-shadow: none; }
 .lightbox__btn--prev { left: 1rem; } .lightbox__btn--next { right: 1rem; }
-.lightbox__close { position: absolute; top: 1rem; right: 1rem; width: 48px; height: 48px; display: grid; place-items: center; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+.lightbox__close { position: absolute; top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); width: 48px; height: 48px; display: grid; place-items: center; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
 .lightbox__close:hover { background: var(--green); box-shadow: none; }
-.lightbox__count { position: absolute; left: 1.25rem; top: 1.5rem; font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; color: var(--gray-300); }
-@media (max-width: 720px) { .lightbox__btn { width: 44px; height: 44px; top: auto; bottom: 1rem; transform: none; } .lightbox__stage { padding: 4rem 0.5rem 5rem; } }
+.lightbox__count { position: absolute; left: max(1.25rem, env(safe-area-inset-left)); top: max(1.5rem, env(safe-area-inset-top)); font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; color: var(--gray-300); }
+@media (max-width: 720px) { .lightbox__btn { width: 48px; height: 48px; top: auto; bottom: calc(1rem + env(safe-area-inset-bottom)); transform: none; } .lightbox__stage { padding: 4rem 0.5rem calc(5rem + env(safe-area-inset-bottom)); } }
 
 /* ---------- toast ---------- */
 .toast { position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 20px); z-index: var(--z-toast); opacity: 0; pointer-events: none; padding: 0.9rem 1.2rem; background: var(--ink-700); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-lg); font-size: 0.92rem; max-width: min(100% - 2rem, 480px); transition: all var(--dur) var(--ease); display: flex; gap: 0.7rem; align-items: center; }
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+@media (max-width: 640px) { .toast { bottom: calc(82px + env(safe-area-inset-bottom)); } }   /* above the fixed mobile bar */
 .toast--ok { box-shadow: inset 0 0 0 1px var(--green-bright), var(--shadow-lg); }
 .toast--err { box-shadow: inset 0 0 0 1px var(--danger), var(--shadow-lg); }
 .toast .ic { color: var(--accent); }

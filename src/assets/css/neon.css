@@ -1,0 +1,160 @@
+/* ============================================================
+   «Неон»: the mint neon of the workshop sign as one system (markup build/neon.py, behaviour neon.js):
+   — 404: «404» bent from tubes on a red-brick wall, one tube of the last digit broken;
+   — the header menu: a thin neon tube under the item, struck on by the pointer or the keyboard;
+   — the footer: the GARAGE TEAM sign hanging on a brick strip, switched on when it comes into view.
+   A tube is layers of strokes (halo, glow, glass, white-hot core), never a blur or a text-shadow. The light on the
+   wall is the same brick tile lit mint (--neon-brick-lit from build/neon.py) under a soft mask around the sign: the
+   mortar joints glow mint, the brick faces only turn a duller brown, as under a real sign.
+   Only opacity is animated, on boxes of their own (the GPU fades them); nothing loops — the rare buzz of the broken
+   tube is started by neon.js, only while the sign is on screen and the tab is visible.
+   The proportions of the two drawings come from build/neon.py as inline styles (--ar, --sign-k, aspect-ratio).
+   ============================================================ */
+:root {
+  --neon-rgb: 64, 240, 192;        /* the mint tubes of the workshop sign (svet.css: --neon) */
+  --neon-core: #f0fffb;            /* the white-hot core of a tube */
+  --neon-brick-scale: 1;           /* 1: bricks 66 × 17 px in 20 px courses (build/neon.py) */
+}
+@media (max-width: 640px) { :root { --neon-brick-scale: 0.8; } }
+
+/* ============================================================
+   404
+   ============================================================ */
+.neon-404 {
+  --pad: clamp(2.75rem, 1.4rem + 4.4vw, 6rem);   /* from the header to the sign; the bricks are laid from this line */
+  position: relative; overflow: hidden; isolation: isolate; background: #140c09;
+}
+/* the wall: bricks at dusk, a warm wash of the room light from above, the corners and the floor in the dark */
+.neon-404__wall { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(180deg, rgba(7, 8, 7, 0) 70%, rgba(7, 8, 7, 0.86) 97%, var(--black)),
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255, 196, 140, 0.13), rgba(255, 196, 140, 0) 75%),
+    radial-gradient(ellipse 85% 80% at 50% 30%, rgba(8, 5, 4, 0) 38%, rgba(8, 5, 4, 0.74) 100%),
+    var(--neon-grain), var(--neon-brick);
+  background-size: auto, auto, auto, var(--neon-grain-w) auto, calc(var(--neon-tile-w) * var(--neon-brick-scale)) auto;
+  background-position: 0 0, 0 0, 0 0, 50% var(--pad), 50% var(--pad);
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat; }
+.neon-404 .notfound { padding-top: var(--pad); }
+
+/* the sign: a size of its own (inline-size container), everything in it placed in % of its box. On short screens
+   (phones in landscape) it is no taller than leaves the heading on the first screen (--ar: its width / height) */
+.neon-404__sign { position: relative; width: min(100%, 37.5rem); width: min(100%, 37.5rem, (100svh - 12rem) * var(--ar, 2.19)); margin-inline: auto; container-type: inline-size; }
+@media (max-height: 500px) and (orientation: landscape) { .neon-404 { --pad: 1.5rem; } }
+.neon-404__sign > * { position: absolute; pointer-events: none; }
+.neon-404__sign > svg { inset: 0; width: 100%; height: 100%; overflow: visible; }
+/* the wall in the light of the tubes: the lit tile, laid from the same line as the wall (the sign's top, 26cqw below
+   this box's top; centred like the wall), plus the glow of the air around the tubes; a soft ellipse cuts it out */
+.neon-404__walllit { left: -32cqw; right: -32cqw; top: -26cqw; bottom: -26cqw;
+  background-image: radial-gradient(closest-side, rgba(var(--neon-rgb), 0.17), rgba(var(--neon-rgb), 0.05) 55%, rgba(var(--neon-rgb), 0)),
+    var(--neon-grain), var(--neon-brick-lit);
+  background-size: auto, var(--neon-grain-w) auto, calc(var(--neon-tile-w) * var(--neon-brick-scale)) auto;
+  background-position: 0 0, 50% 26cqw, 50% 26cqw;
+  background-repeat: no-repeat, repeat, repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 25%, rgba(0, 0, 0, 0.55) 60%, transparent);
+  mask-image: radial-gradient(closest-side, #000 25%, rgba(0, 0, 0, 0.55) 60%, transparent); }
+/* the patch of wall lit by the broken tube alone (placed by build/neon.py): it goes dark with the tube */
+.neon-404__spill { background: radial-gradient(closest-side, rgba(var(--neon-rgb), 0.2), rgba(var(--neon-rgb), 0.06) 55%, rgba(var(--neon-rgb), 0)); }
+
+/* the heading, the text and the links on a darker patch of the wall: the text keeps its contrast over the bricks */
+.neon-404__copy { position: relative; z-index: 0; }
+.neon-404__copy::before { content: ""; position: absolute; z-index: -1; inset: -2.5rem -14%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(12, 8, 7, 0.9), rgba(12, 8, 7, 0.7) 55%, rgba(12, 8, 7, 0)); }
+
+/* switching on: the sign strikes up, the broken tube stays dark, tries a few times and catches;
+   then neon.js sets .is-steady and now and then a short buzz (.is-buzz-1…3) */
+.neon-404__lit, .neon-404__walllit { animation: neon-on 1s 0.35s linear both; }
+.neon-404__tube, .neon-404__spill { animation: neon-broken 5s 0.35s linear both; }
+.neon-404.is-steady :is(.neon-404__tube, .neon-404__spill) { animation: none; }
+.neon-404.is-steady.is-buzz-1 :is(.neon-404__tube, .neon-404__spill) { animation: neon-buzz-1 0.9s linear; }
+.neon-404.is-steady.is-buzz-2 :is(.neon-404__tube, .neon-404__spill) { animation: neon-buzz-2 0.8s linear; }
+.neon-404.is-steady.is-buzz-3 :is(.neon-404__tube, .neon-404__spill) { animation: neon-buzz-3 1.1s linear; }
+
+/* ============================================================
+   header menu: the underline is a neon tube (it replaces the green bar of header.css)
+   ============================================================ */
+/* the tube follows the label, so a label that wraps («О компании» at 1100–1300 px) keeps it under its last line */
+.nav__label { position: relative; }
+.nav__label::before, .nav__label::after { content: ""; position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.25s var(--ease); }
+/* the tube: 3 px of mint glass with a white-hot core, rounded ends */
+.nav__label::after { left: 0; right: 0; bottom: -7px; height: 3px; border-radius: 2px;
+  background: linear-gradient(180deg, #34e6b4, #c6fff0 35%, var(--neon-core) 50%, #c6fff0 65%, #34e6b4); }
+/* its glow on the header glass: a soft band centred on the tube that fades out past its ends */
+.nav__label::before { left: -8px; right: -8px; bottom: -13px; height: 15px;
+  background: linear-gradient(180deg, rgba(var(--neon-rgb), 0), rgba(var(--neon-rgb), 0.36) 50%, rgba(var(--neon-rgb), 0));
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent); }
+/* struck on by the pointer or the keyboard (the focus ring of base.css stays: the tube is an addition, not a
+   replacement); the current page's item stays lit softly. :hover and :focus-visible are separate selectors: the build
+   moves every :hover into @media (hover: hover) (build/css_tools.py), the keyboard must keep its tube on any device */
+.nav__link:hover .nav__label::before, .nav__link:hover .nav__label::after,
+.nav__link:focus-visible .nav__label::before, .nav__link:focus-visible .nav__label::after { opacity: 1; transition: none; animation: neon-strike 0.4s linear; }
+.nav__link.is-active .nav__label::before, .nav__link.is-active .nav__label::after { opacity: 0.55; }
+.nav__link.is-active:hover .nav__label::before, .nav__link.is-active:hover .nav__label::after,
+.nav__link.is-active:focus-visible .nav__label::before, .nav__link.is-active:focus-visible .nav__label::after { opacity: 1; animation: none; transition: opacity 0.2s var(--ease); }
+
+/* ============================================================
+   footer: the GARAGE TEAM sign on a brick strip (markup build/neon.py, footer_sign())
+   ============================================================ */
+.neon-strip {
+  --strip-h: clamp(150px, 7.5rem + 7vw, 240px);
+  --sign-w: clamp(220px, 9rem + 14vw, 340px);
+  --sign-top: calc((var(--strip-h) - var(--sign-w) * var(--sign-k, 0.35)) / 2 + 12px);   /* --sign-k: height / width */
+  position: relative; height: var(--strip-h); overflow: hidden; background: #140c09;
+  background-image:
+    linear-gradient(180deg, rgba(7, 8, 7, 0.75), rgba(7, 8, 7, 0) 26%, rgba(7, 8, 7, 0) 62%, rgba(7, 8, 7, 0.9) 94%, var(--black)),
+    radial-gradient(ellipse 58% 130% at 50% 55%, rgba(8, 5, 4, 0) 30%, rgba(8, 5, 4, 0.78) 100%),
+    var(--neon-grain), var(--neon-brick);
+  background-size: auto, auto, var(--neon-grain-w) auto, calc(var(--neon-tile-w) * var(--neon-brick-scale)) auto;
+  background-position: 0 0, 0 0, 50% var(--sign-top), 50% var(--sign-top);
+  background-repeat: no-repeat, no-repeat, repeat, repeat; }
+.neon-strip__sign { position: absolute; left: calc(50% - var(--sign-w) / 2); top: var(--sign-top); width: var(--sign-w); container-type: inline-size; }
+.neon-strip__sign > * { position: absolute; pointer-events: none; }
+.neon-strip__sign > svg { inset: 0; width: 100%; height: 100%; overflow: visible; }
+/* two thin wires from the ceiling hold the sign, as in the workshop hall; they catch its light at the bottom */
+.neon-strip__sign::before, .neon-strip__sign::after { content: ""; position: absolute; bottom: calc(100% - 1.3cqw); width: 1px; height: calc(var(--sign-top) + 2px);
+  background: linear-gradient(180deg, rgba(40, 44, 42, 0.9), rgba(120, 140, 134, 0.7) 70%, rgba(var(--neon-rgb), 0.6)); }
+.neon-strip__sign::before { left: 21%; }
+.neon-strip__sign::after { right: 13%; }
+.neon-strip__lit { left: -60cqw; right: -60cqw; top: -34cqw; bottom: -34cqw;
+  background-image: radial-gradient(closest-side, rgba(var(--neon-rgb), 0.16), rgba(var(--neon-rgb), 0.05) 55%, rgba(var(--neon-rgb), 0)),
+    var(--neon-grain), var(--neon-brick-lit);
+  background-size: auto, var(--neon-grain-w) auto, calc(var(--neon-tile-w) * var(--neon-brick-scale)) auto;
+  background-position: 0 0, 50% 34cqw, 50% 34cqw;
+  background-repeat: no-repeat, repeat, repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 22%, rgba(0, 0, 0, 0.5) 58%, transparent);
+  mask-image: radial-gradient(closest-side, #000 22%, rgba(0, 0, 0, 0.5) 58%, transparent); }
+/* dark until the strip comes into view (neon.js), then it strikes on once and stays lit;
+   without JavaScript or with reduced motion it is simply lit */
+.neon-strip.is-off :is(.neon-sign__lit, .neon-strip__lit) { opacity: 0; }
+.neon-strip.is-on :is(.neon-sign__lit, .neon-strip__lit) { animation: neon-on 1.1s 0.1s linear both; }
+/* the 404 page is a neon wall of its own: one sign per screen is enough */
+.page-404 .neon-strip { display: none; }
+
+/* browsers without container units (Safari < 16) would misplace the lit bricks: they get the plain glow of the tubes */
+@supports not (width: 1cqw) {
+  .neon-404__walllit, .neon-strip__lit { display: none; }
+}
+
+/* ============================================================
+   switching (opacity only; fewer than three flashes in any second — WCAG 2.3.1)
+   ============================================================ */
+/* a tube strikes up: one short flash, a pause, a second try, steady */
+@keyframes neon-on { 0%, 10% { opacity: 0; } 14% { opacity: 0.8; } 18%, 60% { opacity: 0.05; } 66% { opacity: 0.9; } 72% { opacity: 0.35; } 83%, 100% { opacity: 1; } }
+/* the header tube: one flicker and it holds */
+@keyframes neon-strike { 0% { opacity: 0; } 20% { opacity: 0.9; } 36% { opacity: 0.15; } 60%, 100% { opacity: 1; } }
+/* the broken tube: dark while the others strike, then a few calm tries, half a second or more apart */
+@keyframes neon-broken { 0%, 26% { opacity: 0; } 28.4% { opacity: 0.5; } 31%, 44% { opacity: 0; } 45.2%, 50% { opacity: 0.85; } 52% { opacity: 0.15; } 55%, 66% { opacity: 0.9; } 68% { opacity: 0.4; } 71%, 86% { opacity: 1; } 87.6% { opacity: 0.75; } 89.2%, 100% { opacity: 1; } }
+/* its buzz now and then: a hum too faint to count as a flash, one or two real dips */
+@keyframes neon-buzz-1 { 0%, 100% { opacity: 1; } 6% { opacity: 0.9; } 11% { opacity: 1; } 17% { opacity: 0.91; } 22% { opacity: 1; } 38% { opacity: 0.3; } 46% { opacity: 0.95; } 52% { opacity: 0.9; } 58% { opacity: 1; } }
+@keyframes neon-buzz-2 { 0%, 100% { opacity: 1; } 8% { opacity: 0.25; } 16% { opacity: 0.95; } 60% { opacity: 0.9; } 66% { opacity: 0.2; } 76% { opacity: 1; } }
+@keyframes neon-buzz-3 { 0%, 100% { opacity: 1; } 5%, 55% { opacity: 0.1; } 61% { opacity: 0.7; } 66% { opacity: 0.3; } 74% { opacity: 1; } }
+
+/* reduced motion: every tube simply burns */
+@media (prefers-reduced-motion: reduce) {
+  .neon-404__lit, .neon-404__walllit, .neon-404__tube, .neon-404__spill, .neon-strip :is(.neon-sign__lit, .neon-strip__lit),
+  .nav__label::before, .nav__label::after { animation: none !important; }
+}
+/* forced colours (Windows high contrast): the decoration steps aside, the text and the focus ring stay */
+@media (forced-colors: active) {
+  .neon-404__wall, .neon-404__sign, .neon-404__copy::before, .neon-strip, .nav__label::before, .nav__label::after { display: none; }
+}

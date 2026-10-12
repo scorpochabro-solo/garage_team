@@ -1,0 +1,401 @@
+{
+ "_note": "Главный запрос каждой страницы (регион 47). Один запрос — одна страница. final — решено; tentative — предварительно, можно заменить по данным Wordstat, но только на запрос, которого нет у других страниц этого файла; изменение записать сюда.",
+ "pages": {
+  "avtozapcasti": {
+   "main": "автозапчасти",
+   "status": "final"
+  },
+  "cip-tuning": {
+   "main": "чип тюнинг",
+   "status": "final"
+  },
+  "cip-tuning__programmnoe-udalenie-osibki-po-lambda-zondam": {
+   "main": "ошибка лямбда зонда",
+   "status": "final"
+  },
+  "cip-tuning__udalenie-i-pereprogrammirovanie-sazevyh-filtrov": {
+   "main": "удаление сажевого фильтра",
+   "status": "final"
+  },
+  "cip-tuning__udalenie-katalizatorov-i-adaptacia-raboty-lambda-zondov": {
+   "main": "удаление катализатора прошивка",
+   "status": "final"
+  },
+  "cip-tuning__udalenieotklucenie-moceviny-adblue": {
+   "main": "отключение мочевины",
+   "status": "final"
+  },
+  "cip-tuning__uvelicenie-mosnosti-motociklov": {
+   "main": "чип тюнинг мотоцикла",
+   "status": "final"
+  },
+  "diagnostika": {
+   "main": "диагностика автомобиля",
+   "status": "final"
+  },
+  "diagnostika__diagnostika-akpp": {
+   "main": "диагностика акпп",
+   "status": "final"
+  },
+  "diagnostika__diagnostika-i-zapravka-kondicionera": {
+   "main": "диагностика кондиционера",
+   "status": "final"
+  },
+  "diagnostika__diagnostika-podveski": {
+   "main": "диагностика подвески",
+   "status": "final"
+  },
+  "diagnostika__diagnostika-tormoznoj-sistemy": {
+   "main": "диагностика тормозной системы",
+   "status": "final"
+  },
+  "diagnostika__kompleksnaa-diagnostika": {
+   "main": "полная диагностика автомобиля",
+   "status": "final"
+  },
+  "diagnostika__komputernaa-diagnostika": {
+   "main": "диагностика двигателя",
+   "status": "final"
+  },
+  "himcistka-salona": {
+   "main": "химчистка салона",
+   "status": "final"
+  },
+  "hranenie-sin": {
+   "main": "хранение шин",
+   "status": "final"
+  },
+  "kuzovnoj-remont": {
+   "main": "кузовной ремонт",
+   "status": "final"
+  },
+  "planovoe-to": {
+   "main": "техническое обслуживание автомобиля",
+   "status": "final"
+  },
+  "pokraska-avtomobilej-plasti-dip": {
+   "main": "покраска жидкой резиной",
+   "status": "final"
+  },
+  "polirovka-kuzova-avtomobila": {
+   "main": "полировка авто",
+   "status": "final"
+  },
+  "polnaa-i-lokalnaa-pokraska-avtomobila": {
+   "main": "покраска авто",
+   "status": "final"
+  },
+  "polnaa-i-lokalnaa-pokraska-avtomobila__pokraska-bampera": {
+   "main": "покраска бампера",
+   "status": "final"
+  },
+  "remont-akpp-i-zamena-masla-v-akpp": {
+   "main": "ремонт акпп",
+   "status": "final"
+  },
+  "remont-akpp-i-zamena-masla-v-akpp__zamena-filtra-akpp": {
+   "main": "замена фильтра акпп",
+   "status": "final"
+  },
+  "remont-akpp-i-zamena-masla-v-akpp__zamena-masla-v-akpp": {
+   "main": "замена масла в акпп",
+   "status": "final"
+  },
+  "remont-dizela": {
+   "main": "ремонт дизеля",
+   "status": "final"
+  },
+  "remont-dizela__remont-dizelnogo-dvigatela": {
+   "main": "ремонт дизельного двигателя",
+   "status": "final"
+  },
+  "remont-dizela__remont-dizelnyh-forsunok": {
+   "main": "ремонт дизельных форсунок",
+   "status": "final"
+  },
+  "remont-dizela__remont-tnvd-professionalami": {
+   "main": "ремонт тнвд дизеля",
+   "status": "final"
+  },
+  "remont-dvigatela": {
+   "main": "ремонт двигателя",
+   "status": "final"
+  },
+  "remont-dvigatela__ustranenie-teci-masla": {
+   "main": "устранение течи масла",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-klapanov": {
+   "main": "замена клапанов двигателя",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-masla-v-dvigatele": {
+   "main": "замена масла в двигателе",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-pompy": {
+   "main": "замена помпы",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-prokladki-gbc": {
+   "main": "замена прокладки гбц",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-remna-generatora": {
+   "main": "замена ремня генератора",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-remna-grm": {
+   "main": "замена ремня грм",
+   "status": "final"
+  },
+  "remont-dvigatela__zamena-vozdusnogo-filtra-dvs": {
+   "main": "замена воздушного фильтра",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila": {
+   "main": "автоэлектрик",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__regulirovka-far": {
+   "main": "регулировка фар",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__remont-elektroprovodki": {
+   "main": "ремонт проводки",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__remont-generatora": {
+   "main": "ремонт генератора",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__remont-startera": {
+   "main": "ремонт стартера",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__ustanovka-ksenona": {
+   "main": "установка ксенона",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__zamena-far": {
+   "main": "замена фар",
+   "status": "final"
+  },
+  "remont-elektrooborudovania-avtomobila__zamena-lampocek-osvesenia": {
+   "main": "замена ламп",
+   "status": "final"
+  },
+  "remont-hodovoj": {
+   "main": "ремонт подвески",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-amortizatora": {
+   "main": "замена амортизаторов",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-opornogo-podsipnika": {
+   "main": "замена опорного подшипника",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-podsipnika-stupicy": {
+   "main": "замена подшипника ступицы",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-rulevogo-nakonecnika": {
+   "main": "замена рулевого наконечника",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-rulevoj-rejki": {
+   "main": "замена рулевой рейки",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-rulevoj-tagi": {
+   "main": "замена рулевой тяги",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-rycagov-podveski": {
+   "main": "замена рычагов",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-sajlentblokov": {
+   "main": "замена сайлентблоков",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-sarovoj-opory": {
+   "main": "замена шаровой опоры",
+   "status": "final"
+  },
+  "remont-hodovoj__zamena-srusa": {
+   "main": "замена шруса",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia": {
+   "main": "промывка системы охлаждения",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-datcikov-temperatury-ohlazdausej-zidkosti": {
+   "main": "замена датчика температуры",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-motora-radiatora": {
+   "main": "замена вентилятора радиатора",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-ohlazdausej-zidkosti": {
+   "main": "замена антифриза",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-pompy": {
+   "main": "замена водяного насоса",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-radiatora": {
+   "main": "замена радиатора",
+   "status": "final"
+  },
+  "remont-i-promyvka-sistem-ohlazdenia__zamena-termostata": {
+   "main": "замена термостата",
+   "status": "final"
+  },
+  "remont-mkpp-zamena-korobki-peredac": {
+   "main": "ремонт мкпп",
+   "status": "final"
+  },
+  "remont-mkpp-zamena-korobki-peredac__zamena-masla-kpp": {
+   "main": "замена масла в мкпп",
+   "status": "final"
+  },
+  "remont-promyvka-inzektorov-i-monovpryskov": {
+   "main": "ремонт инжектора",
+   "status": "final"
+  },
+  "remont-promyvka-inzektorov-i-monovpryskov__cistka-forsunok-ultrazvukom": {
+   "main": "промывка форсунок",
+   "status": "final"
+  },
+  "remont-promyvka-inzektorov-i-monovpryskov__zamena-forsunok": {
+   "main": "замена форсунок",
+   "status": "final"
+  },
+  "remont-promyvka-inzektorov-i-monovpryskov__zamena-svecej": {
+   "main": "замена свечей",
+   "status": "final"
+  },
+  "remont-promyvka-inzektorov-i-monovpryskov__zamer-davlenia-masla": {
+   "main": "замер давления масла",
+   "status": "final"
+  },
+  "remont-tnvd": {
+   "main": "ремонт тнвд",
+   "status": "final"
+  },
+  "remont-turbin-i-turbokompressorov": {
+   "main": "ремонт турбины",
+   "status": "final"
+  },
+  "remont-vyhlopnoj-sistemy": {
+   "main": "ремонт выхлопной системы",
+   "status": "final"
+  },
+  "remont-vyhlopnoj-sistemy__remont-glusitela": {
+   "main": "ремонт глушителя",
+   "status": "final"
+  },
+  "remont-vyhlopnoj-sistemy__udalenie-katalizatora": {
+   "main": "удаление катализатора",
+   "status": "final"
+  },
+  "remont-vyhlopnoj-sistemy__zamena-glusitela": {
+   "main": "замена глушителя",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov": {
+   "main": "прокачка тормозов",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__profilaktika-tormozov": {
+   "main": "профилактика тормозов",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__remont-pereborka-tormoznyh-supportov": {
+   "main": "ремонт суппортов",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__zamena-kolodok": {
+   "main": "замена тормозных колодок",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__zamena-kolodok-rucnika": {
+   "main": "замена колодок ручника",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__zamena-tormoznyh-diskov": {
+   "main": "замена тормозных дисков",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__zamena-tormoznyh-supportov-cilindrov": {
+   "main": "замена суппорта",
+   "status": "final"
+  },
+  "remont-zamena-regulirovka-prokacka-tormozov__zamena-trosa-rucnika": {
+   "main": "замена троса ручника",
+   "status": "final"
+  },
+  "shod-razval-regulirovka-i-diagnostika": {
+   "main": "развал схождение",
+   "status": "final"
+  },
+  "sinomontaz": {
+   "main": "шиномонтаж",
+   "status": "final"
+  },
+  "tehosmotr-avto-diagnosticeskaa-karta-dla-osago": {
+   "main": "техосмотр",
+   "status": "final"
+  },
+  "ustanovka-dopolnitelnogo-oborudovania": {
+   "main": "установка дополнительного оборудования",
+   "status": "tentative"
+  },
+  "zamena-sceplenia": {
+   "main": "замена сцепления",
+   "status": "final"
+  },
+  "zamena-sceplenia__regulirovka-sceplenia": {
+   "main": "регулировка сцепления",
+   "status": "final"
+  },
+  "zamena-sceplenia__zamena-rabocego-cilindra-sceplenia": {
+   "main": "замена рабочего цилиндра сцепления",
+   "status": "final"
+  },
+  "zamena-sceplenia__zamena-trosa-sceplenia": {
+   "main": "замена троса сцепления",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov": {
+   "main": "ремонт кондиционера",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov__zamena-filtra-kondicionera": {
+   "main": "замена салонного фильтра",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov__zamena-motorcika-pecki": {
+   "main": "замена моторчика печки",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov__zamena-radiatora-kondicionera": {
+   "main": "замена радиатора кондиционера",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov__zamena-remna-kondicionera": {
+   "main": "замена ремня кондиционера",
+   "status": "final"
+  },
+  "zapravka-i-remont-avtokondicionerov__zapravka-kondicionera": {
+   "main": "заправка кондиционера",
+   "status": "final"
+  }
+ }
+}

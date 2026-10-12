@@ -5,12 +5,16 @@ import json
 import re
 from pathlib import Path
 
+from .content import load_all as load_content, load_page_seo
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
 
 SITE = json.loads((DATA / "site.json").read_text(encoding="utf-8"))
+# titles of the pages that are not services: keys of site.json → pages plus the pages whose text lives in the code
+PAGE_SEO = load_page_seo(DATA / "page_seo.json", set(SITE["pages"]) | {"home", "services", "registration", "otzyvy", "slovar", "moya_mashina"})
 _SERVICES = json.loads((DATA / "services.json").read_text(encoding="utf-8"))
 DESCR = json.loads((DATA / "descriptions.json").read_text(encoding="utf-8"))
 HOTSPOTS = json.loads((DATA / "hotspots.json").read_text(encoding="utf-8"))["items"]
@@ -43,6 +47,24 @@ def _with_extras(categories: list, services: list, extra: dict) -> tuple[list, l
 
 CATEGORIES, SERVICES, _EXTRA_DESCR = _with_extras(_SERVICES["categories"], _SERVICES["services"], _EXTRA)
 DESCR = {**DESCR, **_EXTRA_DESCR}
+
+# detailed page content (data/content/<slug>.json); see build/content.py for the format
+CONTENT = load_content(DATA / "content", {s["path"] for s in SERVICES}, {t["name"] for t in SITE.get("team", [])})
+
+
+def _with_content_names(categories: list, services: list, content: dict) -> tuple[list, list]:
+    """nav_name and h1 from the content files replace the original names everywhere: menus, lists, breadcrumbs, readout."""
+    def nav(path: str, default: str) -> str:
+        return content[path]["nav_name"] if path in content else default
+
+    cats = [dict(c, name=nav(c["href"], c["name"]), subs=[dict(s, name=nav(s["href"], s["name"])) for s in c["subs"]])
+            for c in categories]
+    svcs = [dict(s, h1=content[s["path"]]["h1"], nav_name=content[s["path"]]["nav_name"], h1_original=s["h1"])
+            if s["path"] in content else s for s in services]
+    return cats, svcs
+
+
+CATEGORIES, SERVICES = _with_content_names(CATEGORIES, SERVICES, CONTENT)
 BY_PATH = {s["path"]: s for s in SERVICES}
 CAT_BY_HREF = {c["href"]: c for c in CATEGORIES}
 
@@ -75,45 +97,52 @@ PHONE_TEL = "+78314161677"
 EMAIL = "info@garage.team"
 ADDRESS_SHORT = "Н. Новгород, ул. Красная слобода, 9"
 ADDRESS_FULL = "603155, г. Нижний Новгород, ул. Красная слобода, 9"
-HOURS = [("Понедельник – пятница", "9:00 – 19:00"), ("Суббота", "9:00 – 17:00")]
-SHOP_HOURS = [("Понедельник – пятница", "10:00 – 19:00"), ("Суббота", "10:00 – 17:00"), ("Воскресенье", "по предварительной записи")]
+HOURS = [("Понедельник – пятница", "9:00 – 19:00"), ("Суббота", "выходной"), ("Воскресенье", "выходной")]
+SHOP_HOURS = HOURS
 VK_URL = "https://vk.com/garagebest"
 FB_URL = ("https://www.facebook.com/%D0%90%D0%B2%D1%82%D0%BE%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81-%D0%B3%D0%B0%D1%80%D0%B0%D0%B6-"
           "wwwgarageteam-1811807572418855/?ref=bookmarks")
 COORDS = (56.328949, 44.027199)
-FOUNDED = 2011
-COPYRIGHT_FROM = 2011
+FOUNDED = 2016
+COPYRIGHT_FROM = 2016
 COMPANY = "ООО «Гараж»"
-COMPANY_LINE_2 = "Сеть магазинов запчастей «Гараж»"
-SLOGAN_EN = "Complete car care since 2011"
-META_KEYWORDS = "Гараж - поиск и подбор запчастей, автозапчасти, запчасти для иномарок, каталог запчастей, магазин запчастей"
+COMPANY_LINE_2 = "Автосервис Garage Team"
+SLOGAN_EN = "Complete car care since 2016"
+WARRANTY = "Гарантия 1 год на все выполненные работы"
+PREMIUM_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Porsche", "Lexus", "Land Rover", "Bentley", "Rolls-Royce", "Ferrari", "Tesla", "Zeekr", "Li Auto", "Genesis", "Lamborghini", "Voyah"]
+# content hashes of dist/assets/css/site.css and js/site.js, filled by build.py before the pages are rendered
+ASSET_VERSION = {"css": "", "js": ""}
 
 NAV = [
     ("Услуги", "/services.html"),
-    ("Автозапчасти", "/avtozapchasti/"),
+    ("Моя машина", "/moya-mashina/"),
     ("Оплата", "/oplata.html"),
     ("О компании", "/about/"),
     ("Контакты", "/contacts/"),
 ]
 FOOTER_LINKS = [
     ("Все услуги", "/services.html"),
-    ("Автозапчасти", "/avtozapchasti/"),
-    ("Каталоги запчастей", "/cats/"),
-    ("Поиск по номеру", "/search/"),
-    ("Доставка", "/delivery.html"),
+    ("Моя машина", "/moya-mashina/"),
     ("Оплата", "/oplata.html"),
     ("О компании", "/about/"),
     ("Отзывы", "/otzyvy.html"),
+    ("Словарь автомеханика", "/slovar/"),
     ("Контакты", "/contacts/"),
     ("Оставить заявку", "/call/request/"),
     ("Звонок менеджеру", "/call/manager/"),
-    ("Регистрация", "/registration/"),
     ("Пользовательское соглашение", "/page/soglashenie/"),
 ]
 
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+
+def plural(n, one, few, many):
+    n = abs(n) % 100
+    if 11 <= n <= 19:
+        return many
+    return one if n % 10 == 1 else few if n % 10 in (2, 3, 4) else many
 
 
 # ---------- base path (GitHub Pages project sites live under /<repo>/) ----------
@@ -208,6 +237,12 @@ def price_from(svc):
                 if p and (best is None or p[1] < best):
                     best = p[1]
     return best
+
+
+def page_meta(key, title, description):
+    """(title, description) of a page that is not a service: data/page_seo.json wins over the defaults in the code."""
+    seo = PAGE_SEO.get(key, {})
+    return seo.get("title", title), seo.get("meta_description", description)
 
 
 def category_of(svc):

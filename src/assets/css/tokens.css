@@ -69,6 +69,9 @@
   --container: 1400px;
   --container-narrow: 960px;
   --gutter: clamp(1.1rem, 0.6rem + 2.6vw, 3.5rem);
+  /* iPhone in landscape: the page runs under the rounded corners and the Dynamic Island (viewport-fit=cover),
+     so the side gutter is never narrower than the safe area */
+  --gutter-safe: max(var(--gutter), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   --section-y: clamp(4.5rem, 3rem + 6vw, 9.5rem);
   --header-h: 76px;
   --topline-h: 36px;

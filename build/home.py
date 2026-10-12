@@ -2,62 +2,66 @@
 """Homepage renderer."""
 import json
 
+from . import arki, fonar, kraska, otkryto, schema, svet
 from . import data as D
 from .icons import icon, icon_for_href
-from .layout import document, request_section, reviews_section, green_note
+from .layout import document, request_section, reviews_section, green_note, slider_nav
+from .pogoda import pogoda_section
+from .pribory import pribory_section
+from .stuk import stuk_section
+from .vorota import gate_scene
+from .zima import zima_section
 
 esc = D.esc
 S = D.SITE
 
 # Тексты первого экрана. Каждая строка заголовка — отдельная строка на экране; зелёным красятся строки из HERO_ACCENT_FROM и ниже.
-HERO_EYEBROW = "Complete car care · since 2011"
+HERO_EYEBROW = "Garage Team · с 2016 года"
 HERO_LINES = ["Автосервис", "в Нижнем", "Новгороде"]
 HERO_ACCENT_FROM = 1
-HERO_SUB = ("Ремонт и обслуживание автомобилей любых марок с 2011 года. Коммерческая техника до 5,5 т, "
-            "запчасти в наличии и под заказ, гарантия на работы до 360 дней*.")
+HERO_SUB = ("Ремонт и обслуживание премиальных автомобилей. Диагностика, плановое ТО и ремонт — "
+            "с запчастями от проверенных поставщиков. Гарантия 1 год на все выполненные работы.")
 
 
 def hero():
-    photo = D.img("/data/images/gallerymain/BV5A0791.jpg")
+    # «Свет ламп» (build/svet.py): the background is the brick wall of the office with two pendant lamps and the neon sign
     title = "".join(
         f'<span class="hero__line{" hero__line--accent" if i >= HERO_ACCENT_FROM else ""}"><span style="--i:{i}">{esc(t)}</span></span>'
         for i, t in enumerate(HERO_LINES)
     )
-    promo_text = S["promo_text"].replace("<br>", " ")
     facts = f"""<ul class="hero__facts" aria-label="Факты о компании">
-      <li><b>{D.FOUNDED}</b><span>год основания компании</span></li>
-      <li><b><span data-countup="{len(D.CATEGORIES)}">{len(D.CATEGORIES)}</span></b><span>направлений услуг</span></li>
-      <li><b><span data-countup="360">360</span> <i>дн.</i></b><span>гарантия на работы*</span></li>
-      <li><b>5,5 <i>т</i></b><span>коммерческая техника</span></li>
+      <li><b>{D.FOUNDED}</b><span>работаем с этого года</span></li>
+      <li><b><span data-countup="{len(D.CATEGORIES)}">{len(D.CATEGORIES)}</span></b><span>{D.plural(len(D.CATEGORIES), 'направление', 'направления', 'направлений')} услуг</span></li>
+      <li><b>1 <i>год</i></b><span>гарантия на работы</span></li>
+      <li><b>5/2</b><span>суббота и воскресенье — выходные</span></li>
     </ul>"""
-    return f"""<section class="hero" id="top" aria-labelledby="hero-title">
+    return f"""<section class="hero hero--svet" id="top" aria-labelledby="hero-title">
   <div class="hero__bg" aria-hidden="true">
-    <img class="hero__photo" src="{photo}" alt="" width="1600" height="1067" fetchpriority="high" decoding="async">
-    <div class="hero__grid grid-bg"></div>
-    <div class="hero__veil"></div>
-    <div class="hero__glow"></div>
+    {svet.wall()}
   </div>
   <div class="wrap hero__in">
     <div class="hero__copy">
-      <p class="eyebrow" lang="en">{esc(HERO_EYEBROW)}</p>
+      <p class="eyebrow">{esc(HERO_EYEBROW)}</p>
       <h1 class="h-giant hero__title" id="hero-title">{title}</h1>
       <p class="lead hero__sub">{esc(HERO_SUB)}</p>
       <div class="hero__actions">
         <a class="btn btn--primary btn--lg" href="#request">{icon('check')} Оставить заявку</a>
         <button class="btn btn--ghost btn--lg" type="button" data-modal="call" style="--btn-bg:#070807">{icon('phone')} Заказать звонок</button>
-        <a class="hero__phone" href="tel:{D.PHONE_TEL}"><b>{esc(D.PHONE)}</b><span>Пн–Пт 9–19 · Сб 9–17</span></a>
+        <a class="hero__phone" href="tel:{D.PHONE_TEL}"><b>{esc(D.PHONE)}</b><span>Пн–Пт 9–19 · Сб–Вс выходные</span></a>
       </div>
     </div>
     <aside class="hero__aside">
-      <div class="promo-ticket corner reveal">
-        <span class="mono accent">Акция</span>
-        <p class="promo-ticket__text">{promo_text}</p>
-        <a class="btn btn--white btn--sm" href="/registration/">{esc(S['promo_btn'])}</a>
-        <span class="promo-ticket__num" aria-hidden="true">-5%</span>
+      <div class="promo-ticket corner reveal {kraska.HOST} {kraska.HOST}--night">
+        {kraska.layers(night=True)}
+        <span class="mono accent">Garage Team</span>
+        <p class="promo-ticket__text">Знаем вашу машину.<br>Сохраняем её историю.</p>
+        <a class="btn btn--white btn--sm" href="/moya-mashina/">Моя машина</a>
+        <span class="promo-ticket__num {kraska.PAINT}" aria-hidden="true">2016</span>
       </div>
       {facts}
     </aside>
   </div>
+  {svet.room()}
   <div class="hero__scroll" aria-hidden="true"><span class="mono">листайте</span><i></i></div>
 </section>"""
 
@@ -78,7 +82,7 @@ def _hotspot_payload():
             "cat": (cat["name"] if cat and cat["href"] != h["href"] else "Направление услуг"),
             "blurb": h["blurb"],
             "price": f"от {D.fmt_amount(best)}" if best else "",
-            "price_note": "по прайсу, иномарки",
+            "price_note": "",
             "href": D.BASE + h["href"],
             "icon": h["icon"],
             "n": i + 1,
@@ -108,7 +112,7 @@ def services_map():
   <div class="wrap">
     <div class="sec-head reveal">
       <div><p class="eyebrow">// 01 — Что мы делаем</p><h2 class="h2 sec-head__title" id="services-title">Наши услуги</h2></div>
-      <p class="sec-head__aside">Наведите на услугу или на точку на автомобиле — покажем, что входит в работу и с какой суммы начинается прайс. Всего {len(D.CATEGORIES)} направлений и {total_works} видов работ.</p>
+      <p class="sec-head__aside">Наведите на услугу или на точку на автомобиле — покажем, что входит в работу. Всего {len(D.CATEGORIES)} {D.plural(len(D.CATEGORIES), 'направление', 'направления', 'направлений')} и {total_works} видов работ.</p>
     </div>
     <div class="svc-stage reveal" data-svc-stage>
       <div class="svc-col svc-col--left">{"".join(item(h) for h in left)}</div>
@@ -123,9 +127,11 @@ def services_map():
           </div>
           {hotspots}
         </div>
-        <div class="svc-readout" data-readout aria-live="polite">
-          <div class="svc-readout__icon">{icon('info')}</div>
-          <div class="svc-readout__hint">Наведите на услугу или проведите курсором по автомобилю: прицел найдёт узел, здесь появятся описание и стартовая цена. На телефоне нажмите на точку.</div>
+        <div class="svc-readout-box">
+          <div class="svc-readout" data-readout aria-live="polite">
+            <div class="svc-readout__icon">{icon('info')}</div>
+            <div class="svc-readout__hint">Наведите на услугу или проведите курсором по автомобилю — здесь появится описание работы. На телефоне нажмите на точку.</div>
+          </div>
         </div>
       </div>
       <div class="svc-col svc-col--right">{"".join(item(h) for h in right)}</div>
@@ -133,8 +139,8 @@ def services_map():
       <svg class="svc-lines" aria-hidden="true"></svg>
     </div>
     <div class="svc-cta reveal">
-      <a class="btn btn--primary btn--lg" href="/services.html">Все {len(D.CATEGORIES)} направлений услуг {icon('arrow')}</a>
-      <span class="svc-cta__note">{total_works} видов работ · цены на страницах услуг</span>
+      <a class="btn btn--primary btn--lg" href="/services.html">{len(D.CATEGORIES)} {D.plural(len(D.CATEGORIES), 'направление', 'направления', 'направлений')} услуг {icon('arrow')}</a>
+      <span class="svc-cta__note">{total_works} видов работ · по предварительной записи</span>
     </div>
   </div>
   <script type="application/json" id="svc-data">{payload}</script>
@@ -144,10 +150,11 @@ def services_map():
 def advantages():
     items = S["advantages"]
     big_idx = next((i for i, t in enumerate(items) if "Гарантия" in t), len(items) - 1)
-    cells = [f"""<div class="adv__item adv__item--big reveal">
+    cells = [f"""<div class="adv__item adv__item--big reveal {kraska.HOST} {kraska.HOST}--day">
+      {kraska.layers()}
       <span class="adv__num">// 01</span>
       <p class="adv__text">{esc(items[big_idx])}</p>
-      <span class="adv__big" aria-hidden="true">360</span>
+      <span class="adv__big {kraska.PAINT}" aria-hidden="true">1 год</span>
     </div>"""]
     n = 2
     for i, t in enumerate(items):
@@ -160,14 +167,14 @@ def advantages():
   <div class="wrap">
     <div class="sec-head reveal">
       <div><p class="eyebrow">// 02 — Преимущества</p><h2 class="h2 sec-head__title" id="adv-title">Почему выбирают<br>Гараж</h2></div>
-      <p class="sec-head__aside">Полный цикл: диагностика, ремонт, запчасти, кузов и дополнительное оборудование — в одном месте, с {D.FOUNDED} года.</p>
+      <p class="sec-head__aside">Диагностика, обслуживание и ремонт премиальных автомобилей с {D.FOUNDED} года.</p>
     </div>
     <div class="adv__grid">{"".join(cells)}</div>
     <p class="adv__note">{esc(S['advantages_note'])}</p>
 
     <div class="director reveal" id="director">
       <div class="director__photo">
-        <img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async">
+        <div class="director__win"><img src="{D.img(d['photo'])}" alt="{esc(d['name'])}, {esc(d['position'])}" width="800" height="1000" loading="lazy" decoding="async"></div>
         <span class="badge director__badge">{icon('shield', 'ic--sm')} генеральный директор</span>
       </div>
       <blockquote class="director__quote">
@@ -194,10 +201,10 @@ def gallery():
   <div class="wrap">
     <div class="sec-head reveal">
       <div><p class="eyebrow">// 03 — Фото работ</p><h2 class="h2 sec-head__title" id="gallery-title">Фото работ</h2></div>
-      <div class="row between" style="--gap:1rem"><p class="sec-head__aside">Ремонт двигателей, ходовой, кузова и электрики — как это выглядит в наших боксах.</p>
-      <div class="slider__nav"><button class="slider__btn" type="button" data-prev aria-label="Назад">{icon('chevron-left')}</button><button class="slider__btn" type="button" data-next aria-label="Вперёд">{icon('chevron-right')}</button></div></div>
+      <div class="row between" style="--gap:1rem"><p class="sec-head__aside">Ремонт двигателей, ходовой и электрики — как это выглядит в наших боксах.</p>
+      {slider_nav("gallery-track", "фото")}</div>
     </div>
-    <div class="slider reveal" data-slider><div class="slider__track">{"".join(items)}</div></div>
+    <div class="slider reveal" data-slider><div class="slider__track" id="gallery-track">{"".join(items)}</div></div>
   </div>
 </section>"""
 
@@ -206,8 +213,10 @@ def team():
     cards = []
     for i, m in enumerate(S["team"]):
         lead = " member--lead" if i == 0 else ""
+        portrait = (f'<img src="{D.img(m["photo"])}" alt="{esc(m["name"])} — {esc(m["position"])}" width="900" height="1200" loading="lazy" decoding="async">'
+                    if m.get("photo") else f'<div class="member__initials" aria-hidden="true">{esc("".join(n[0] for n in m["name"].split()[:2]))}</div>')
         cards.append(f"""<article class="member{lead} reveal" style="--d:{i * 50}ms">
-      <div class="member__photo"><img src="{D.img(m['photo'])}" alt="{esc(m['name'])} — {esc(m['position'])}" width="900" height="1200" loading="lazy" decoding="async"><span class="member__n">{i + 1:02d}</span></div>
+      <div class="member__photo">{portrait}<span class="member__n">{i + 1:02d}</span></div>
       <h3 class="member__name">{esc(m['name'])}</h3>
       <p class="member__role">{esc(m['position'])}</p>
     </article>""")
@@ -215,7 +224,7 @@ def team():
   <div class="wrap">
     <div class="sec-head reveal">
       <div><p class="eyebrow">// 04 — Наша команда</p><h2 class="h2 sec-head__title" id="team-title">Наша команда</h2></div>
-      <p class="sec-head__aside">{len(S['team'])} специалистов: диагносты, мотористы, электрики, мастера по ходовой, кузову и доп. оборудованию.</p>
+      <p class="sec-head__aside">{len(S['team'])} человек: диагностика, двигатели, электрика, ходовая, обслуживание и дополнительное оборудование.</p>
     </div>
     <div class="team__grid">{"".join(cards)}</div>
   </div>
@@ -225,67 +234,57 @@ def team():
 def contacts_strip():
     lat, lon = D.COORDS
     map_src = f"https://yandex.ru/map-widget/v1/?ll={lon}%2C{lat}&z=16&pt={lon}%2C{lat}%2Cpm2gnm&text={esc('Нижний Новгород, улица Красная Слобода, 9')}"
-    route = f"https://yandex.ru/maps/?rtext=~{lat}%2C{lon}"
-    hours = "<br>".join(f"{esc(d)}: {esc(h)}" for d, h in D.HOURS)
-    return f"""<section class="section section--black" id="contacts" aria-labelledby="contacts-title">
+    # the section heading lives in the «Ворота» scene (build/vorota.py): the facade, the gate, the way in;
+    # under the address the scene shows the live status of «Открыто сейчас» (build/otkryto.py)
+    return f"""<section class="section section--black section--gate" id="contacts" aria-labelledby="contacts-title">
+  {gate_scene(esc(otkryto.ROUTE_URL), otkryto.inline(D.HOURS, "gate__oc"))}
   <div class="wrap contacts">
     <div class="reveal">
-      <p class="eyebrow">// 06 — Контакты</p>
-      <h2 class="h2 sec-head__title" id="contacts-title">Приезжайте<br>в Гараж</h2>
       <ul class="contacts__list">
-        <li class="contacts__item">{icon('pin')}<div><b>{esc(D.ADDRESS_FULL)}</b><span>Автосервис и магазин запчастей</span></div></li>
+        <li class="contacts__item">{icon('pin')}<div><b>{esc(D.ADDRESS_FULL)}</b><span>Автосервис Garage Team</span></div></li>
         <li class="contacts__item">{icon('phone')}<div><a class="big" href="tel:{D.PHONE_TEL}">{esc(D.PHONE)}</a><span>Звоните по телефонам горячей линии</span></div></li>
-        <li class="contacts__item">{icon('clock')}<div><b>Часы работы</b><span>{hours}</span></div></li>
+        <li class="contacts__item">{icon('clock')}{otkryto.schedule(D.HOURS, title="Часы работы")}</li>
         <li class="contacts__item">{icon('mail')}<div><a class="big" href="mailto:{D.EMAIL}" style="font-size:1.2rem">{D.EMAIL}</a><span>Ответим в рабочие часы</span></div></li>
       </ul>
-      <div class="row" style="margin-top:2rem"><a class="btn btn--primary" href="{route}" target="_blank" rel="noopener">{icon('pin')} Схема проезда</a><a class="btn btn--ghost is-on-dark" href="/contacts/">Страница контактов {icon('arrow')}</a></div>
+      {otkryto.actions()}
+      <a class="link-arrow link-arrow--inline oc-go__more" href="/contacts/">Страница контактов {icon('arrow')}</a>
     </div>
     <div class="map reveal">
       <iframe src="{map_src}" title="Карта: ул. Красная слобода, 9, Нижний Новгород" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <a class="map__label" href="{route}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
+      <a class="map__label" href="{esc(otkryto.ROUTE_URL)}" target="_blank" rel="noopener">{icon('pin')} ул. Красная слобода, 9 — построить маршрут</a>
     </div>
   </div>
 </section>"""
 
 
 def jsonld():
-    lat, lon = D.COORDS
-    return json.dumps({
-        "@context": "https://schema.org",
-        "@type": "AutoRepair",
-        "name": "Автосервис «Гараж»",
-        "alternateName": "Автотехцентр «Гараж»",
-        "url": D.SITE_URL,
-        "telephone": "+7 831 416-16-77",
-        "email": D.EMAIL,
-        "image": D.SITE_URL + "/assets/img/misc/advantages-bg.webp",
-        "address": {"@type": "PostalAddress", "streetAddress": "ул. Красная слобода, 9", "addressLocality": "Нижний Новгород", "postalCode": "603155", "addressCountry": "RU"},
-        "geo": {"@type": "GeoCoordinates", "latitude": lat, "longitude": lon},
-        "openingHoursSpecification": [
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "09:00", "closes": "19:00"},
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "09:00", "closes": "17:00"},
-        ],
-        "sameAs": [D.VK_URL],
-        "foundingDate": str(D.FOUNDED),
-    }, ensure_ascii=False)
+    return schema.dump(schema.org())
 
 
 def render_home():
     body = "\n".join([
         hero(),
         ticker(),
-        services_map(),
+        fonar.mark(services_map()),
+        fonar.mark(pribory_section()),
+        # the light «Почему выбирают» (with the director in an arched niche) sits between the two dark tool/photo blocks,
+        # and the pendant of «Свет ламп» hangs from the edge where the paper ends and «Как у нас» begins
         advantages(),
-        gallery(),
-        team(),
+        fonar.mark(arki.inside_section(lamp=svet.mini())),
+        fonar.mark(gallery()),
+        fonar.mark(team()),
         reviews_section(paper=True),
+        fonar.mark(stuk_section()),
+        fonar.mark(pogoda_section()),
+        fonar.mark(zima_section()),
         request_section("Оставить запрос"),
         green_note_wrap(),
-        contacts_strip(),
+        fonar.mark(contacts_strip(), after=".gate"),
     ])
-    title = "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж"
-    desc = ("Автосервис «Гараж» в Нижнем Новгороде, ул. Красная слобода, 9. Ремонт и обслуживание автомобилей любых марок, запчасти для иномарок "
-            "в наличии и под заказ, гарантия до 360 дней. Тел. (831) 416-16-77.")
+    title, desc = D.page_meta(
+        "home", "Автосервис в Нижнем Новгороде — ремонт автомобилей любых марок, запчасти, ТО | Гараж",
+        "Автосервис «Гараж» в Нижнем Новгороде, ул. Красная слобода, 9. Ремонт и обслуживание автомобилей любых марок, запчасти для иномарок "
+        "в наличии и под заказ, гарантия до 360 дней. Тел. (831) 416-16-77.")
     return document(title, desc, "/", body, body_class="page-home", jsonld=jsonld())
 
 

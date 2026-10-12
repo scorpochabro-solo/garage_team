@@ -1,0 +1,152 @@
+/* ============================================================
+   «Что горит на приборной панели» (#pribory): the warning-light
+   cluster and its cards (build/pribory.py, js/pribory.js).
+   Lamps are two copies of one symbol: the dim one and the lit one
+   with a static glow; only the lit copy's opacity ever changes.
+   ============================================================ */
+.pribory {
+  /* dashboard lamp colours: the red, amber and blue of real indicators, a little brighter than the brand palette */
+  --tone-red: 255, 74, 58;
+  --tone-amber: 255, 178, 36;
+  --tone-blue: 84, 162, 255;
+  background: var(--black);
+  border-top: 1px solid var(--line);
+}
+.pribory [data-tone="red"] { --lamp-rgb: var(--tone-red); }
+.pribory [data-tone="amber"] { --lamp-rgb: var(--tone-amber); }
+.pribory [data-tone="blue"] { --lamp-rgb: var(--tone-blue); }
+.pribory [data-tone] { --lamp: rgb(var(--lamp-rgb)); }
+
+.pribory__stage { display: grid; gap: clamp(0.75rem, 0.5rem + 0.8vw, 1.25rem); }
+/* without JavaScript (no .is-live, set by the first line of the section) the lamps would do nothing: the section is
+   a readable list of cards, the panel stays hidden, and the scroll-reveal that only core.js can finish is skipped */
+.pribory:not(.is-live) .pribory__panel { display: none; }
+.pribory:not(.is-live) .reveal { opacity: 1; transform: none; }
+.pribory:not(.is-live) .lamp-card__hint { display: none; }
+.pribory__panel { container-type: inline-size; min-width: 0; }
+
+/* ---------- the cluster: dark glass, two dim gauge faces, the lamps in the middle ---------- */
+.cluster {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center;
+  gap: clamp(1rem, 0.4rem + 2vw, 2.5rem); padding: clamp(1.4rem, 1rem + 1.4vw, 2.4rem) clamp(1rem, 0.4rem + 2vw, 2.5rem);
+  background:
+    linear-gradient(112deg, transparent 36%, rgba(255, 255, 255, 0.022) 45%, transparent 54%),
+    radial-gradient(70% 90% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 70%),
+    linear-gradient(180deg, #0f110f 0%, #080908 100%);
+  box-shadow: inset 0 0 0 1px var(--line), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.cluster__dial { width: 100%; max-width: 270px; justify-self: center; opacity: 0.35; transition: opacity 1s var(--ease); }
+.cluster.is-awake .cluster__dial { opacity: 1; }
+.dial__arc { fill: none; stroke: rgba(255, 255, 255, 0.13); stroke-width: 1; }
+.dial__ring { fill: none; stroke: rgba(255, 255, 255, 0.05); stroke-width: 1; }
+.dial__minor { stroke: rgba(255, 255, 255, 0.17); stroke-width: 1.2; }
+.dial__major { stroke: rgba(255, 255, 255, 0.4); stroke-width: 2; }
+.dial__red { stroke: rgba(var(--tone-red), 0.6); stroke-width: 2; }
+
+.cluster__center { display: grid; justify-items: center; gap: clamp(0.8rem, 0.6rem + 0.6vw, 1.25rem); min-width: 0; }
+/* the trip-computer line: names the lamp under the pointer or the selected one */
+.cluster__screen {
+  display: flex; align-items: center; justify-content: center; gap: 0.7em; max-width: 100%; min-height: 36px; padding: 0 1.1em;
+  font-family: var(--font-mono); font-size: var(--fs-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-2);
+  background: rgba(255, 255, 255, 0.025); box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap;
+}
+.cluster__screen span { overflow: hidden; text-overflow: ellipsis; }
+.cluster__screen i { width: 6px; height: 6px; flex: none; background: var(--text-3); }
+.cluster__screen[data-tone] { color: #fff; }
+.cluster__screen[data-tone] i { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
+
+.cluster__grid { --cell: clamp(64px, 40px + 2.8vw, 88px); display: grid; grid-template-columns: repeat(4, var(--cell)); gap: 4px; }
+/* a wide panel: the lamps in two rows of eight, as between the gauges of a real cluster */
+@container (min-width: 1180px) { .cluster__grid { grid-template-columns: repeat(8, var(--cell)); } }
+.lamp {
+  position: relative; display: grid; place-items: center; width: var(--cell); aspect-ratio: 1;
+  color: rgba(255, 255, 255, 0.3); transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.lamp:hover { color: rgba(255, 255, 255, 0.68); background: rgba(255, 255, 255, 0.04); }
+.lamp:focus-visible { outline-offset: -2px; }
+.lamp__sym { grid-area: 1 / 1; width: 55%; height: 55%; }
+/* the lit copy and its halo: switched on at once, like a lamp; switched off with a short fade and the per-lamp delay
+   of the bulb check (--off, from build/pribory.py) */
+.lamp__sym--lit { color: var(--lamp); opacity: 0; filter: drop-shadow(0 0 4px rgba(var(--lamp-rgb), 0.85)); transition: opacity 0.22s ease-out var(--off, 0ms); }
+.lamp::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(closest-side, rgba(var(--lamp-rgb), 0.24), rgba(var(--lamp-rgb), 0.07) 60%, transparent);
+  transition: opacity 0.3s ease-out var(--off, 0ms);
+}
+.lamp.is-on .lamp__sym--lit, .lamp.is-on::before,
+.cluster.is-check .lamp:not([data-no-check]) .lamp__sym--lit, .cluster.is-check .lamp:not([data-no-check])::before { opacity: 1; transition-duration: 0.06s; transition-delay: 0s; }
+.lamp.is-on { box-shadow: inset 0 0 0 1px rgba(var(--lamp-rgb), 0.38); }
+.cluster.has-active .lamp:not(.is-on):not(:hover) { color: rgba(255, 255, 255, 0.22); }
+
+/* ---------- cards: the colour legend first, then one card per lamp ---------- */
+.pribory__cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.lamp-card { position: relative; min-width: 0; container-type: inline-size; background: var(--ink-900); box-shadow: inset 0 0 0 1px var(--line-2); }
+.lamp-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--lamp, var(--green)); }
+/* the spare height of a card shorter than the longest one goes to the last row: text stays at the top, the foot at the bottom */
+.lamp-card__in {
+  height: 100%; display: grid; gap: 1.1rem 2rem; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto 1fr;
+  padding: clamp(1.25rem, 1rem + 0.9vw, 1.9rem) clamp(1.25rem, 1rem + 0.9vw, 1.9rem) clamp(1.25rem, 1rem + 0.9vw, 1.9rem) calc(clamp(1.25rem, 1rem + 0.9vw, 1.9rem) + 3px);
+}
+.lamp-card__id { display: grid; gap: 1rem; align-content: start; }
+.lamp-card__head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; }
+.lamp-card__icon { width: 60px; height: 60px; display: grid; place-items: center; color: var(--lamp); background: rgba(var(--lamp-rgb), 0.1); }
+.lamp-card__icon svg { width: 36px; height: 36px; filter: drop-shadow(0 0 5px rgba(var(--lamp-rgb), 0.6)); }
+.lamp-card__title { font-family: var(--font-display); font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem); font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.lamp-card__look { margin-top: 0.3rem; font-size: 0.85rem; color: var(--text-3); }
+.lamp-card__urgency { padding: 0.7rem 0.95rem; font-size: 0.93rem; line-height: 1.45; color: var(--text); background: rgba(var(--lamp-rgb), 0.08); box-shadow: inset 2px 0 0 var(--lamp); text-wrap: pretty; }
+.lamp-card__urgency b { color: var(--lamp); }
+.lamp-card__label { font-family: var(--font-mono); font-size: var(--fs-mono); font-weight: 500; letter-spacing: 0.16em; line-height: 1.4; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.5rem; }
+.lamp-card__text { font-size: 0.95rem; line-height: 1.6; color: var(--text-2); }
+.lamp-card__text p { text-wrap: pretty; }
+.lamp-card__note { margin-top: 0.6rem; font-size: 0.86rem; color: var(--text-3); }
+.lamp-card__foot { align-self: end; display: grid; gap: 1rem; justify-items: start; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.lamp-card__links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.4rem; font-size: 0.92rem; }
+.lamp-card__links .link-arrow { gap: 0.4em; }
+.lamp-card .btn { white-space: normal; text-align: left; }
+
+/* the colour legend */
+.lamp-legend { display: grid; gap: 0.7rem; align-content: start; }
+.lamp-legend li { display: flex; gap: 0.85rem; align-items: baseline; color: var(--text-2); line-height: 1.5; }
+.lamp-legend li::before { content: ""; flex: none; width: 10px; height: 10px; background: var(--lamp); box-shadow: 0 0 10px rgba(var(--lamp-rgb), 0.6); }
+.lamp-legend li[data-tone="blue"]::before { background: linear-gradient(135deg, var(--green-bright) 50%, rgb(var(--tone-blue)) 50%); }
+.lamp-legend b { color: var(--text); }
+.lamp-card__hint { margin-top: 0.8rem; color: var(--text-3); }
+.lamp-card__ask { font-size: 0.92rem; color: var(--text-2); max-width: 52ch; }
+
+/* a wide card: who the lamp is on the left, what it means and what to do beside it, services and the button below */
+@container (min-width: 600px) {
+  .lamp-card__in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .lamp-card__id, .lamp-card__foot { grid-column: 1 / -1; }
+  .lamp-card__foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .lamp-card--hint .lamp-card__in > * { grid-column: auto; }
+  .lamp-card--hint .lamp-card__id, .lamp-card--hint .lamp-card__foot { grid-column: 1 / -1; }
+}
+@container (min-width: 1000px) {
+  .lamp-card__in { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 2.5rem; }
+  .lamp-card__id { grid-column: auto; }
+  .lamp-card--hint .lamp-card__id { grid-column: auto; }
+}
+
+/* ---------- with JavaScript: one card at a time ---------- */
+/* all cards share one grid cell, so the box is as tall as the longest card and does not jump when the lamp changes */
+.pribory.is-live .pribory__cards { grid-template-columns: minmax(0, 1fr); }
+.pribory.is-live .lamp-card { grid-area: 1 / 1; }
+.pribory.is-live .lamp-card:not(.is-active) { visibility: hidden; }
+.pribory.is-live .lamp-card.is-active { animation: lamp-card-in 0.4s var(--ease); }
+@keyframes lamp-card-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* phones: the lamps become a compact 4×4 grid without the gauges; the card takes its own height under the panel */
+@media (max-width: 640px) {
+  .cluster { grid-template-columns: minmax(0, 1fr); padding: 1rem 0.7rem 0.75rem; }
+  .cluster__dial { display: none; }
+  .cluster__center { gap: 0.75rem; }
+  .cluster__grid { width: 100%; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
+  .lamp { width: 100%; aspect-ratio: 1.22; }
+  .lamp__sym { width: 46%; height: 46%; min-width: 30px; min-height: 30px; }
+  .pribory.is-live .lamp-card:not(.is-active) { display: none; }
+  .lamp-card__icon { width: 52px; height: 52px; }
+  .lamp-card__icon svg { width: 32px; height: 32px; }
+  .lamp-card__foot .btn { width: 100%; justify-content: center; text-align: center; }
+}
+/* 320–360px: the longest button label («Записаться на регулировку фар») stays on one line without its icon */
+@media (max-width: 360px) { .lamp-card__foot .btn { --px: 0.9em; font-size: 0.9rem; } .lamp-card__foot .btn .ic { display: none; } }

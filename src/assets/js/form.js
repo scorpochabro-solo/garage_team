@@ -68,13 +68,14 @@
       });
       if (n > 1) form.scrollIntoView({ behavior: G.reducedMotion ? 'auto' : 'smooth', block: 'start' });
       const first = $(`.rq__panel[data-panel="${n}"] input:not([type=hidden]):not([disabled]), .rq__panel[data-panel="${n}"] select:not([disabled])`, form);
-      if (first && n > 1) setTimeout(() => first.focus(), 350);
+      // phones: no automatic focus, it would open the keyboard or a select wheel on its own (see G.openModal)
+      if (first && n > 1 && G.canHover) setTimeout(() => first.focus(), 350);
     };
 
     /* car selection mode toggle */
     const setMode = (mode, note) => {
       const isSelect = mode === 'select';
-      if (modeInput) modeInput.value = isSelect ? '1' : '0';
+      if (modeInput) modeInput.value = isSelect ? '1' : '2';
       if (selectMode) selectMode.hidden = !isSelect;
       if (textMode) textMode.hidden = isSelect;
       $$('[data-mode-toggle]', form).forEach((b) => { b.textContent = isSelect ? 'Не нашли свой автомобиль?' : 'Выбрать из списка'; });
@@ -170,7 +171,9 @@
         const first = $('.part input[type=text]', form);
         const filled = $$('.part input[type=text]', form).some((i) => i.value.trim());
         const comment = $('[name="request_part[what]"]', form);
-        const ok = filled || (comment && comment.value.trim());
+        // «Когда удобно приехать?» (vremya.js) writes its line into this text: the line alone does not describe the task
+        const text = comment ? (G.vremya ? G.vremya.ownText(comment) : comment.value) : '';
+        const ok = filled || text.trim();
         if (first) G.setError(first, !ok);
         return !!ok;
       }

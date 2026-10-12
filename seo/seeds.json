@@ -1,0 +1,1215 @@
+{
+ "_note": "Исходные фразы для семантического ядра страниц услуг (seo/collect_core.py). seeds — основной запрос страницы, по нему берутся до 300 уточнений и похожие запросы; alts — альтернативные формулировки для выбора названия (частота и 20 уточнений). Регион 47, Нижний Новгород.",
+ "pages": [
+  {
+   "slug": "avtozapcasti",
+   "path": "/services/avtozapcasti.html",
+   "h1": "Автозапчасти",
+   "seeds": [
+    "автозапчасти"
+   ],
+   "alts": [
+    "запчасти для иномарок",
+    "магазин автозапчастей",
+    "автозапчасти в наличии"
+   ]
+  },
+  {
+   "slug": "cip-tuning",
+   "path": "/services/cip-tuning.html",
+   "h1": "Чип-тюнинг",
+   "seeds": [
+    "чип тюнинг"
+   ],
+   "alts": [
+    "чип тюнинг двигателя",
+    "прошивка двигателя",
+    "чиповка авто"
+   ]
+  },
+  {
+   "slug": "cip-tuning__programmnoe-udalenie-osibki-po-lambda-zondam",
+   "path": "/services/cip-tuning/programmnoe-udalenie-osibki-po-lambda-zondam.html",
+   "h1": "Программное удаление ошибки по лямбда-зондам",
+   "seeds": [
+    "ошибка лямбда зонда"
+   ],
+   "alts": [
+    "отключение второго лямбда зонда",
+    "программное отключение лямбды"
+   ]
+  },
+  {
+   "slug": "cip-tuning__udalenie-i-pereprogrammirovanie-sazevyh-filtrov",
+   "path": "/services/cip-tuning/udalenie-i-pereprogrammirovanie-sazevyh-filtrov.html",
+   "h1": "Удаление и перепрограммирование сажевых фильтров",
+   "seeds": [
+    "сажевый фильтр"
+   ],
+   "alts": [
+    "удаление сажевого фильтра",
+    "удаление dpf",
+    "чистка сажевого фильтра"
+   ]
+  },
+  {
+   "slug": "cip-tuning__udalenie-katalizatorov-i-adaptacia-raboty-lambda-zondov",
+   "path": "/services/cip-tuning/udalenie-katalizatorov-i-adaptacia-raboty-lambda-zondov.html",
+   "h1": "Удаление катализаторов и адаптация работы лямбда-зондов",
+   "seeds": [
+    "отключение лямбда зонда"
+   ],
+   "alts": [
+    "удаление катализатора прошивка",
+    "обманка лямбда зонда"
+   ]
+  },
+  {
+   "slug": "cip-tuning__udalenieotklucenie-moceviny-adblue",
+   "path": "/services/cip-tuning/udalenieotklucenie-moceviny-adblue.html",
+   "h1": "Удаление/отключение мочевины Adblue",
+   "seeds": [
+    "adblue"
+   ],
+   "alts": [
+    "отключение мочевины",
+    "отключение adblue",
+    "удаление мочевины"
+   ]
+  },
+  {
+   "slug": "cip-tuning__uvelicenie-mosnosti-motociklov",
+   "path": "/services/cip-tuning/uvelicenie-mosnosti-motociklov.html",
+   "h1": "Увеличение мощности мотоциклов",
+   "seeds": [
+    "чип тюнинг мотоцикла"
+   ],
+   "alts": [
+    "прошивка мотоцикла",
+    "увеличение мощности мотоцикла"
+   ]
+  },
+  {
+   "slug": "diagnostika",
+   "path": "/services/diagnostika.html",
+   "h1": "Диагностика",
+   "seeds": [
+    "диагностика автомобиля"
+   ],
+   "alts": [
+    "диагностика авто",
+    "проверка автомобиля",
+    "диагностика машины"
+   ]
+  },
+  {
+   "slug": "diagnostika__diagnostika-akpp",
+   "path": "/services/diagnostika/diagnostika-akpp.html",
+   "h1": "Диагностика АКПП",
+   "seeds": [
+    "диагностика акпп"
+   ],
+   "alts": [
+    "диагностика коробки автомат",
+    "компьютерная диагностика акпп"
+   ]
+  },
+  {
+   "slug": "diagnostika__diagnostika-i-zapravka-kondicionera",
+   "path": "/services/diagnostika/diagnostika-i-zapravka-kondicionera.html",
+   "h1": "Диагностика и заправка кондиционера",
+   "seeds": [
+    "диагностика кондиционера"
+   ],
+   "alts": [
+    "проверка кондиционера автомобиля",
+    "проверка кондиционера на утечку"
+   ]
+  },
+  {
+   "slug": "diagnostika__diagnostika-podveski",
+   "path": "/services/diagnostika/diagnostika-podveski.html",
+   "h1": "Диагностика подвески",
+   "seeds": [
+    "диагностика подвески"
+   ],
+   "alts": [
+    "диагностика ходовой",
+    "проверка подвески"
+   ]
+  },
+  {
+   "slug": "diagnostika__diagnostika-tormoznoj-sistemy",
+   "path": "/services/diagnostika/diagnostika-tormoznoj-sistemy.html",
+   "h1": "Диагностика тормозной системы",
+   "seeds": [
+    "диагностика тормозной системы"
+   ],
+   "alts": [
+    "проверка тормозов",
+    "диагностика тормозов"
+   ]
+  },
+  {
+   "slug": "diagnostika__kompleksnaa-diagnostika",
+   "path": "/services/diagnostika/kompleksnaa-diagnostika.html",
+   "h1": "Комплексная диагностика",
+   "seeds": [
+    "комплексная диагностика автомобиля"
+   ],
+   "alts": [
+    "диагностика авто перед покупкой",
+    "проверка авто перед покупкой",
+    "полная диагностика автомобиля"
+   ]
+  },
+  {
+   "slug": "diagnostika__komputernaa-diagnostika",
+   "path": "/services/diagnostika/komputernaa-diagnostika.html",
+   "h1": "Компьютерная диагностика",
+   "seeds": [
+    "компьютерная диагностика автомобиля"
+   ],
+   "alts": [
+    "компьютерная диагностика авто",
+    "диагностика двигателя",
+    "проверка ошибок автомобиля"
+   ]
+  },
+  {
+   "slug": "himcistka-salona",
+   "path": "/services/himcistka-salona.html",
+   "h1": "Химчистка салона",
+   "seeds": [
+    "химчистка салона"
+   ],
+   "alts": [
+    "химчистка салона авто",
+    "химчистка автомобиля",
+    "химчистка сидений"
+   ]
+  },
+  {
+   "slug": "hranenie-sin",
+   "path": "/services/hranenie-sin.html",
+   "h1": "Хранение шин",
+   "seeds": [
+    "хранение шин"
+   ],
+   "alts": [
+    "хранение колес",
+    "сезонное хранение шин"
+   ]
+  },
+  {
+   "slug": "kuzovnoj-remont",
+   "path": "/services/kuzovnoj-remont.html",
+   "h1": "Кузовной ремонт",
+   "seeds": [
+    "кузовной ремонт"
+   ],
+   "alts": [
+    "ремонт кузова",
+    "рихтовка",
+    "кузовной ремонт авто"
+   ]
+  },
+  {
+   "slug": "planovoe-to",
+   "path": "/services/planovoe-to.html",
+   "h1": "Плановое ТО",
+   "seeds": [
+    "техническое обслуживание автомобиля"
+   ],
+   "alts": [
+    "техобслуживание автомобиля",
+    "плановое то",
+    "то авто"
+   ]
+  },
+  {
+   "slug": "pokraska-avtomobilej-plasti-dip",
+   "path": "/services/pokraska-avtomobilej-plasti-dip.html",
+   "h1": "Покраска автомобилей PLASTI DIP",
+   "seeds": [
+    "жидкая резина"
+   ],
+   "alts": [
+    "plasti dip",
+    "покраска жидкой резиной"
+   ]
+  },
+  {
+   "slug": "polirovka-kuzova-avtomobila",
+   "path": "/services/polirovka-kuzova-avtomobila.html",
+   "h1": "Полировка кузова автомобиля",
+   "seeds": [
+    "полировка авто"
+   ],
+   "alts": [
+    "полировка кузова",
+    "полировка автомобиля",
+    "керамика авто"
+   ]
+  },
+  {
+   "slug": "polnaa-i-lokalnaa-pokraska-avtomobila",
+   "path": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
+   "h1": "Полная и локальная покраска автомобиля",
+   "seeds": [
+    "покраска автомобиля"
+   ],
+   "alts": [
+    "покраска авто",
+    "покраска машины",
+    "локальная покраска",
+    "полная покраска автомобиля"
+   ]
+  },
+  {
+   "slug": "polnaa-i-lokalnaa-pokraska-avtomobila__pokraska-bampera",
+   "path": "/services/polnaa-i-lokalnaa-pokraska-avtomobila/pokraska-bampera.html",
+   "h1": "Покраска бампера",
+   "seeds": [
+    "покраска бампера"
+   ],
+   "alts": [
+    "ремонт бампера",
+    "ремонт и покраска бампера"
+   ]
+  },
+  {
+   "slug": "remont-akpp-i-zamena-masla-v-akpp",
+   "path": "/services/remont-akpp-i-zamena-masla-v-akpp.html",
+   "h1": "Ремонт АКПП и замена масла в АКПП",
+   "seeds": [
+    "ремонт акпп"
+   ],
+   "alts": [
+    "ремонт автоматической коробки передач",
+    "ремонт вариатора",
+    "ремонт коробки автомат"
+   ]
+  },
+  {
+   "slug": "remont-akpp-i-zamena-masla-v-akpp__zamena-filtra-akpp",
+   "path": "/services/remont-akpp-i-zamena-masla-v-akpp/zamena-filtra-akpp.html",
+   "h1": "Замена фильтра АКПП",
+   "seeds": [
+    "фильтр акпп"
+   ],
+   "alts": [
+    "замена фильтра акпп",
+    "замена масла и фильтра акпп"
+   ]
+  },
+  {
+   "slug": "remont-akpp-i-zamena-masla-v-akpp__zamena-masla-v-akpp",
+   "path": "/services/remont-akpp-i-zamena-masla-v-akpp/zamena-masla-v-akpp.html",
+   "h1": "Замена масла в АКПП",
+   "seeds": [
+    "замена масла в акпп"
+   ],
+   "alts": [
+    "полная замена масла в акпп",
+    "частичная замена масла в акпп",
+    "замена масла в вариаторе"
+   ]
+  },
+  {
+   "slug": "remont-dizela",
+   "path": "/services/remont-dizela.html",
+   "h1": "Ремонт дизеля",
+   "seeds": [
+    "ремонт дизеля"
+   ],
+   "alts": [
+    "ремонт дизельного двигателя",
+    "ремонт дизельных двигателей",
+    "диагностика дизеля"
+   ]
+  },
+  {
+   "slug": "remont-dizela__remont-dizelnogo-dvigatela",
+   "path": "/services/remont-dizela/remont-dizelnogo-dvigatela.html",
+   "h1": "Ремонт дизельного двигателя",
+   "seeds": [],
+   "alts": [
+    "капитальный ремонт дизельного двигателя"
+   ]
+  },
+  {
+   "slug": "remont-dizela__remont-dizelnyh-forsunok",
+   "path": "/services/remont-dizela/remont-dizelnyh-forsunok.html",
+   "h1": "Ремонт дизельных форсунок",
+   "seeds": [
+    "дизельные форсунки"
+   ],
+   "alts": [
+    "ремонт дизельных форсунок",
+    "ремонт форсунок дизель"
+   ]
+  },
+  {
+   "slug": "remont-dizela__remont-tnvd-professionalami",
+   "path": "/services/remont-dizela/remont-tnvd-professionalami.html",
+   "h1": "Ремонт ТНВД профессионалами",
+   "seeds": [],
+   "alts": [
+    "ремонт тнвд дизеля",
+    "ремонт топливного насоса высокого давления"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela",
+   "path": "/services/remont-dvigatela.html",
+   "h1": "Ремонт двигателя",
+   "seeds": [
+    "ремонт двигателя"
+   ],
+   "alts": [
+    "капитальный ремонт двигателя",
+    "ремонт двс",
+    "ремонт мотора"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__ustranenie-teci-masla",
+   "path": "/services/remont-dvigatela/ustranenie-teci-masla.html",
+   "h1": "Устранение течи масла",
+   "seeds": [
+    "течь масла"
+   ],
+   "alts": [
+    "устранение течи масла",
+    "течет масло из двигателя",
+    "замена прокладки клапанной крышки",
+    "замена сальника коленвала"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-klapanov",
+   "path": "/services/remont-dvigatela/zamena-klapanov.html",
+   "h1": "Замена клапанов",
+   "seeds": [
+    "замена клапанов"
+   ],
+   "alts": [
+    "регулировка клапанов",
+    "ремонт гбц",
+    "замена маслосъемных колпачков"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-masla-v-dvigatele",
+   "path": "/services/remont-dvigatela/zamena-masla-v-dvigatele.html",
+   "h1": "Замена масла в двигателе",
+   "seeds": [
+    "замена масла в двигателе"
+   ],
+   "alts": [
+    "замена масла",
+    "замена моторного масла",
+    "замена масла и фильтра"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-pompy",
+   "path": "/services/remont-dvigatela/zamena-pompy.html",
+   "h1": "Замена помпы",
+   "seeds": [
+    "замена помпы"
+   ],
+   "alts": [
+    "замена водяного насоса",
+    "замена помпы охлаждения"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-prokladki-gbc",
+   "path": "/services/remont-dvigatela/zamena-prokladki-gbc.html",
+   "h1": "Замена прокладки ГБЦ",
+   "seeds": [
+    "замена прокладки гбц"
+   ],
+   "alts": [
+    "замена прокладки головки блока",
+    "пробило прокладку гбц"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-remna-generatora",
+   "path": "/services/remont-dvigatela/zamena-remna-generatora.html",
+   "h1": "Замена ремня генератора",
+   "seeds": [
+    "замена ремня генератора"
+   ],
+   "alts": [
+    "замена приводного ремня",
+    "замена ремня навесного оборудования"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-remna-grm",
+   "path": "/services/remont-dvigatela/zamena-remna-grm.html",
+   "h1": "Замена ремня ГРМ",
+   "seeds": [
+    "замена ремня грм"
+   ],
+   "alts": [
+    "замена грм",
+    "замена цепи грм",
+    "замена комплекта грм"
+   ]
+  },
+  {
+   "slug": "remont-dvigatela__zamena-vozdusnogo-filtra-dvs",
+   "path": "/services/remont-dvigatela/zamena-vozdusnogo-filtra-dvs.html",
+   "h1": "Замена воздушного фильтра ДВС",
+   "seeds": [
+    "замена воздушного фильтра"
+   ],
+   "alts": [
+    "замена фильтров автомобиля"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila",
+   "path": "/services/remont-elektrooborudovania-avtomobila.html",
+   "h1": "Ремонт электрооборудования автомобиля",
+   "seeds": [
+    "автоэлектрик"
+   ],
+   "alts": [
+    "автоэлектрика",
+    "ремонт автоэлектрики",
+    "ремонт электрооборудования автомобиля",
+    "диагностика электрики автомобиля"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__regulirovka-far",
+   "path": "/services/remont-elektrooborudovania-avtomobila/regulirovka-far.html",
+   "h1": "Регулировка фар",
+   "seeds": [
+    "регулировка фар"
+   ],
+   "alts": [
+    "регулировка света фар"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__remont-elektroprovodki",
+   "path": "/services/remont-elektrooborudovania-avtomobila/remont-elektroprovodki.html",
+   "h1": "Ремонт электропроводки",
+   "seeds": [
+    "ремонт проводки"
+   ],
+   "alts": [
+    "ремонт электропроводки автомобиля",
+    "замена проводки"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__remont-generatora",
+   "path": "/services/remont-elektrooborudovania-avtomobila/remont-generatora.html",
+   "h1": "Ремонт генератора",
+   "seeds": [
+    "ремонт генератора"
+   ],
+   "alts": [
+    "замена генератора",
+    "проверка генератора"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__remont-startera",
+   "path": "/services/remont-elektrooborudovania-avtomobila/remont-startera.html",
+   "h1": "Ремонт стартера",
+   "seeds": [
+    "ремонт стартера"
+   ],
+   "alts": [
+    "замена стартера",
+    "замена бендикса"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__ustanovka-ksenona",
+   "path": "/services/remont-elektrooborudovania-avtomobila/ustanovka-ksenona.html",
+   "h1": "Установка ксенона",
+   "seeds": [
+    "установка ксенона"
+   ],
+   "alts": [
+    "установка линз",
+    "установка биксенона",
+    "установка светодиодных ламп"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__zamena-far",
+   "path": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
+   "h1": "Замена фар",
+   "seeds": [
+    "замена фар"
+   ],
+   "alts": [
+    "ремонт фар",
+    "полировка фар",
+    "замена стекла фары"
+   ]
+  },
+  {
+   "slug": "remont-elektrooborudovania-avtomobila__zamena-lampocek-osvesenia",
+   "path": "/services/remont-elektrooborudovania-avtomobila/zamena-lampocek-osvesenia.html",
+   "h1": "Замена лампочек освещения",
+   "seeds": [
+    "замена лампы"
+   ],
+   "alts": [
+    "замена лампочки",
+    "замена ламп фар",
+    "замена ламп ближнего света"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj",
+   "path": "/services/remont-hodovoj.html",
+   "h1": "Ремонт ходовой",
+   "seeds": [
+    "ремонт ходовой"
+   ],
+   "alts": [
+    "ремонт подвески",
+    "ремонт ходовой части"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-amortizatora",
+   "path": "/services/remont-hodovoj/zamena-amortizatora.html",
+   "h1": "Замена амортизатора",
+   "seeds": [
+    "замена амортизаторов"
+   ],
+   "alts": [
+    "замена стоек",
+    "замена передних стоек"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-opornogo-podsipnika",
+   "path": "/services/remont-hodovoj/zamena-opornogo-podsipnika.html",
+   "h1": "Замена опорного подшипника",
+   "seeds": [
+    "опорный подшипник"
+   ],
+   "alts": [
+    "замена опорного подшипника",
+    "замена опоры стойки"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-podsipnika-stupicy",
+   "path": "/services/remont-hodovoj/zamena-podsipnika-stupicy.html",
+   "h1": "Замена подшипника ступицы",
+   "seeds": [
+    "подшипник ступицы"
+   ],
+   "alts": [
+    "замена подшипника ступицы",
+    "замена ступицы"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-rulevogo-nakonecnika",
+   "path": "/services/remont-hodovoj/zamena-rulevogo-nakonecnika.html",
+   "h1": "Замена рулевого наконечника",
+   "seeds": [
+    "рулевой наконечник"
+   ],
+   "alts": [
+    "замена рулевого наконечника"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-rulevoj-rejki",
+   "path": "/services/remont-hodovoj/zamena-rulevoj-rejki.html",
+   "h1": "Замена рулевой рейки",
+   "seeds": [
+    "рулевая рейка"
+   ],
+   "alts": [
+    "замена рулевой рейки",
+    "ремонт рулевой рейки"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-rulevoj-tagi",
+   "path": "/services/remont-hodovoj/zamena-rulevoj-tagi.html",
+   "h1": "Замена рулевой тяги",
+   "seeds": [
+    "рулевая тяга"
+   ],
+   "alts": [
+    "замена рулевой тяги"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-rycagov-podveski",
+   "path": "/services/remont-hodovoj/zamena-rycagov-podveski.html",
+   "h1": "Замена рычагов подвески",
+   "seeds": [
+    "замена рычагов"
+   ],
+   "alts": [
+    "замена рычага подвески",
+    "замена нижнего рычага"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-sajlentblokov",
+   "path": "/services/remont-hodovoj/zamena-sajlentblokov.html",
+   "h1": "Замена сайлентблоков",
+   "seeds": [
+    "сайлентблоки"
+   ],
+   "alts": [
+    "замена сайлентблоков"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-sarovoj-opory",
+   "path": "/services/remont-hodovoj/zamena-sarovoj-opory.html",
+   "h1": "Замена шаровой опоры",
+   "seeds": [
+    "шаровая опора"
+   ],
+   "alts": [
+    "замена шаровой опоры"
+   ]
+  },
+  {
+   "slug": "remont-hodovoj__zamena-srusa",
+   "path": "/services/remont-hodovoj/zamena-srusa.html",
+   "h1": "Замена ШРУСа",
+   "seeds": [
+    "шрус"
+   ],
+   "alts": [
+    "замена шруса",
+    "замена гранаты",
+    "замена пыльника шруса"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia.html",
+   "h1": "Ремонт и промывка систем охлаждения",
+   "seeds": [
+    "система охлаждения"
+   ],
+   "alts": [
+    "ремонт системы охлаждения",
+    "промывка системы охлаждения",
+    "перегрев двигателя"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-datcikov-temperatury-ohlazdausej-zidkosti",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-datcikov-temperatury-ohlazdausej-zidkosti.html",
+   "h1": "Замена датчиков температуры охлаждающей жидкости",
+   "seeds": [
+    "датчик температуры охлаждающей жидкости"
+   ],
+   "alts": [
+    "замена датчика температуры",
+    "датчик температуры двигателя"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-motora-radiatora",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-motora-radiatora.html",
+   "h1": "Замена мотора радиатора",
+   "seeds": [
+    "вентилятор радиатора"
+   ],
+   "alts": [
+    "замена вентилятора радиатора",
+    "не включается вентилятор радиатора",
+    "замена мотора вентилятора"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-ohlazdausej-zidkosti",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-ohlazdausej-zidkosti.html",
+   "h1": "Замена охлаждающей жидкости",
+   "seeds": [
+    "замена антифриза"
+   ],
+   "alts": [
+    "замена охлаждающей жидкости",
+    "замена тосола"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-pompy",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-pompy.html",
+   "h1": "Замена помпы",
+   "seeds": [],
+   "alts": [
+    "замена помпы и антифриза",
+    "течет помпа"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-radiatora",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-radiatora.html",
+   "h1": "Замена радиатора",
+   "seeds": [
+    "замена радиатора"
+   ],
+   "alts": [
+    "ремонт радиатора",
+    "замена радиатора охлаждения"
+   ]
+  },
+  {
+   "slug": "remont-i-promyvka-sistem-ohlazdenia__zamena-termostata",
+   "path": "/services/remont-i-promyvka-sistem-ohlazdenia/zamena-termostata.html",
+   "h1": "Замена термостата",
+   "seeds": [
+    "замена термостата"
+   ],
+   "alts": [
+    "не работает термостат"
+   ]
+  },
+  {
+   "slug": "remont-mkpp-zamena-korobki-peredac",
+   "path": "/services/remont-mkpp-zamena-korobki-peredac.html",
+   "h1": "Ремонт МКПП, замена коробки передач",
+   "seeds": [
+    "ремонт мкпп"
+   ],
+   "alts": [
+    "ремонт коробки передач",
+    "ремонт механической коробки передач",
+    "замена коробки передач"
+   ]
+  },
+  {
+   "slug": "remont-mkpp-zamena-korobki-peredac__zamena-masla-kpp",
+   "path": "/services/remont-mkpp-zamena-korobki-peredac/zamena-masla-kpp.html",
+   "h1": "Замена масла КПП",
+   "seeds": [
+    "замена масла в мкпп"
+   ],
+   "alts": [
+    "замена масла в коробке передач",
+    "замена масла кпп",
+    "замена масла в механической коробке"
+   ]
+  },
+  {
+   "slug": "remont-promyvka-inzektorov-i-monovpryskov",
+   "path": "/services/remont-promyvka-inzektorov-i-monovpryskov.html",
+   "h1": "Ремонт, промывка инжекторов и моновпрысков",
+   "seeds": [
+    "промывка инжектора"
+   ],
+   "alts": [
+    "промывка форсунок",
+    "ремонт инжектора",
+    "чистка инжектора"
+   ]
+  },
+  {
+   "slug": "remont-promyvka-inzektorov-i-monovpryskov__cistka-forsunok-ultrazvukom",
+   "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/cistka-forsunok-ultrazvukom.html",
+   "h1": "Чистка форсунок ультразвуком",
+   "seeds": [
+    "чистка форсунок"
+   ],
+   "alts": [
+    "чистка форсунок ультразвуком",
+    "ультразвуковая чистка форсунок"
+   ]
+  },
+  {
+   "slug": "remont-promyvka-inzektorov-i-monovpryskov__zamena-forsunok",
+   "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-forsunok.html",
+   "h1": "Замена форсунок",
+   "seeds": [
+    "замена форсунок"
+   ],
+   "alts": [
+    "замена топливных форсунок"
+   ]
+  },
+  {
+   "slug": "remont-promyvka-inzektorov-i-monovpryskov__zamena-svecej",
+   "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-svecej.html",
+   "h1": "Замена свечей",
+   "seeds": [
+    "замена свечей"
+   ],
+   "alts": [
+    "замена свечей зажигания"
+   ]
+  },
+  {
+   "slug": "remont-promyvka-inzektorov-i-monovpryskov__zamer-davlenia-masla",
+   "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamer-davlenia-masla.html",
+   "h1": "Замер давления масла",
+   "seeds": [
+    "давление масла"
+   ],
+   "alts": [
+    "замер давления масла",
+    "проверка давления масла в двигателе"
+   ]
+  },
+  {
+   "slug": "remont-tnvd",
+   "path": "/services/remont-tnvd.html",
+   "h1": "Ремонт ТНВД",
+   "seeds": [
+    "ремонт тнвд"
+   ],
+   "alts": [
+    "тнвд"
+   ]
+  },
+  {
+   "slug": "remont-turbin-i-turbokompressorov",
+   "path": "/services/remont-turbin-i-turbokompressorov.html",
+   "h1": "Ремонт турбин и турбокомпрессоров",
+   "seeds": [
+    "ремонт турбины"
+   ],
+   "alts": [
+    "ремонт турбокомпрессора",
+    "замена турбины"
+   ]
+  },
+  {
+   "slug": "remont-vyhlopnoj-sistemy",
+   "path": "/services/remont-vyhlopnoj-sistemy.html",
+   "h1": "Ремонт выхлопной системы",
+   "seeds": [
+    "ремонт выхлопной системы"
+   ],
+   "alts": [
+    "ремонт выхлопа",
+    "выхлопная система"
+   ]
+  },
+  {
+   "slug": "remont-vyhlopnoj-sistemy__remont-glusitela",
+   "path": "/services/remont-vyhlopnoj-sistemy/remont-glusitela.html",
+   "h1": "Ремонт глушителя",
+   "seeds": [
+    "ремонт глушителя"
+   ],
+   "alts": [
+    "сварка глушителя",
+    "замена гофры"
+   ]
+  },
+  {
+   "slug": "remont-vyhlopnoj-sistemy__udalenie-katalizatora",
+   "path": "/services/remont-vyhlopnoj-sistemy/udalenie-katalizatora.html",
+   "h1": "Удаление катализатора",
+   "seeds": [
+    "удаление катализатора"
+   ],
+   "alts": [
+    "замена катализатора",
+    "установка пламегасителя"
+   ]
+  },
+  {
+   "slug": "remont-vyhlopnoj-sistemy__zamena-glusitela",
+   "path": "/services/remont-vyhlopnoj-sistemy/zamena-glusitela.html",
+   "h1": "Замена глушителя",
+   "seeds": [
+    "замена глушителя"
+   ],
+   "alts": [
+    "замена резонатора",
+    "замена выхлопной трубы"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov.html",
+   "h1": "Ремонт, замена, регулировка, прокачка тормозов",
+   "seeds": [
+    "ремонт тормозов"
+   ],
+   "alts": [
+    "ремонт тормозной системы",
+    "прокачка тормозов",
+    "замена тормозной жидкости"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__profilaktika-tormozov",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/profilaktika-tormozov.html",
+   "h1": "Профилактика тормозов",
+   "seeds": [
+    "обслуживание тормозов"
+   ],
+   "alts": [
+    "обслуживание суппортов",
+    "профилактика тормозов",
+    "смазка суппортов"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__remont-pereborka-tormoznyh-supportov",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/remont-pereborka-tormoznyh-supportov.html",
+   "h1": "Ремонт (переборка) тормозных суппортов",
+   "seeds": [
+    "ремонт суппортов"
+   ],
+   "alts": [
+    "переборка суппортов",
+    "ремонт тормозных суппортов",
+    "клинит суппорт"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__zamena-kolodok-rucnika",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-kolodok-rucnika.html",
+   "h1": "Замена колодок ручника",
+   "seeds": [
+    "колодки ручника"
+   ],
+   "alts": [
+    "замена колодок ручника",
+    "замена колодок стояночного тормоза"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__zamena-kolodok",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-kolodok.html",
+   "h1": "Замена колодок",
+   "seeds": [
+    "замена тормозных колодок"
+   ],
+   "alts": [
+    "замена колодок",
+    "замена передних колодок",
+    "замена задних колодок"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__zamena-tormoznyh-diskov",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-tormoznyh-diskov.html",
+   "h1": "Замена тормозных дисков",
+   "seeds": [
+    "замена тормозных дисков"
+   ],
+   "alts": [
+    "замена дисков и колодок"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__zamena-tormoznyh-supportov-cilindrov",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-tormoznyh-supportov-cilindrov.html",
+   "h1": "Замена тормозных суппортов (цилиндров)",
+   "seeds": [
+    "замена суппорта"
+   ],
+   "alts": [
+    "замена тормозного цилиндра",
+    "замена тормозного суппорта"
+   ]
+  },
+  {
+   "slug": "remont-zamena-regulirovka-prokacka-tormozov__zamena-trosa-rucnika",
+   "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-trosa-rucnika.html",
+   "h1": "Замена троса ручника",
+   "seeds": [
+    "трос ручника"
+   ],
+   "alts": [
+    "замена троса ручника",
+    "регулировка ручника"
+   ]
+  },
+  {
+   "slug": "shod-razval-regulirovka-i-diagnostika",
+   "path": "/services/shod-razval-regulirovka-i-diagnostika.html",
+   "h1": "Сход-развал, регулировка и диагностика",
+   "seeds": [
+    "развал схождение"
+   ],
+   "alts": [
+    "сход развал",
+    "3д развал схождение"
+   ]
+  },
+  {
+   "slug": "sinomontaz",
+   "path": "/services/sinomontaz.html",
+   "h1": "Шиномонтаж",
+   "seeds": [
+    "шиномонтаж"
+   ],
+   "alts": [
+    "балансировка колес",
+    "переобуть машину",
+    "сезонная замена шин"
+   ]
+  },
+  {
+   "slug": "tehosmotr-avto-diagnosticeskaa-karta-dla-osago",
+   "path": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
+   "h1": "Техосмотр авто, диагностическая карта для ОСАГО",
+   "seeds": [
+    "техосмотр"
+   ],
+   "alts": [
+    "диагностическая карта",
+    "пройти техосмотр",
+    "техосмотр для осаго"
+   ]
+  },
+  {
+   "slug": "ustanovka-dopolnitelnogo-oborudovania",
+   "path": "/services/ustanovka-dopolnitelnogo-oborudovania.html",
+   "h1": "Установка дополнительного оборудования",
+   "seeds": [
+    "установка дополнительного оборудования"
+   ],
+   "alts": [
+    "установка доп оборудования на авто",
+    "установка парктроников",
+    "установка камеры заднего вида"
+   ]
+  },
+  {
+   "slug": "zamena-sceplenia",
+   "path": "/services/zamena-sceplenia.html",
+   "h1": "Замена сцепления",
+   "seeds": [
+    "замена сцепления"
+   ],
+   "alts": [
+    "ремонт сцепления",
+    "замена диска сцепления",
+    "замена корзины сцепления"
+   ]
+  },
+  {
+   "slug": "zamena-sceplenia__regulirovka-sceplenia",
+   "path": "/services/zamena-sceplenia/regulirovka-sceplenia.html",
+   "h1": "Регулировка сцепления",
+   "seeds": [
+    "регулировка сцепления"
+   ],
+   "alts": [
+    "регулировка педали сцепления"
+   ]
+  },
+  {
+   "slug": "zamena-sceplenia__zamena-rabocego-cilindra-sceplenia",
+   "path": "/services/zamena-sceplenia/zamena-rabocego-cilindra-sceplenia.html",
+   "h1": "Замена рабочего цилиндра сцепления",
+   "seeds": [
+    "рабочий цилиндр сцепления"
+   ],
+   "alts": [
+    "замена рабочего цилиндра сцепления",
+    "замена главного цилиндра сцепления"
+   ]
+  },
+  {
+   "slug": "zamena-sceplenia__zamena-trosa-sceplenia",
+   "path": "/services/zamena-sceplenia/zamena-trosa-sceplenia.html",
+   "h1": "Замена троса сцепления",
+   "seeds": [
+    "трос сцепления"
+   ],
+   "alts": [
+    "замена троса сцепления"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov",
+   "path": "/services/zapravka-i-remont-avtokondicionerov.html",
+   "h1": "Заправка и ремонт автокондиционеров",
+   "seeds": [
+    "ремонт кондиционера"
+   ],
+   "alts": [
+    "ремонт автокондиционера",
+    "ремонт кондиционера автомобиля",
+    "не работает кондиционер в машине"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov__zamena-filtra-kondicionera",
+   "path": "/services/zapravka-i-remont-avtokondicionerov/zamena-filtra-kondicionera.html",
+   "h1": "Замена фильтра кондиционера",
+   "seeds": [
+    "салонный фильтр"
+   ],
+   "alts": [
+    "замена салонного фильтра",
+    "замена фильтра кондиционера"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov__zamena-motorcika-pecki",
+   "path": "/services/zapravka-i-remont-avtokondicionerov/zamena-motorcika-pecki.html",
+   "h1": "Замена моторчика печки",
+   "seeds": [
+    "моторчик печки"
+   ],
+   "alts": [
+    "замена моторчика печки",
+    "ремонт печки автомобиля",
+    "не работает печка"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov__zamena-radiatora-kondicionera",
+   "path": "/services/zapravka-i-remont-avtokondicionerov/zamena-radiatora-kondicionera.html",
+   "h1": "Замена радиатора кондиционера",
+   "seeds": [
+    "радиатор кондиционера"
+   ],
+   "alts": [
+    "замена радиатора кондиционера",
+    "ремонт радиатора кондиционера"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov__zamena-remna-kondicionera",
+   "path": "/services/zapravka-i-remont-avtokondicionerov/zamena-remna-kondicionera.html",
+   "h1": "Замена ремня кондиционера",
+   "seeds": [
+    "ремень кондиционера"
+   ],
+   "alts": [
+    "замена ремня кондиционера"
+   ]
+  },
+  {
+   "slug": "zapravka-i-remont-avtokondicionerov__zapravka-kondicionera",
+   "path": "/services/zapravka-i-remont-avtokondicionerov/zapravka-kondicionera.html",
+   "h1": "Заправка кондиционера",
+   "seeds": [
+    "заправка кондиционера"
+   ],
+   "alts": [
+    "заправка кондиционера авто",
+    "заправка фреоном"
+   ]
+  }
+ ]
+}

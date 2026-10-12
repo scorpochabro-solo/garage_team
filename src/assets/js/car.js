@@ -200,7 +200,7 @@
   function readoutHTML(d) {
     const price = d.price
       ? `<b>${d.price}</b><span>${d.price_note || ''}</span>`
-      : '<span>Стоимость уточняйте по телефону</span>';
+      : '<span>Стоимость уточняйте по\u00a0телефону</span>';
     return `
       <div class="svc-readout__icon"><svg class="ic" aria-hidden="true"><use href="#i-${d.icon}"/></svg></div>
       <div class="svc-readout__body">
@@ -215,6 +215,35 @@
   }
   const roamHTML = '<div class="svc-readout__icon"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></div><div class="svc-readout__hint">Ведите прицел по автомобилю. Рядом с точкой он «прилипнет» к узлу и покажет услугу.</div>';
   let swapTimer = 0;
+
+  /* the panel keeps one size for every service: the tallest of all its possible contents at the current width */
+  let readoutW = 0;
+  function lockReadout(force) {
+    if (!readout) return;
+    const w = readout.offsetWidth;
+    if (!w || (w === readoutW && !force)) return;
+    readoutW = w;
+    const probe = readout.cloneNode(false);
+    probe.removeAttribute('data-readout');
+    probe.removeAttribute('aria-live');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = `position:absolute;left:0;top:0;width:${w}px;height:auto;visibility:hidden;pointer-events:none`;
+    readout.parentNode.appendChild(probe);
+    let max = 0;
+    [hintHTML, roamHTML, ...Object.values(data).map(readoutHTML)].forEach((html) => {
+      probe.innerHTML = html;
+      max = Math.max(max, probe.offsetHeight);
+    });
+    probe.remove();
+    readout.style.setProperty('--readout-h', `${Math.ceil(max)}px`);
+  }
+  lockReadout(true);
+  if (document.fonts) {
+    // web fonts change line wrapping: measure again once they are in
+    document.fonts.ready.then(() => lockReadout(true));
+    document.fonts.addEventListener('loadingdone', () => lockReadout(true));
+  }
+
   function updateReadout(key, roam) {
     if (!readout) return;
     const d = key ? data[key] : null;
@@ -364,6 +393,7 @@
     if (resizeRaf) return;
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = 0;
+      lockReadout();
       if (!measured) return;
       measure();
       const s = spotByKey.get(active);

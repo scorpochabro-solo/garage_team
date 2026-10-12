@@ -24,11 +24,23 @@
       burger.setAttribute('aria-expanded', String(open));
       menu.classList.toggle('is-open', open);
       document.body.classList.toggle('no-scroll', open);
+      document.body.classList.toggle('is-menu-open', open);   // hides the fixed mobile bar: the menu has its own call buttons
     };
     burger.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
     menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
     addEventListener('resize', () => { if (innerWidth > 1100) setOpen(false); }, { passive: true });
+  }
+
+  /* ---------- side index: open next to the content on wide screens, collapsed under it on phones ---------- */
+  const sideIndex = $('[data-side-index]');
+  if (sideIndex) {
+    const wide = matchMedia('(min-width: 1001px)');
+    const sync = () => { sideIndex.open = wide.matches; };
+    sync();
+    if (wide.addEventListener) wide.addEventListener('change', sync); else wide.addListener(sync);
+    // next to the content the list is always shown: its title is a heading there, not a toggle
+    sideIndex.querySelector('summary').addEventListener('click', (e) => { if (wide.matches) e.preventDefault(); });
   }
 
   /* ---------- active nav ---------- */
@@ -72,18 +84,25 @@
     const run = (el) => {
       const end = Number(el.dataset.countup);
       if (G.reducedMotion || !Number.isFinite(end)) { el.textContent = el.dataset.countup; return; }
+      // the markup holds the final number: its width is kept while counting, otherwise a narrow fact card re-wrapped
+      // «360 дн.» on every other frame and the whole first screen jumped (layout shift 0.2–0.6 at 1180–1300 px)
+      el.style.display = 'inline-block';
+      el.style.minWidth = `${el.getBoundingClientRect().width}px`;
       const dur = 1400; const t0 = performance.now();
       const step = (t) => {
         const p = Math.min(1, (t - t0) / dur); const e = 1 - Math.pow(1 - p, 3);
         el.textContent = String(Math.round(end * e));
         if (p < 1) requestAnimationFrame(step);
+        else el.style.minWidth = '';   // the final number has that width anyway; a later resize must not keep it
       };
       requestAnimationFrame(step);
     };
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
     }, { threshold: 0.5 });
-    counters.forEach((el) => io.observe(el));
+    // the width is measured in the real font: start once the web fonts are in (a failed font does not block it)
+    const fontsIn = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    fontsIn.catch(() => {}).then(() => counters.forEach((el) => io.observe(el)));
   }
 
   /* ---------- hero parallax ---------- */
@@ -106,8 +125,10 @@
     if (!dlg) return;
     if (preset) { Object.entries(preset).forEach(([k, v]) => { const f = dlg.querySelector(`[name="${k}"]`); if (f) f.value = v; }); }
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    // with a mouse the cursor goes straight to the first field; on a phone that would throw the keyboard over the form
+    // before it is read, so there the dialog keeps its own focus on the close button and the visitor taps a field
     const first = dlg.querySelector('input:not([type=hidden]):not([disabled]), select, textarea');
-    if (first) setTimeout(() => first.focus(), 60);
+    if (first && G.canHover) setTimeout(() => first.focus(), 60);
   };
   G.closeModal = (dlg) => { if (!dlg) return; if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); };
   document.addEventListener('click', (e) => {
@@ -177,15 +198,18 @@
   G.postForm = async (form) => {
     const body = new FormData(form);
     const action = form.getAttribute('action') || location.pathname;
-    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json, text/html' }, credentials: 'same-origin' });
+    const res = await fetch(action, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' }, credentials: 'same-origin' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const ct = res.headers.get('content-type') || '';
     if (ct.includes('json')) {
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
+      if (!data || typeof data !== 'object') throw new Error('invalid_response');
       if (data && (data.error || data.success === false)) throw new Error(data.error || 'server');
+      const created = data.data || data;
+      if (data.success !== true && !(created && (typeof created.id === 'string' || typeof created.id === 'number'))) throw new Error('invalid_response');
       return data;
     }
-    return {};
+    throw new Error('invalid_response');
   };
 
   /* ---------- copyright year ---------- */

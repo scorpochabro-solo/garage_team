@@ -238,10 +238,6 @@
     {
      "href": "/services/remont-elektrooborudovania-avtomobila/regulirovka-far.html",
      "name": "Регулировка фар"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/ustanovka-ksenona.html",
-     "name": "Установка ксенона"
     }
    ]
   },
@@ -379,56 +375,15 @@
    ]
   },
   {
-   "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "icon": "/data/images/service/service-15.png",
-   "name": "Полная и локальная покраска автомобиля",
-   "subs": [
-    {
-     "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila/pokraska-bampera.html",
-     "name": "Покраска бампера"
-    }
-   ]
-  },
-  {
    "href": "/services/ustanovka-dopolnitelnogo-oborudovania.html",
    "icon": "/data/images/service/service-16.png",
    "name": "Установка дополнительного оборудования",
    "subs": []
   },
   {
-   "href": "/services/polirovka-kuzova-avtomobila.html",
-   "icon": "/data/images/service/service-17.png",
-   "name": "Полировка кузова автомобиля",
-   "subs": []
-  },
-  {
-   "href": "/services/kuzovnoj-remont.html",
-   "icon": "/data/images/service/service-18.png",
-   "name": "Кузовной ремонт",
-   "subs": []
-  },
-  {
-   "href": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-   "icon": "/data/images/service/service-19.png",
-   "name": "Техосмотр авто, диагностическая карта для ОСАГО",
-   "subs": []
-  },
-  {
-   "href": "/services/pokraska-avtomobilej-plasti-dip.html",
-   "icon": "/data/images/service/service-20.png",
-   "name": "Покраска автомобилей PLASTI DIP",
-   "subs": []
-  },
-  {
    "href": "/services/shod-razval-regulirovka-i-diagnostika.html",
    "icon": "/data/images/service/service-21.png",
    "name": "Сход-развал, регулировка и диагностика",
-   "subs": []
-  },
-  {
-   "href": "/services/himcistka-salona.html",
-   "icon": "/data/images/service/service-22.png",
-   "name": "Химчистка салона",
    "subs": []
   },
   {
@@ -450,12 +405,6 @@
    "subs": []
   },
   {
-   "href": "/services/avtozapcasti.html",
-   "icon": "/data/images/service/promo-service-17.png",
-   "name": "Автозапчасти",
-   "subs": []
-  },
-  {
    "href": "/services/planovoe-to.html",
    "icon": "/data/images/service/service-27.png",
    "name": "Плановое ТО",
@@ -469,35 +418,6 @@
   }
  ],
  "services": [
-  {
-   "path": "/services/avtozapcasti.html",
-   "file": "services__avtozapcasti.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Автозапчасти",
-   "category": "Автозапчасти",
-   "category_href": "/services/avtozapcasti.html",
-   "category_name": "Автозапчасти",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
   {
    "path": "/services/cip-tuning.html",
    "file": "services__cip-tuning.html",
@@ -643,18 +563,8 @@
      "Чип-тюнинг"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Программное удаление ошибки по лямбда-зондам",
-     "от 600 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/cip-tuning/udalenie-i-pereprogrammirovanie-sazevyh-filtrov.html",
@@ -730,18 +640,8 @@
      "Чип-тюнинг"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Удаление и перепрограммирование сажевых фильтров",
-     "от 6000 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/cip-tuning/udalenie-katalizatorov-i-adaptacia-raboty-lambda-zondov.html",
@@ -817,18 +717,8 @@
      "Чип-тюнинг"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Удаление катализаторов и адаптация работы лямбда-зондов",
-     "от 2000 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/cip-tuning/udalenieotklucenie-moceviny-adblue.html",
@@ -904,18 +794,8 @@
      "Чип-тюнинг"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Удаление/отключение мочевины Adblue",
-     "от 1600 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/cip-tuning/uvelicenie-mosnosti-motociklov.html",
@@ -991,18 +871,8 @@
      "Чип-тюнинг"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Увеличение мощности мотоциклов",
-     "от 9000 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika.html",
@@ -1083,23 +953,8 @@
      "Услуги"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Диагностика двигателя",
-     "от 500 рублей",
-     "от 500 рублей"
-    ],
-    [
-     "Диагностика АКПП",
-     "от 500 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/diagnostika-akpp.html",
@@ -1190,18 +1045,8 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Диагностика АКПП",
-     "от 600",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/diagnostika-i-zapravka-kondicionera.html",
@@ -1286,18 +1131,8 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Диагностика кондиционера",
-     "от 400 рублей",
-     "от 400 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/diagnostika-podveski.html",
@@ -1382,18 +1217,8 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Диагностика подвески",
-     "300",
-     "200"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/diagnostika-tormoznoj-sistemy.html",
@@ -1478,18 +1303,8 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Диагностика тормозной системы (с помощью компьютера)",
-     "от 500 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/kompleksnaa-diagnostika.html",
@@ -1574,18 +1389,8 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Комплексная диагностика перед покупкой",
-     "1500",
-     "800"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/diagnostika/komputernaa-diagnostika.html",
@@ -1676,45 +1481,6 @@
      "Диагностика"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Компьютерная диагностика",
-     "от 500 рублей",
-     "от 500 рублей"
-    ]
-   ]
-  },
-  {
-   "path": "/services/himcistka-salona.html",
-   "file": "services__himcistka-salona.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Химчистка салона",
-   "category": "Химчистка салона",
-   "category_href": "/services/himcistka-salona.html",
-   "category_name": "Химчистка салона",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
    "price_heads": [],
    "price_rows": []
   },
@@ -1727,35 +1493,6 @@
    "category": "Хранение шин",
    "category_href": "/services/hranenie-sin.html",
    "category_name": "Хранение шин",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/kuzovnoj-remont.html",
-   "file": "services__kuzovnoj-remont.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Кузовной ремонт",
-   "category": "Кузовной ремонт",
-   "category_href": "/services/kuzovnoj-remont.html",
-   "category_name": "Кузовной ремонт",
    "siblings": [],
    "description_html": "",
    "price_html": "",
@@ -1800,136 +1537,6 @@
     [
      "/services.html",
      "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/pokraska-avtomobilej-plasti-dip.html",
-   "file": "services__pokraska-avtomobilej-plasti-dip.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Покраска автомобилей PLASTI DIP",
-   "category": "Покраска автомобилей PLASTI DIP",
-   "category_href": "/services/pokraska-avtomobilej-plasti-dip.html",
-   "category_name": "Покраска автомобилей PLASTI DIP",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/polirovka-kuzova-avtomobila.html",
-   "file": "services__polirovka-kuzova-avtomobila.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Полировка кузова автомобиля",
-   "category": "Полировка кузова автомобиля",
-   "category_href": "/services/polirovka-kuzova-avtomobila.html",
-   "category_name": "Полировка кузова автомобиля",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "file": "services__polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Полная и локальная покраска автомобиля",
-   "category": "Полная и локальная покраска автомобиля",
-   "category_href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "category_name": "Полная и локальная покраска автомобиля",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [
-    {
-     "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila/pokraska-bampera.html",
-     "name": "Покраска бампера"
-    }
-   ],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/polnaa-i-lokalnaa-pokraska-avtomobila/pokraska-bampera.html",
-   "file": "services__polnaa-i-lokalnaa-pokraska-avtomobila__pokraska-bampera.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Покраска бампера",
-   "category": "Полная и локальная покраска автомобиля",
-   "category_href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-   "category_name": "Полная и локальная покраска автомобиля",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [
-    {
-     "href": "/services/polnaa-i-lokalnaa-pokraska-avtomobila/pokraska-bampera.html",
-     "name": "Покраска бампера"
-    }
-   ],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ],
-    [
-     "/services/polnaa-i-lokalnaa-pokraska-avtomobila.html",
-     "Полная и локальная покраска автомобиля"
     ]
    ],
    "price_heads": [],
@@ -2498,18 +2105,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Устранение течи масла",
-     "от 200 рублей",
-     "от 200 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-klapanov.html",
@@ -2612,18 +2209,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена клапанов (С/У ГБЦ)",
-     "от 4500 рублей",
-     "от 3000 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-masla-v-dvigatele.html",
@@ -2726,18 +2313,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена масла в двигателе",
-     "от 400 рублей",
-     "от 400 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-pompy.html",
@@ -2840,18 +2417,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена помпы",
-     "от 900 рублей",
-     "от 600 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-prokladki-gbc.html",
@@ -2954,18 +2521,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена прокладки ГБЦ",
-     "от 600 рублей",
-     "от 300 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-remna-generatora.html",
@@ -3068,18 +2625,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена ремня генератора",
-     "от 500 рублей",
-     "от 300 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-remna-grm.html",
@@ -3204,18 +2751,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена ремня ГРМ",
-     "от 1800 рублей",
-     "от 800 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-dvigatela/zamena-vozdusnogo-filtra-dvs.html",
@@ -3318,18 +2855,8 @@
      "Ремонт двигателя"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "",
-     "от 200 рублей",
-     "от 100 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-elektrooborudovania-avtomobila.html",
@@ -3723,99 +3250,6 @@
      "href": "/services/remont-elektrooborudovania-avtomobila/remont-startera.html",
      "name": "Ремонт стартера",
      "current": true
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-elektroprovodki.html",
-     "name": "Ремонт электропроводки",
-     "current": false
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
-     "name": "Замена фар",
-     "current": false
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/regulirovka-far.html",
-     "name": "Регулировка фар",
-     "current": false
-    }
-   ],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/zamena-lampocek-osvesenia.html",
-     "name": "Замена лампочек освещения"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-generatora.html",
-     "name": "Ремонт генератора"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-startera.html",
-     "name": "Ремонт стартера"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-elektroprovodki.html",
-     "name": "Ремонт электропроводки"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/zamena-far.html",
-     "name": "Замена фар"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/regulirovka-far.html",
-     "name": "Регулировка фар"
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/ustanovka-ksenona.html",
-     "name": "Установка ксенона"
-    }
-   ],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ],
-    [
-     "/services/remont-elektrooborudovania-avtomobila.html",
-     "Ремонт электрооборудования автомобиля"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/remont-elektrooborudovania-avtomobila/ustanovka-ksenona.html",
-   "file": "services__remont-elektrooborudovania-avtomobila__ustanovka-ksenona.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Установка ксенона",
-   "category": "Ремонт электрооборудования автомобиля",
-   "category_href": "/services/remont-elektrooborudovania-avtomobila.html",
-   "category_name": "Ремонт электрооборудования автомобиля",
-   "siblings": [
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/zamena-lampocek-osvesenia.html",
-     "name": "Замена лампочек освещения",
-     "current": false
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-generatora.html",
-     "name": "Ремонт генератора",
-     "current": false
-    },
-    {
-     "href": "/services/remont-elektrooborudovania-avtomobila/remont-startera.html",
-     "name": "Ремонт стартера",
-     "current": false
     },
     {
      "href": "/services/remont-elektrooborudovania-avtomobila/remont-elektroprovodki.html",
@@ -4306,23 +3740,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена переднего амортизатора",
-     "700",
-     "400"
-    ],
-    [
-     "Замена заднего амортизатора",
-     "500",
-     "500"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-opornogo-podsipnika.html",
@@ -4443,18 +3862,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена опорного подшипника (С/У амортизатора)",
-     "от 900 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-podsipnika-stupicy.html",
@@ -4575,18 +3984,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена подшипника ступицы",
-     "от 900 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-rulevogo-nakonecnika.html",
@@ -4707,18 +4106,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена рулевого наконечника",
-     "от 300 рублей",
-     "от 200 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-rulevoj-rejki.html",
@@ -4839,18 +4228,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена рулевой рейки",
-     "от 1200 рублей",
-     "от 700 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-rulevoj-tagi.html",
@@ -4971,18 +4350,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена рулевой тяги",
-     "от 500 рублей",
-     "от 400 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-rycagov-podveski.html",
@@ -5103,18 +4472,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "С/У рычага подвески",
-     "от 500 рублей",
-     "от 200 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-sajlentblokov.html",
@@ -5173,7 +4532,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замена сайленблока</td><td><strong>300</strong></td><td><strong>200</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замена сайлентблока</td><td><strong>300</strong></td><td><strong>200</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -5235,18 +4594,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена сайленблока",
-     "300",
-     "200"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-sarovoj-opory.html",
@@ -5305,7 +4654,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Выпресовка шаровой опоры (рычаг снят)</td><td><strong>350</strong></td><td><strong>200</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Выпрессовка шаровой опоры (рычаг снят)</td><td><strong>350</strong></td><td><strong>200</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -5367,18 +4716,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Выпресовка шаровой опоры (рычаг снят)",
-     "350",
-     "200"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-hodovoj/zamena-srusa.html",
@@ -5499,18 +4838,8 @@
      "Ремонт ходовой"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена шруса (С/У привода)",
-     "от 1000",
-     "от 600 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-i-promyvka-sistem-ohlazdenia.html",
@@ -6295,18 +5624,8 @@
      "Ремонт, промывка инжекторов и моновпрысков"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Чистка топливных форсунок (без снятия) на ДВС до 2.0 литров",
-     "от 1800 рублей",
-     "от 1500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-forsunok.html",
@@ -6373,23 +5692,8 @@
      "Ремонт, промывка инжекторов и моновпрысков"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена топливных форсунок (комплект 4 шт.)",
-     "от 900 рублей",
-     "от 500 рублей"
-    ],
-    [
-     "Замена топливных форсунок, дизель (комплект 4 шт.)",
-     "от 1200 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamena-svecej.html",
@@ -6456,18 +5760,8 @@
      "Ремонт, промывка инжекторов и моновпрысков"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена свечей зажигания (4 шт.)",
-     "от 500 рублей",
-     "от 400 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-promyvka-inzektorov-i-monovpryskov/zamer-davlenia-masla.html",
@@ -6496,7 +5790,7 @@
     }
    ],
    "description_html": "",
-   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замер давления масла ДВС монометром</td><td><strong>от 500 рублей</strong></td><td><strong>от 400 рублей</strong></td></tr></table>",
+   "price_html": "<table class=\"w100\"><tr><th>Ремонт</th><th>Иномарки</th><th>ВАЗ</th></tr><tr><td>Замер давления масла ДВС манометром</td><td><strong>от 500 рублей</strong></td><td><strong>от 400 рублей</strong></td></tr></table>",
    "gallery": [],
    "article_html": "",
    "other_services": [
@@ -6534,18 +5828,8 @@
      "Ремонт, промывка инжекторов и моновпрысков"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замер давления масла ДВС монометром",
-     "от 500 рублей",
-     "от 400 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-tnvd.html",
@@ -7010,18 +6294,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Профилактика тормозов (1 ось)",
-     "от 600 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/remont-pereborka-tormoznyh-supportov.html",
@@ -7115,18 +6389,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Ремонт (переборка) тормозных суппортов",
-     "от 700 рублей",
-     "от 500 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-kolodok-rucnika.html",
@@ -7220,18 +6484,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена колодок ручника",
-     "от 1200 рублей",
-     ""
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-kolodok.html",
@@ -7325,23 +6579,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена колодок (дисковый тормоз)",
-     "от 500 рублей",
-     "от 500 рублей"
-    ],
-    [
-     "Замена колодок (барабанный тормоз)",
-     "от 1000 рублей",
-     "от 700 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-tormoznyh-diskov.html",
@@ -7435,18 +6674,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена тормозных дисков (с тормозными колодками)",
-     "от 1000 рублей",
-     "от 800 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-tormoznyh-supportov-cilindrov.html",
@@ -7540,18 +6769,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена тормозных суппортов (с прокачкой)",
-     "от 1000 рублей",
-     "от 700 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/remont-zamena-regulirovka-prokacka-tormozov/zamena-trosa-rucnika.html",
@@ -7645,18 +6864,8 @@
      "Ремонт, замена, регулировка, прокачка тормозов"
     ]
    ],
-   "price_heads": [
-    "Ремонт",
-    "Иномарки",
-    "ВАЗ"
-   ],
-   "price_rows": [
-    [
-     "Замена троса ручника",
-     "от 600 рублей",
-     "от 800 рублей"
-    ]
-   ]
+   "price_heads": [],
+   "price_rows": []
   },
   {
    "path": "/services/shod-razval-regulirovka-i-diagnostika.html",
@@ -7696,35 +6905,6 @@
    "category": "Шиномонтаж",
    "category_href": "/services/sinomontaz.html",
    "category_name": "Шиномонтаж",
-   "siblings": [],
-   "description_html": "",
-   "price_html": "",
-   "gallery": [],
-   "article_html": "",
-   "other_services": [],
-   "headings": [],
-   "breadcrumbs": [
-    [
-     "/",
-     "Главная"
-    ],
-    [
-     "/services.html",
-     "Услуги"
-    ]
-   ],
-   "price_heads": [],
-   "price_rows": []
-  },
-  {
-   "path": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-   "file": "services__tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-   "title": "Запчасти для иномарок | Автозапчасти в Нижнем Новгороде | Подбор запчастей | Гараж",
-   "meta_description": "Автозапчасти в Нижнем Новгороде: отзывы клиентов, новости магазина Гараж",
-   "h1": "Техосмотр авто, диагностическая карта для ОСАГО",
-   "category": "Техосмотр авто, диагностическая карта для ОСАГО",
-   "category_href": "/services/tehosmotr-avto-diagnosticeskaa-karta-dla-osago.html",
-   "category_name": "Техосмотр авто, диагностическая карта для ОСАГО",
    "siblings": [],
    "description_html": "",
    "price_html": "",
