@@ -2893,7 +2893,7 @@
     kick: $('[data-pg-kick]'), chip: $('[data-pg-chip]'), chipText: $('[data-pg-chip-text]'), why: $('[data-pg-why]'),
     note: $('[data-pg-note]'), book: $('[data-pg-book]'), plot: $('[data-pg-plot]'), list: $('[data-pg-days]'),
     msg: $('[data-pg-msg]'), msgText: $('[data-pg-msg-text]'), retry: $('[data-pg-retry]'), updated: $('[data-pg-updated]'),
-    live: $('[data-pg-live]'), snow: $('.pogoda-key--snow svg'),
+    live: $('[data-pg-live]'), snow: $('.pogoda-key--snow svg'), source: $('[data-pg-source]'),
   };
   if (Object.keys(el).some((k) => !el[k])) { root.dataset.pgError = 'markup'; return; }
 
@@ -3056,6 +3056,7 @@
     el.face.hidden = true;
     el.list.hidden = true;
     el.list.textContent = '';
+    el.source.hidden = true;
     el.updated.textContent = '';
     el.msgText.textContent = reason === 'offline' ? T['msg-offline'] : T['msg-error'];
     el.msg.hidden = false;
@@ -3099,6 +3100,7 @@
       ? fill(T['updated-stale'], { when: `${dateText(fetched.date, cfg)}, ${fetched.time}` })
       : fill(T.updated, { time: fetched.time });
     drawDays(days, t, v);
+    el.source.hidden = false;
     shownAt = entry.t;
     shownDay = today;
     announce(words.live);
