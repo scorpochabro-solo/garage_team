@@ -107,6 +107,7 @@ class MarkupTest(unittest.TestCase):
             P.pogoda_section()
 
     def test_attribution_and_the_hedge(self):
+        self.assertIn('data-pg-source hidden', self.html)
         self.assertIn(f'<a href="{P.SOURCE[1]}" target="_blank" rel="noopener">Open-Meteo.com</a>', self.html)
         self.assertIn(f'<a href="{P.LICENCE[1]}" target="_blank" rel="noopener">CC BY 4.0</a>', self.html)
         self.assertIn("прогноз может меняться", self.text)
