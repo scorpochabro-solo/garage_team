@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-26",
+  "tool": "image_gen",
+  "target": "assets/copper.png",
+  "reference": "https://www.alpina-classic.shop/teile/alpina-raddeckel-ii-komplett-mit-anbauteilen",
+  "source": "/Users/scorpocha/.codex/generated_images/01a0f71c-f48f-73a1-af09-d868693e1026/exec-5b7bf2c6-7450-485d-a4bf-bdd8e9f1b78e.png",
+  "prompt": "Use case: precise-object-edit. Image 1 is the edit target, the existing automotive website hero. Image 2 is a reference photograph of the genuine classic ALPINA wheel centre emblem from the official parts shop. Edit ONLY the small emblem in the centre of the foreground wheel in image 1 (approximately x=493,y=682 in the 1672x941 target). Replace the malformed blurry crest with an optically sharp, accurately reproduced classic ALPINA roundel matching image 2: black circular ring, clean white ALPINA lettering across the upper arc, thin silver outlines, inner shield split red on the left and blue on the right, precise white twin intake/throttle body device on red and delicate white crankshaft on blue. Copy the genuine emblem's shapes and lettering carefully. Adapt its perspective to the existing wheel centre and integrate warm realistic metal/enamel reflections. Keep the emblem at the SAME physical size and centre location. Do not copy the large silver reference cap, replace only the badge face. Preserve the wheel geometry, spokes, hub, tire, paint, headlamp, gold pinstripes, brick wall, pendant, lighting, framing, negative space and every other part of image 1. High resolution landscape ideally 3072x1728 so the small emblem remains crisp. No other text, no watermark, no composition changes. Final image must be the full original hero scene with corrected wheel emblem, not a close-up."
+}
