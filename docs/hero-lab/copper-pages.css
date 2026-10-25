@@ -1,0 +1,130 @@
+/* 21–23: the wheel hero continues in warm metal, brick and mint light. */
+.copper-page { --paper:#100e0b; --ink:#f3eadb; --muted:#c8bbaa; --green:#e9cead; --line:#e9cead29; }
+.copper-page .page-section .cta { background:#e9cead; color:#25180d; }
+.copper-page .page-section .cta:hover { background:#ffe3be; }
+.copper-page .page-section .cta>span { color:#25180d; }
+.copper-brick { background:linear-gradient(#170f09b3,#110d09d9),url('assets/close-brick.jpg') center/cover no-repeat; }
+.copper-page .section-kicker { color:#e9cead; }
+.copper-page .service-lines>a:hover,.copper-page .text-link:hover { color:#b2f2d2; }
+.copper-page .guarantee-copy h2 { color:#e9cead; }
+.copper-page .visit-copy h2 { font-size:clamp(50px,5.5vw,92px); }
+
+/* 21: full-width engine, a recessed optical panel, then the cabin. */
+.copper-panorama-services .section-content { position:absolute; top:17%; left:var(--gutter); width:51%; }
+.copper-panorama-services .section-kicker { margin-bottom:40px; }
+.copper-panorama-services .text-link { margin-top:38px; }
+.copper-panorama-services .scene-shade { background:linear-gradient(90deg,#100d09ec,#100d0990 43%,transparent 80%); }
+.copper-panorama-services .fragment img { object-position:65%; }
+.copper-panel { display:grid; grid-template-columns:44% minmax(0,1fr); align-items:center; min-height:900px; padding:90px var(--gutter); gap:3vw; }
+.copper-panel>.fragment { height:680px; box-shadow:0 25px 70px #0008; outline:1px solid #e9cead35; outline-offset:10px; }
+.copper-panel .fragment img { object-position:73%; }
+.copper-panel h2 strong { font-size:clamp(210px,26vw,400px); }
+.copper-panorama-visit .visit-copy { position:absolute; top:15%; left:61%; right:var(--gutter); }
+.copper-panorama-visit .scene-shade { background:linear-gradient(90deg,transparent 20%,#100e0b66 50%,#100e0bef 78%); }
+.copper-panorama-visit .fragment img { object-position:36%; }
+
+/* 22: deliberate offset between service labels and the selected close-up. */
+.copper-sequence-services { display:grid; grid-template-columns:40% 60%; padding:90px var(--gutter) 100px; align-items:center; }
+.copper-sequence-services>h2 { grid-column:1; font-size:clamp(70px,8vw,140px); align-self:start; }
+.copper-selector { grid-column:1; grid-row:2; padding-right:5vw; }
+.copper-sequence-services .chapter-detail { grid-column:2; grid-row:1/3; padding-top:90px; }
+.copper-sequence-services .chapter-detail .fragment { height:560px; clip-path:polygon(10% 0,100% 0,100% 100%,0 100%,0 12%); }
+.copper-sequence-services .service-choice { color:#a99c8c; font-size:clamp(27px,3vw,48px); }
+.copper-sequence-services .service-choice[aria-pressed=true] { color:#e9cead; }
+.copper-sequence-services .service-choice:hover { color:#f3eadb; }
+.copper-sequence-guarantee .fragment img { object-position:20%; }
+.copper-sequence-guarantee .scene-shade { background:linear-gradient(90deg,transparent 25%,#100e0b88 56%,#100e0bf0 85%); }
+.copper-sequence-guarantee .guarantee-copy { position:absolute; top:13%; left:63%; right:var(--gutter); }
+.copper-sequence-guarantee h2 strong { font-size:clamp(200px,23vw,330px); }
+.copper-sequence-visit { display:grid; grid-template-columns:40% 60%; min-height:900px; padding:100px var(--gutter); align-items:center; }
+.copper-visit-picture { padding:80px 4vw 0 0; }
+.copper-visit-picture .fragment { height:630px; }
+.copper-visit-picture img { object-position:30%; }
+.copper-sequence-visit .visit-copy { padding:60px 0 0 6vw; }
+.copper-sequence-visit .section-neon { left:48%; top:70px; width:190px; }
+
+/* 23: three material studies at different heights on one masonry wall. */
+.copper-collection-services { padding:95px var(--gutter) 110px; }
+.collection-cards { display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:28px; align-items:start; }
+.collection-card { min-width:0; }
+.collection-card>.fragment { height:540px; box-shadow:0 20px 40px #0007; }
+.collection-card:nth-child(2) { margin-top:110px; }
+.collection-card:nth-child(2)>.fragment { height:340px; }
+.collection-card:nth-child(2) img { object-position:80%; }
+.collection-card:nth-child(3) { margin-top:45px; }
+.collection-card:nth-child(3)>.fragment { height:450px; }
+.collection-card:nth-child(3) img { object-position:75%; }
+.collection-card>span { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:25px 0 16px; border-bottom:1px solid var(--line); font-size:clamp(21px,2.6vw,42px); letter-spacing:-.045em; }
+.collection-card svg { width:26px; height:26px; flex:none; }
+.collection-card:hover { color:#b2f2d2; }
+.copper-collection-guarantee .fragment img { object-position:75%; }
+.copper-collection-guarantee .scene-shade { background:linear-gradient(90deg,#100e0be8,#100e0b99 35%,transparent 75%); }
+.copper-collection-guarantee .guarantee-copy { position:absolute; left:var(--gutter); top:14%; }
+.copper-collection-visit { display:grid; grid-template-columns:52% 48%; min-height:900px; }
+.collection-address { padding:70px var(--gutter); display:flex; flex-direction:column; justify-content:space-between; gap:70px; }
+.collection-address .section-neon { position:relative; width:230px; }
+.copper-collection-visit>.fragment { margin:60px 0; }
+.copper-collection-visit>.fragment img { object-position:25%; }
+
+@media(min-width:701px) and (max-width:1100px) {
+  .copper-panel { grid-template-columns:46% 54%; gap:0; padding-block:70px; min-height:780px; }
+  .copper-panel>.fragment { height:590px; }
+  .copper-panel .parts-note { font-size:13px; }
+  .copper-panorama-visit .visit-copy { left:51%; }
+  .copper-page .visit-copy h2 { font-size:54px; }
+  .copper-sequence-services { grid-template-columns:43% 57%; }
+  .copper-sequence-services .chapter-detail .fragment { height:450px; }
+  .copper-sequence-guarantee .guarantee-copy { left:57%; }
+  .copper-sequence-visit .visit-copy { padding-left:4vw; }
+  .collection-cards { gap:20px; }
+  .collection-card>span { font-size:23px; }
+  .collection-card svg { width:18px; }
+  .copper-collection-visit { grid-template-columns:58% 42%; }
+}
+@media(max-width:700px) {
+  .copper-panorama-services .section-content { top:auto; bottom:65px; width:auto; right:var(--gutter); }
+  .copper-panorama-services .scene-shade { background:linear-gradient(0deg,#100e0bfa 5%,#100e0bc0 40%,transparent 90%); }
+  .copper-panorama-services .fragment img { object-position:67%; }
+  .copper-panel { display:flex; flex-direction:column-reverse; padding:45px var(--gutter) 65px; gap:45px; }
+  .copper-panel>.fragment { width:100%; height:380px; outline-offset:6px; }
+  .copper-panel .guarantee-copy { align-self:flex-start; }
+  .copper-panel h2 strong { font-size:200px; }
+  .copper-page .parts-note { margin-top:35px; }
+  .copper-panorama-visit { height:930px; }
+  .copper-panorama-visit .visit-copy { top:auto; left:var(--gutter); bottom:50px; }
+  .copper-panorama-visit .scene-shade { background:linear-gradient(0deg,#100e0b 0%,#100e0be8 40%,transparent 85%); }
+  .copper-panorama-visit .fragment img { object-position:26%; }
+  .copper-page .visit-copy h2 { font-size:clamp(48px,12vw,70px); }
+  .copper-sequence-services { display:flex; flex-direction:column; align-items:stretch; padding:65px var(--gutter); }
+  .copper-sequence-services>h2 { font-size:60px; }
+  .copper-selector { padding:25px 0 35px; }
+  .copper-sequence-services .service-choice { font-size:31px; padding-block:15px; }
+  .copper-sequence-services .chapter-detail { padding:0; }
+  .copper-sequence-services .chapter-detail .fragment { height:330px; }
+  .copper-sequence-services .chapter-caption { align-items:start; flex-direction:column; gap:6px; }
+  .copper-sequence-guarantee { height:860px; }
+  .copper-sequence-guarantee .fragment img { object-position:22%; }
+  .copper-sequence-guarantee .scene-shade { background:linear-gradient(0deg,#100e0bfc,#100e0bd9 43%,transparent 88%); }
+  .copper-sequence-guarantee .guarantee-copy { top:auto; bottom:55px; left:var(--gutter); }
+  .copper-sequence-guarantee h2 strong { font-size:200px; }
+  .copper-sequence-visit { display:flex; flex-direction:column; align-items:stretch; padding:55px var(--gutter) 65px; }
+  .copper-sequence-visit .section-neon { position:relative; top:auto; left:auto; order:-1; width:180px; margin-bottom:40px; }
+  .copper-visit-picture { padding:0; }
+  .copper-visit-picture .fragment { height:360px; }
+  .copper-sequence-visit .visit-copy { padding:45px 0 0; }
+  .copper-collection-services { padding:65px var(--gutter); }
+  .collection-cards { display:flex; flex-direction:column; gap:45px; }
+  .collection-card { width:100%; }
+  .collection-card:nth-child(n) { margin-top:0; }
+  .collection-card:nth-child(n)>.fragment { height:360px; }
+  .collection-card:nth-child(2) { width:86%; align-self:flex-end; }
+  .collection-card>span { font-size:30px; padding-top:20px; }
+  .copper-collection-guarantee { height:840px; }
+  .copper-collection-guarantee .fragment img { object-position:70%; }
+  .copper-collection-guarantee .scene-shade { background:linear-gradient(0deg,#100e0bfa,#100e0bc9 42%,transparent 85%); }
+  .copper-collection-guarantee .guarantee-copy { top:auto; bottom:55px; }
+  .copper-collection-visit { display:flex; flex-direction:column-reverse; }
+  .copper-collection-visit>.fragment { height:380px; margin:0; }
+  .collection-address { padding:50px var(--gutter) 65px; gap:45px; }
+  .collection-address .section-neon { width:190px; }
+}
