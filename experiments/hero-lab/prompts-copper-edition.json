@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-26",
+  "tool": "image_gen",
+  "assets": [
+    {
+      "key": "copper-optic",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium automotive website editorial background, landscape 1536x1024. Extremely realistic professional automotive macro photography, actual physical materials, natural optical imperfections, rich deep forest green metallic Alpina B3 Touring paint, copper amber overhead workshop light with restrained mint neon reflection, authentic dark russet brick workshop backdrop. Luxury boutique car service mood. No people, no typography, no watermark, no graphic interface, no fake technical overlays. Deep photographic shadows and dimensionality, not a videogame or plastic CGI render. Subject: extreme close crop of front headlamp, hood edge and green fender, filling right 70% of frame. Lamp is a believable modern optical assembly with precise lenses, soft white LED signature. Golden light grazing green paint, a thin mint reflected line. LEFT 30% deep dark warm brick wall, unobtrusive negative space. Lens 85mm, low eye level, crisp photographic focus on lamp, distant brick gently soft. Car extends out of right and bottom frame.",
+      "source": "/Users/scorpocha/.codex/generated_images/01a0f71c-f48f-73a1-af09-d868693e1026/exec-ccc6b142-230b-4009-801b-986abaa8b3e1.png"
+    },
+    {
+      "key": "copper-engine",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium automotive website editorial background, landscape 1536x1024. Extremely realistic professional automotive macro photography, actual physical materials, natural optical imperfections, rich deep forest green metallic Alpina B3 Touring paint, copper amber overhead workshop light with restrained mint neon reflection, authentic dark russet brick workshop backdrop. Luxury boutique car service mood. No people, no typography, no watermark, no graphic interface, no fake technical overlays. Deep photographic shadows and dimensionality, not a videogame or plastic CGI render. Subject: very close elevated oblique view into open hood of a performance six-cylinder engine, tactile black ribs, machined aluminum fasteners, realistic hoses, green fender edge sweeping diagonally across foreground. Engine fills right two thirds. Left third falls into dark warm shadow, subtle brick only at top background. Highly detailed plausible engine architecture, no invented prominent emblems or words. Photographic 50mm lens, restrained highlights, no smoke.",
+      "source": "/Users/scorpocha/.codex/generated_images/01a0f71c-f48f-73a1-af09-d868693e1026/exec-28081656-e9c0-441d-933c-6b6e3db8f8df.png"
+    },
+    {
+      "key": "copper-cabin",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium automotive website editorial background, landscape 1536x1024. Extremely realistic professional automotive macro photography, actual physical materials, natural optical imperfections, rich deep forest green metallic Alpina B3 Touring paint, copper amber overhead workshop light with restrained mint neon reflection, authentic dark russet brick workshop backdrop. Luxury boutique car service mood. No people, no typography, no watermark, no graphic interface, no fake technical overlays. Deep photographic shadows and dimensionality, not a videogame or plastic CGI render. Subject: very close view through open driver window of a dark green Alpina Touring, supple cognac leather front seat and steering wheel, black dashboard, fine stitching and brushed metal. Green door and mirror foreground LEFT side, physical brick reflected in glossy paint. Cabin fills left 65%, RIGHT 35% soft dark russet brick wall and warm light, intentional negative space. Camera outside car at window height, 85mm editorial lens. Natural interior perspective, beautiful rich subtle amber lighting, elegant mint reflection.",
+      "source": "/Users/scorpocha/.codex/generated_images/01a0f71c-f48f-73a1-af09-d868693e1026/exec-bee87335-a438-4669-b139-f4f9ae3e81ee.png"
+    }
+  ]
+}
