@@ -1,0 +1,27 @@
+[
+  {
+    "key": "precision",
+    "transparent_background": true,
+    "prompt": "Use case: ads-marketing. Generate one premium automotive campaign asset, a photorealistic full car cutout with real transparent background. Subject: a BMW Alpina B3 G20 sports sedan, metallic dark graphite silver body, unmistakable fine many-spoke classic Alpina silver wheels, elegant proportions, restrained thin Alpina side stripes, no huge grille, no tuning exaggerations. Entire car visible, nose pointing left, low front three-quarter camera angle, exquisitely sculptural studio highlights, monochrome polished metal with realistic black glass. Wide horizontal 3:2 composition, car occupies 88 percent of width, plenty of transparent space above. Art direction: brutalist Swiss industrial design meets luxury car campaign, high microcontrast, clean materials. Wheels not cropped, geometrically coherent wheel circles, realistic headlights. No scenery, no background, no text, no slogans, no ground plane, no opaque shadow. This will be layered over huge black typography on a warm white website."
+  },
+  {
+    "key": "afterhours",
+    "transparent_background": false,
+    "prompt": "Use case: ads-marketing. Photorealistic cinematic luxury automotive campaign photograph, panoramic landscape 16:9. A deep emerald green BMW Alpina B3 G20 sedan, fine silver multi-spoke Alpina wheels, headlights softly lit, low front three-quarter view nose pointing toward left foreground, full car in RIGHT TWO THIRDS of composition. A vast nearly black studio, one architectural horizontal white light slit far behind at roof level, damp charcoal concrete floor subtly reflecting the car, restrained green atmospheric haze, tactile film grain and extraordinary lighting separation. LEFT THIRD deliberately empty black negative space for white Russian web headline. A thin pool of white light from above sculpts hood, everything moody and sophisticated, absolutely no busy neon cyberpunk. Car occupies lower middle of image, entire silhouette visible, landscape editorial shot. No text, no graphics, no people, no watermark, no readable licence plate, no brand advertising captions. Realistic restrained car proportions."
+  },
+  {
+    "key": "engineering",
+    "transparent_background": true,
+    "prompt": "Use case: product-mockup. Premium automotive engineering editorial asset on real transparent background: exactly one complete BMW Alpina B3 G20 sedan in brushed pearl silver, perfect orthographic SIDE PROFILE facing RIGHT. Both Alpina classic many-spoke wheels exactly circular and beautifully defined, restrained green and silver Alpina coachline, black glass, finely rendered mechanical precision. Whole car from front bumper to rear bumper fully inside canvas. Horizontal wide composition roughly 3:2 with car filling 90 percent of width and large transparent area above. Neutral diffuse studio illumination with cool silver highlights, hyperreal product photography not cartoon. No perspective distortion, no background scene, no grid, no text, no labels, no props, no ground or platform, no opaque ground shadow. This is a cutout to float on a pale blue-gray technical website."
+  },
+  {
+    "key": "motion",
+    "transparent_background": false,
+    "prompt": "Use case: ads-marketing. Create a premium editorial automotive photograph in panoramic landscape 16:9, strongly inspired by high fashion kinetic photography. A metallic charcoal BMW Alpina B3 sports sedan speeding toward the right, rear three-quarter view, placed in the RIGHT HALF with an elegant long vivid red-orange tail-light exposure trailing to the LEFT across a quiet cool pale gray studio background. Recognizable sculpted sedan silhouette, exquisite chrome multi-spoke wheels and curved rear window, motion blur in environment and car edges but car rear sharp enough to recognize. Low rear camera. Refined sense of speed, no people, no road signage. Composition: the left upper third is clean light gray negative space for dark typography, lower edge also quiet. The car body near center-right occupies about half image width. White and gray fashion-art editorial look, orange red tail light only saturated color. No text, no graphic letters, no watermarks, no decorative UI."
+  },
+  {
+    "key": "atelier",
+    "transparent_background": true,
+    "prompt": "Use case: ads-marketing. One photorealistic luxury automobile CUTOUT on a genuinely transparent background. A very deep British racing green BMW Alpina B3 G20 sedan in a dramatic low FRONT THREE QUARTER angle with its nose pointed RIGHT, full car filling canvas horizontally, all wheels and bumpers visible. Fine classic Alpina many-spoke bright silver wheels, restrained gold pinstripe along body, detailed black glass, small BMW kidney grille, elegant understated German performance car. Cinematic warm overhead softbox highlights down hood and roof, cool subtle rim light along body; beautiful dimensionality and glossy deep green paint. This car will float in a layered warm brick and dark green architectural web composition, so the car should be cleanly cut out, with nothing behind or under it. No scenery, no floor, no plate text, no headings, no watermarks. Wide horizontal 3:2 canvas, photoreal precision, not illustration."
+  }
+]
