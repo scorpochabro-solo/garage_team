@@ -204,9 +204,9 @@ def main():
             continue
         if source.suffix == '.png':
             target = OUT / 'assets' / source.with_suffix('.webp').name
-            if not target.exists() or source.stat().st_mtime > target.stat().st_mtime:
-                with Image.open(source) as image:
-                    image.save(target, 'WEBP', quality=90, method=6)
+            # A fresh Git checkout can make an old WebP newer than its edited PNG.
+            with Image.open(source) as image:
+                image.save(target, 'WEBP', quality=90, method=6)
         else:
             shutil.copy(source, OUT / 'assets' / source.name)
     shutil.copy(ROOT / 'src/assets/logo/logo.svg', OUT / 'assets/logo.svg')
