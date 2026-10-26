@@ -105,7 +105,7 @@
 .svet-neon__lit { opacity: 0; }
 .hero--svet.is-dark .svet-neon__lit { opacity: 1; animation: svet-neon 1.5s 0.25s linear backwards; }
 
-/* the eyebrow sits on lit brick: a small dark plate keeps the mono type crisp */
+/* the eyebrow sits on lit brick: a small dark plate keeps the text readable */
 .hero--svet .hero__copy > .eyebrow { padding: 0.5em 0.75em; margin-left: -0.75em; background: rgba(8, 7, 6, 0.78); }
 
 /* the aside cards: opaque instead of a backdrop blur, which would be recomputed under every swinging light cone */
