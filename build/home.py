@@ -41,7 +41,7 @@ def hero():
   </div>
   <div class="wrap hero__in">
     <div class="hero__copy">
-      <p class="eyebrow">{esc(HERO_EYEBROW)}</p>
+      <p class="eyebrow hero__eyebrow">{esc(HERO_EYEBROW)}</p>
       <h1 class="h-giant hero__title" id="hero-title">{title}</h1>
       <p class="lead hero__sub">{esc(HERO_SUB)}</p>
       <div class="hero__actions">
