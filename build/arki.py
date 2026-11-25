@@ -99,6 +99,7 @@ def inside_section(lamp=""):
     <div class="inside__row" data-arcade>
       {arches}
     </div>
+    <p class="inside__tour"><a class="btn btn--ghost" href="/tour/">Осмотреть офис в 360°</a></p>
   </div>
 </section>"""
 

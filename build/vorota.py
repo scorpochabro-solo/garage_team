@@ -2,9 +2,7 @@
 """«Ворота»: the contacts scene of the homepage.
 
 The real facade at dusk: the sign over the gate lights up, the roller shutter in the black portal rolls up as the page
-scrolls, the camera walks through the gate into the workshop. Two framings of the same place: the wide photo for
-desktops, tablets and phones in landscape, the tall one for phones held upright (<picture> + the same media query
-in vorota.css).
+scrolls, the camera walks through the gate into the workshop. Three framings of the November facade shoot share breakpoints with vorota.css.
 
 Everything drawn over a photo (shutter, dusk, sign light) is positioned from the pixel coordinates below, measured on
 the original JPEGs, and rendered in % of a box that has the photo's own aspect ratio — so it stays glued to the gate
@@ -17,19 +15,22 @@ esc = D.esc
 
 TALL_MEDIA = "(max-width: 700px) and (orientation: portrait)"  # same query as the tall framing in vorota.css
 
-# Pixel coordinates on the original photos (src/assets/img/real/*.jpg).
-# opening — the gate opening right under the roller housing (TL, TR, BR, BL; the right jamb leans a little);
-# sign — the «GARAGE TEAM · car service» board, its left edge follows the rounded «G».
+# Coordinates measured on proportionally scaled crops of the three camera frames.
 GATE_ART = {
     "wide": {
-        "photo": "facade-wide", "size": (2400, 1800), "widths": (800, 1600),
-        "opening": [(1352, 968), (2090, 968), (2110, 1562), (1352, 1548)],
-        "sign": [(1440, 822), (1440, 765), (1442, 735), (1446, 710), (1452, 690), (1462, 677), (1947, 628), (1928, 778)],
+        "photo": "arrival-wide", "size": (678, 381), "widths": (800, 1600),
+        "opening": [(399, 156), (570, 160), (577, 321), (396, 326)],
+        "sign": [(430, 144), (432, 118), (436, 108), (548, 110), (546, 146)],
+    },
+    "tablet": {
+        "photo": "arrival-tablet", "size": (508, 381), "widths": (800, 1600),
+        "opening": [(271, 159), (441, 163), (450, 322), (268, 328)],
+        "sign": [(303, 144), (306, 117), (310, 108), (425, 111), (421, 147)],
     },
     "tall": {
-        "photo": "facade-sky", "size": (1800, 2400), "widths": (800, 1200),
-        "opening": [(825, 1598), (1548, 1598), (1570, 2255), (825, 2245)],
-        "sign": [(919, 1452), (919, 1390), (920, 1370), (922, 1350), (926, 1330), (932, 1312), (940, 1304), (1390, 1275), (1381, 1426)],
+        "photo": "arrival-tall", "size": (286, 381), "widths": (800, 1200),
+        "opening": [(92, 186), (265, 190), (273, 351), (86, 359)],
+        "sign": [(124, 171), (126, 147), (131, 136), (242, 140), (238, 175)],
     },
 }
 PHOTO_ALT = ("Фасад автосервиса «Гараж»: старое здание из красного кирпича, ворота в чёрном портале "
@@ -97,16 +98,18 @@ def _srcset(name, widths):
 def gate_scene(route, hours=None):
     """route: href of «Схема проезда», already escaped; hours: markup of the line under the address
     (home.py passes the live status of «Открыто сейчас»), the plain hours by default."""
-    wide, tall = GATE_ART["wide"], GATE_ART["tall"]
+    wide, tablet, tall = (GATE_ART[key] for key in ("wide", "tablet", "tall"))
     hours = hours or '<span class="mono">Пн–Пт 9–19 · Сб 9–17</span>'
     return f"""<div class="gate" data-gate>
     <div class="gate__stage">
       <div class="gate__world">
         <picture>
           <source media="{TALL_MEDIA}" srcset="{_srcset(tall['photo'], tall['widths'])}" sizes="140vw" width="{tall['widths'][1]}" height="{tall['widths'][1] * 4 // 3}">
-          <img class="gate__photo" src="/assets/img/real/{wide['photo']}.webp" srcset="{_srcset(wide['photo'], wide['widths'])}" sizes="(orientation: portrait) 170vw, 100vw" width="1600" height="1200" alt="{esc(PHOTO_ALT)}" loading="lazy" decoding="async">
+          <source media="(max-width: 1050px)" srcset="{_srcset(tablet['photo'], tablet['widths'])}" sizes="(orientation: portrait) 170vw, 100vw" width="1600" height="1200">
+          <img class="gate__photo" src="/assets/img/real/{wide['photo']}.webp" srcset="{_srcset(wide['photo'], wide['widths'])}" sizes="(orientation: portrait) 170vw, 100vw" width="1600" height="900" alt="{esc(PHOTO_ALT)}" loading="lazy" decoding="async">
         </picture>
         {_art("wide")}
+        {_art("tablet")}
         {_art("tall")}
       </div>
       <div class="gate__inside">

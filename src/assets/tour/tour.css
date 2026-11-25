@@ -1,0 +1,10 @@
+.office-tour { padding-block: clamp(2rem, 4vw, 4rem); }
+.office-tour h1 { margin-block: .45em .6em; }
+#office-panorama { height: clamp(300px, 62svh, 760px); background: #191c1a; overflow: hidden; }
+#office-panorama:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.tour-still { width: 100%; height: 100%; object-fit: cover; }
+.tour-scenes { display: flex; gap: .65rem; flex-wrap: wrap; margin-top: 1rem; }
+.tour-scenes [aria-current="true"] { background: var(--green); color: white; }
+.tour-hint { margin-top: .7rem; color: var(--text-2); }
+#office-panorama .pnlm-hotspot { width: 44px; height: 44px; border: 2px solid white; border-radius: 50%; background: #17442e; }
+#office-panorama .pnlm-hotspot::before { content: '↑'; color: white; display: grid; height: 100%; place-items: center; font: bold 24px/1 sans-serif; }
