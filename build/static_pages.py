@@ -316,6 +316,34 @@ def render_otzyvy():
     return document(title, desc, "/otzyvy.html", body, body_class="page-reviews")
 
 
+def render_review_invite():
+    maps = (
+        ("Яндекс Карты", "https://yandex.ru/maps/org/garage_team/1717867618/reviews/"),
+        ("2ГИС", "https://2gis.ru/n_novgorod/firm/70000001025313502/tab/reviews"),
+        ("Google Карты", "https://www.google.com/maps/place/Garage+Team/@56.32873,44.02752,17z/data=!4m6!3m5!1s0x4151d442da47c763:0x80046154e3b82616!8m2!3d56.3293555!4d44.0261372!16s%2Fg%2F11fxd_sl96?hl=ru"),
+    )
+    links = "".join(
+        f'<li><a href="{esc(url)}">{label}<span aria-hidden="true">↗</span></a></li>'
+        for label, url in maps
+    )
+    return f"""<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Оцените нас | Garage Team</title>
+<meta name="description" content="Оставьте отзыв о визите в Garage Team на Красной Слободе в Нижнем Новгороде.">
+<link rel="canonical" href="{D.SITE_URL}/otzyv/">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/assets/css/site.css?v={esc(D.ASSET_VERSION.get('css', ''))}">
+</head><body class="review-invite">
+<main class="review-invite__card">
+  <a class="review-invite__logo" href="/" aria-label="Garage Team — главная"><img src="/assets/logo/logo.svg" width="133" height="48" alt="Garage Team"></a>
+  <h1>Оцените нас</h1>
+  <p>Как прошёл ваш визит? Оставьте отзыв на удобной для вас карте.</p>
+  <ul aria-label="Где оставить отзыв">{links}</ul>
+  <address>Нижний Новгород · ул. Красная Слобода, 9</address>
+</main></body></html>"""
+
+
 def render_moya_mashina():
     crumbs = [("Главная", "/"), (knizhka.H1, None)]
     hero = page_hero(knizhka.H1, crumbs, eyebrow=knizhka.EYEBROW, lead=esc(knizhka.LEAD), aside=phone_aside("Заказать звонок"),
@@ -342,6 +370,7 @@ PAGES = {
     "/call/manager/": render_call_manager,
     "/page/soglashenie/": render_soglashenie,
     "/otzyvy.html": render_otzyvy,
+    "/otzyv/": render_review_invite,
     "/slovar/": slovar.render,
     knizhka.PATH: render_moya_mashina,
     "/404.html": render_404,

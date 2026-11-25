@@ -22,6 +22,7 @@ from build import data as D  # noqa: E402
 from build import fonar, kraska, neon  # noqa: E402
 from build.css_tools import guard_hover  # noqa: E402
 from build.home import render_home  # noqa: E402
+from build.office_tour import office_tour  # noqa: E402
 from build.images import make_logo_assets, process_images  # noqa: E402
 from build.services import render_service, render_services_index  # noqa: E402
 from build.static_pages import PAGES  # noqa: E402
@@ -93,6 +94,7 @@ def main(verbose=False):
     shutil.copytree(SRC / "assets" / "fonts", DIST / "assets" / "fonts")
     (DIST / "assets" / "logo").mkdir(parents=True)
     shutil.copy(SRC / "assets" / "logo" / "logo.svg", DIST / "assets" / "logo" / "logo.svg")
+    shutil.copytree(SRC / "assets" / "tour", DIST / "assets" / "tour")
     make_logo_assets(SRC / "assets" / "logo" / "mark.png", DIST)
     n_img, img_bytes = process_images(SRC / "assets" / "img", DIST / "assets" / "img", verbose=verbose)
 
@@ -111,6 +113,7 @@ def main(verbose=False):
     # pages
     urls = []
     write("/", render_home()); urls.append("/")
+    write("/tour/", office_tour()); urls.append("/tour/")
     write("/services.html", render_services_index()); urls.append("/services.html")
     for svc in D.SERVICES:
         write(svc["path"], render_service(svc)); urls.append(svc["path"])

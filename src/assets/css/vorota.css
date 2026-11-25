@@ -22,7 +22,7 @@
 .gate { position: relative; background: var(--black); --gate-run: 140svh; }
 .gate__stage {
   /* the photo box: aspect ratio of the photo, covers the stage, the gate kept near the middle (--fx/--fy) */
-  --ar: 1.3333; --fx: 0.72; --fy: 0.6;
+  --ar: 1.77778; --fx: 0.72; --fy: 0.6;
   position: relative; overflow: hidden; container-type: size;
   height: clamp(560px, calc(100svh - var(--header-h)), 900px);
   background: var(--black);
@@ -37,13 +37,15 @@
 
 /* everything drawn over the photo is placed in % of the photo box (inline styles from build/vorota.py) */
 .gate__art { position: absolute; inset: 0; pointer-events: none; }
-.gate__art--tall { display: none; }
+.gate__art--tablet, .gate__art--tall { display: none; }
 .gate__dusk { position: absolute; inset: 0; width: 100%; height: 100%; }
 .gate__sign-dim { opacity: 0; }
 .gate__sign-lit { fill: #ffe7a8; fill-opacity: 0.12; }   /* the lit board: a warm wash over the painted sign */
 .gate__glow { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 215, 140, 0.34), rgba(255, 207, 138, 0.12) 55%, rgba(255, 207, 138, 0) 100%); }
 .gate__spill { position: absolute; clip-path: var(--clip); background: linear-gradient(180deg, rgba(255, 222, 170, 0.24), rgba(255, 207, 138, 0.07) 60%, rgba(255, 207, 138, 0) 100%); }
 .gate__opening { position: absolute; overflow: hidden; clip-path: var(--clip); }
+/* The photographed shutter is closed. Reveal the real workshop behind the moving slats. */
+.gate--scroll .gate__opening { background: #121411 url('/assets/img/real/workshop-800.webp') center / cover no-repeat; }
 .gate__shutter {
   position: absolute; inset: 0; transform: translateY(-100%);
   background:
@@ -125,11 +127,16 @@
   .gate__remote { bottom: 1rem; width: 52px; padding: 4px 4px 0.7rem; gap: 0.55rem; }
   .gate__remote-meter { height: 34px; }
 }
+@media (max-width: 1050px) {
+  .gate__stage { --ar: 1.33333; }
+  .gate__art--wide { display: none; }
+  .gate__art--tablet { display: block; }
+}
 /* phones held upright: the tall photo, the copy over the sky; the gate fills the right part of the frame,
    so the remote hangs on the wall to the left of it (in landscape the wide photo stays, as on desktops) */
 @media (max-width: 700px) and (orientation: portrait) {
   .gate__stage { --ar: 0.75; --fx: 0.66; --fy: 0.5; height: clamp(560px, calc(100svh - var(--header-h)), 820px); }
-  .gate__art--wide { display: none; }
+  .gate__art--tablet { display: none; }
   .gate__art--tall { display: block; }
   .gate__veil { background:
     linear-gradient(180deg, rgba(7, 8, 7, 0.92) 0%, rgba(7, 8, 7, 0.7) 24%, rgba(7, 8, 7, 0.25) 40%, rgba(7, 8, 7, 0) 50%),

@@ -136,3 +136,5 @@
 #inside .arch__wall { opacity: 0.45; }
 #inside .arch__bars { display: none; }
 #inside .arch__veil { opacity: 0.08; }
+
+.inside__tour { margin-top: clamp(1.5rem, 4vw, 3rem); }
